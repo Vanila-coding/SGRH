@@ -61,10 +61,11 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
   // (Mon dossier, Mes congés...) lisent le dossier du COMPTE CONNECTÉ lui-même — un compte
   // ADMIN_RH/SUPERADMIN n'a pas de fiche personnel associée, quelle que soit la permission
   // qu'on lui accorderait, les afficher pour lui n'aurait jamais rien de cohérent à montrer.
-  const estPersonnel = user?.role === 'PE' || user?.role === 'PAT';
+  const ROLES_ESPACE_PERSONNEL = ['PE', 'PAT', 'SECRETAIRE_PE', 'SECRETAIRE_PAT'];
+  const estPersonnel = ROLES_ESPACE_PERSONNEL.includes(user?.role);
   const cheminsIntrinseques = new Set(intrinseque.flatMap((g) => g.items.map((i) => i.path)));
   const itemsSupplementaires = !estPersonnel || loading ? [] : Object.entries(menuConfig)
-    .filter(([role]) => role !== 'PE' && role !== 'PAT')
+    .filter(([role]) => !ROLES_ESPACE_PERSONNEL.includes(role))
     .flatMap(([, groupes]) => groupes.flatMap((g) => g.items))
     .filter((item, index, tous) => (
       item.permission
@@ -143,7 +144,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
               if (!group.title || group.items.length === 1) {
                 const { label, path, icon: Icon } = group.items[0];
                 return (
-                  <NavLink key={`${groupIndex}-${path}`} to={path} onClick={onClose} className={classeLien}>
+                  <NavLink key={`${groupIndex}-${path}`} to={path} end onClick={onClose} className={classeLien}>
                     <Icon size={18} />
                     {libellesMenu[label] || label}
                   </NavLink>
@@ -177,7 +178,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
                     <div className="min-h-0 overflow-hidden">
                       <div className="space-y-1 pt-1 pb-1">
                         {group.items.map(({ label, path, icon: Icon }) => (
-                          <NavLink key={path} to={path} onClick={onClose} className={classeLien}>
+                          <NavLink key={path} to={path} end onClick={onClose} className={classeLien}>
                             <Icon size={18} />
                             {libellesMenu[label] || label}
                           </NavLink>

@@ -111,7 +111,13 @@ export default function Corbeille() {
         </div>
       ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        {items.map((item) => (
+        {items.map((item) => {
+          // Un compte utilisateur (`archiveAndDeleteCompte`) est archivé avec ses données
+          // liées (congés, notifications...) : l'utilisateur lui-même est imbriqué sous
+          // `donnees.user`. Les autres types (`personnel_modifie`...) stockent la ligne
+          // directement à plat sous `donnees`.
+          const donnees = item.type_element === 'compte' ? item.donnees?.user : item.donnees;
+          return (
           <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -119,9 +125,9 @@ export default function Corbeille() {
                   {TYPE_LABELS[item.type_element] || item.type_element}
                 </span>
                 <span className="text-sm text-navy dark:text-gray-100 font-medium">
-                  {item.donnees?.email || `#${item.donnees?.id}`}
+                  {donnees?.email || `#${donnees?.id}`}
                 </span>
-                <span className="text-xs text-gray-400 ml-2">— {item.donnees?.role}</span>
+                <span className="text-xs text-gray-400 ml-2">— {donnees?.role}</span>
               </div>
 
               <div className="flex gap-2">
@@ -160,7 +166,8 @@ export default function Corbeille() {
               Supprimé par {item.supprime_par_email || 'système'} le {new Date(item.supprime_le).toLocaleString('fr-FR')}
             </p>
           </div>
-        ))}
+          );
+        })}
       </div>
       )}
     </div>

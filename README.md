@@ -24,13 +24,14 @@ Navigateur → React 19 / Vite / Tailwind → API REST Express → services → 
 
 ## Rôles et fonctionnalités
 
-Les rôles confirmés dans le code sont `SUPERADMIN`, `ADMIN_RH`, `PE` et `PAT`. Les permissions sont stockées en base, chargées dans `PermissionContext`, puis vérifiées une seconde fois par le middleware Express `requirePermission`.
+Les rôles confirmés dans le code sont `SUPERADMIN`, `ADMIN_RH`, `PE`, `PAT`, `SECRETAIRE_PE` et `SECRETAIRE_PAT`. Les permissions sont stockées en base, chargées dans `PermissionContext`, puis vérifiées une seconde fois par le middleware Express `requirePermission`.
 
 | Rôle | Capacités confirmées |
 | --- | --- |
-| `SUPERADMIN` | Reçoit exactement le menu Admin RH, plus un bloc exclusif : gestion des comptes, désactivation/réactivation, corbeille, rôles & permissions, apparence du site. |
-| `ADMIN_RH` | Tableau de bord, personnel (avec résumé des effectifs PE/PAT), **directions & services** (`manage_organisation`), import/export Excel, invitations, comptes en attente, envoi de notifications, fonctions, carrière, situation administrative, **contrats**, congés, documents administratifs, demandes de documents et audit/journal. |
+| `SUPERADMIN` | Reçoit exactement le menu Admin RH, plus un bloc exclusif : gestion des comptes, désactivation/réactivation, corbeille, rôles & permissions, apparence du site. Sert aussi de repli anti-blocage pour la vérification secrétariat (voir ci-dessous) si aucun secrétaire n'a encore été désigné pour une catégorie. |
+| `ADMIN_RH` | Tableau de bord, personnel scindé en **PE** (Personnel Enseignant) et **PAT** (Personnel Administratif et Technique) — une même fiche peut porter les deux rôles à la fois —, **établissements** (`manage_etablissements`, gestion par le Superadmin/RH avec désactivation plutôt que suppression physique), **directions & services** (`manage_organisation`), import/export Excel, invitations, comptes en attente, envoi de notifications, fonctions, carrière, situation administrative, **contrats**, congés, documents administratifs, demandes de documents et audit/journal. |
 | `PE` / `PAT` | Tableau de bord, mon dossier (profil), carrière, **mes contrats**, congés & absences, mes documents, notifications, aide et paramètres. Le profil/les paramètres restent accessibles uniquement via le menu utilisateur de la TopBar, pas dans la sidebar. |
+| `SECRETAIRE_PE` / `SECRETAIRE_PAT` | Même espace personnel que PE/PAT (la promotion, depuis Gestion des comptes, change uniquement `users.role` — pas la fiche personnel), plus un bloc « Secrétariat » : vérifie les demandes de congé et de documents de sa catégorie avant transmission au RH (jamais de décision finale, seulement un filtre avec renvoi motivé possible). |
 
 Fonctionnalités effectivement implémentées : connexion JWT, changement/réinitialisation de mot de passe, OTP e-mail, inscription par matricule avec validation, fiches personnel, recherche/filtres/tri, import/export Excel, liens d'inscription, invitations, **congés (droits à 2,5 jours par mois de service, reliquat cumulé, suivi par année, soldes d'ouverture)**, **documents de congé (fiche de demande avec QR de vérification, décision d'octroi, état de congé)**, carrière, **situation administrative (avec motif, une seule situation ouverte à la fois — garantie par la base —, contrôle de chevauchement sur tout l'historique, modification, et suppression limitée à la situation en cours)**, **gestion complète des contrats** (import PDF, historique, renouvellement avec renégociation, non-renouvellement motivé, avenants, alerte d'échéance à 183 jours puis notification d'expiration), notifications ciblées **avec lien de navigation direct et « tout marquer comme lu »**, comptes, permissions, **suppression de compte réversible via une corbeille transactionnelle**, historique et personnalisation de textes/couleurs/préférences d'affichage.
 
@@ -97,7 +98,7 @@ La page `/parametres` regroupe cinq catégories filtrées par rôle et permissio
 
 La route `/profil` (« Mon dossier » dans la navigation) présente le dossier de la personne connectée : une bannière d'identité (photo, statut, matricule/fonction/catégorie), puis deux grilles d'informations personnelles et administratives, puis le parcours professionnel. Les données proviennent de `GET /api/personnel/me` et `GET /api/carriere/me` ; toute donnée absente est affichée comme « Non renseigné ».
 
-**Liste du personnel** (`/admin/personnel`) : trois cartes de résumé (personnel total, enseignants PE, personnel administratif et technique PAT), calculées côté client sur la liste complète — indépendantes des filtres de recherche du tableau. Un lien « Gérer les directions & services » (visible avec `manage_organisation`) mène à la gestion de l'organisation.
+**Personnel scindé PE / PAT** : la sidebar « Personnel » propose désormais quatre entrées — **PE** (`/admin/personnel/pe`, nouveau tableau : nom, matricule, établissement, corps/catégorie, diplôme, spécialité, statut du compte), **PAT** (`/admin/personnel`, tableau existant inchangé — recherche, filtres, import/export Excel, carte de résumé), **Directions & services** (`manage_organisation`) et **Établissements** (`/admin/personnel/etablissements`, `manage_etablissements` : liste, création, activer/désactiver — jamais de suppression physique, pour préserver l'historique des PE qui y sont/étaient rattachés). Une même fiche peut porter les deux rôles PE et PAT à la fois (`personnel_roles`, migration `018`) : elle apparaît alors sur les deux tableaux, et sa fiche affiche un badge « Catégorie » combiné (ex. « PAT + PE ») plutôt qu'un rôle unique. Le tableau PE est peuplé de 199 enseignants réels de l'Université de Mahajanga, récupérés depuis l'API publique de FOSIKA (`fosika.mesupres.mg`) — email et téléphone n'y sont pas fournis, remplacés par un placeholder explicite (`pe.<matricule>@a-completer.local`, `+261 00 00 000 00`) à compléter par la RH via « Modifier la fiche ». Le champ **prénom** est désormais optionnel (nom obligatoire) : une partie du personnel malgache n'a légitimement qu'un seul nom.
 
 **Sélection du personnel par recherche** (`client/src/components/PersonnelSearchSelect.jsx`) : sur Carrière, Fonctions, Contrats et Documents administratifs, le `<select>` qui obligeait à faire défiler tout l'effectif pour trouver quelqu'un est remplacé par un champ de recherche (nom, prénom ou matricule) avec liste déroulante filtrée, navigable au clavier (flèches, Entrée, Échap) et accessible (`role="combobox"`/`listbox`, `aria-activedescendant`). `GET /api/users` renvoie désormais aussi `matricule`, `nom`, `prenom` (additif, nécessaire pour que Fonctions — qui liste des comptes, pas des fiches personnel — soit cherchable de la même façon). Demandes de documents garde une liste de cartes (pas une sélection) mais gagne le même filtre par nom/matricule au-dessus de la grille. Ces cinq pages ne sont plus limitées en largeur (`max-w-*` retiré) : elles utilisent l'espace jusqu'au plafond de `AppShell` (1600px) ; les autres pages admin gardent leur largeur actuelle, volontairement inchangée (dossier/formulaire de type « lecture » ou action ponctuelle, où une colonne plus étroite reste plus lisible).
 
@@ -172,13 +173,18 @@ La réponse fournit notamment `a_un_compte`, qui indique si une fiche est relié
 ```text
 Personnel → formulaire → POST /api/conges  (permission create_conge)
 → une transaction verrouille la fiche : recharge des droits manquants, contrôles, création, débit
+→ vérification secrétariat : POST /api/conges/:id/review-secretariat (permission review_conges_secretariat)
+  — SECRETAIRE_PE/SECRETAIRE_PAT de la catégorie du demandeur, ADMIN_RH/SUPERADMIN en repli
+  — filtre uniquement (pièces, cohérence) ; refus = fin de la demande, jamais vue par le RH
 → validateur = chef de service (même service) ou responsable de direction, sinon les Admin RH sont notifiés
 → avis intermédiaire : POST /api/conges/:id/review-intermediaire (validateur assigné uniquement)
 → décision finale : POST /api/conges/:id/review (permission view_conges_admin)
 → refus : restitution unique des jours ; notification au demandeur + activity_log
 ```
 
-Le détail d'une demande est accessible à son propriétaire, à son validateur assigné et aux `ADMIN_RH`/`SUPERADMIN`. Chaque changement de statut est conditionnel (« en attente » uniquement) : rejouer ou doubler une décision ne peut pas restituer les jours deux fois.
+Le détail d'une demande est accessible à son propriétaire, à son validateur assigné, aux `ADMIN_RH`/`SUPERADMIN` et au secrétariat de sa catégorie. Chaque changement de statut est conditionnel (« en attente » uniquement) : rejouer ou doubler une décision ne peut pas restituer les jours deux fois.
+
+**Vérification secrétariat** (`decision_secretariat`, colonne séparée de `decision_intermediaire`/`avis_chef_service`) : étape ajoutée avant le circuit ci-dessus, sans le modifier — la notification du validateur/RH, envoyée à la création avant cette fonctionnalité, ne part désormais qu'une fois le secrétariat satisfait. Même principe pour les demandes de documents (`GET /api/documents/demandes/en-attente-secretariat`, `POST /api/documents/demandes/:id/review-secretariat`) : la file RH (`GET /api/documents/demandes/en-attente`) exclut ce qui n'est pas encore vérifié. Un compte Secrétaire est un compte PE/PAT existant **promu** (`PATCH /api/account-admin/:id/role`, réversible, transitions strictement `PE⇄SECRETAIRE_PE`/`PAT⇄SECRETAIRE_PAT`) — sa fiche personnel ne change jamais.
 
 ### Droits à congé
 
@@ -301,7 +307,8 @@ Les réponses sont JSON, sauf l'export Excel et le téléchargement de documents
 
 | Méthode | URL | Accès | Objectif |
 | --- | --- | --- | --- |
-| GET / POST | `/api/personnel` | `view_personnel` / `create_personnel` | Liste ou crée une fiche. |
+| GET / POST | `/api/personnel` | `view_personnel` / `create_personnel` | Liste ou crée une fiche ; chaque fiche renvoie `roles` (tableau `PE`/`PAT`, une personne peut avoir les deux) et, si PE, `etablissement_id`/`etablissement_nom`/`corps_pe`/`diplome`/`specialite`. Création/modification acceptent `roles: []` (au moins un requis) et `peInfos: {}` (établissement, corps, diplôme, spécialité). |
+| GET / POST / PATCH | `/api/etablissements`, `/:id/desactiver`, `/:id/reactiver` | `view_personnel` (lecture) / `manage_etablissements` (écriture) | Établissements auxquels rattacher un PE ; désactivation seulement, jamais de suppression physique. |
 | GET | `/api/personnel/me` | `view_profil` | Fiche de l'utilisateur courant. |
 | PATCH | `/api/personnel/me/photo` | `view_profil` | Enregistre la photo personnelle multipart `photo` (JPG/PNG/WebP, 3 Mo maximum). |
 | GET | `/api/personnel/sans-compte` | `send_registration_link` | Personnel sans compte. |
@@ -309,6 +316,7 @@ Les réponses sont JSON, sauf l'export Excel et le téléchargement de documents
 | GET / POST | `/api/personnel/export`, `/api/personnel/import` | `view_personnel` / `create_personnel` | Export Excel / import multipart `file` (5 Mo maximum). |
 | GET / POST | `/api/pending-accounts`, `/:id/approve`, `/:id/reject` | `view_pending_accounts` | Liste et traite les comptes en attente. |
 | GET / POST / DELETE | `/api/account-admin`, `/:id/deactivate`, `/:id/reactivate`, `/:id` | `manage_accounts` | Gestion des comptes ; la suppression est transactionnelle et réversible (voir Backend et sécurité). |
+| PATCH | `/api/account-admin/:id/role` | `manage_accounts` | Promeut/rétrograde un compte en secrétaire de sa catégorie — transitions strictement limitées à `PE⇄SECRETAIRE_PE`/`PAT⇄SECRETAIRE_PAT`, jamais `ADMIN_RH`/`SUPERADMIN`. |
 | POST | `/api/invitations` | `ADMIN_RH` | Invitation avec e-mail, rôle, fonction, matricule. |
 | GET | `/api/invitations/pending` | `ADMIN_RH` | Invitations soumises. |
 | GET / POST | `/api/invitations/:token`, `/:token/submit` | Public | Lecture et soumission d'invitation. |
@@ -323,6 +331,7 @@ Les réponses sont JSON, sauf l'export Excel et le téléchargement de documents
 | GET | `/api/conges/solde` | `view_mes_conges` | Solde disponible, droits de l'année, reliquat, jours posés (calculés par le backend). |
 | GET | `/api/conges/pending-equipe` | Authentifié (validateur) | Demandes de son équipe en attente d'avis. |
 | POST | `/api/conges/:id/review-intermediaire` | Validateur assigné | Avis intermédiaire du chef de service (un refus restitue les jours). |
+| GET / POST | `/api/conges/pending-secretariat`, `/:id/review-secretariat` | `review_conges_secretariat` | File et vérification secrétariat (filtre avant le circuit ci-dessus) — `SECRETAIRE_PE`/`SECRETAIRE_PAT` ne voient que leur catégorie, `ADMIN_RH`/`SUPERADMIN` voient tout (repli anti-blocage). |
 | GET / POST | `/api/conges/:id`, `/:id/review` | Propriétaire/validateur/Admin RH / `view_conges_admin` | Détail (avec QR d'avis si favorable) et décision finale. |
 | GET | `/api/conges/suivi/:personnelId` | `view_conges_admin` | Solde enregistré et disponible, droits de l'année, reliquat, jours posés, restant par année, congés historiques (avec « décision établie »). |
 | POST | `/api/conges/ouverture/:personnelId` | `view_conges_admin` | Saisie des soldes d'ouverture par année (409 si année existante ou solde non ventilé non confirmé). |
@@ -378,7 +387,8 @@ Les réponses sont JSON, sauf l'export Excel et le téléchargement de documents
 | GET | `/api/documents/:id` | Authentifié (propriétaire ou `manage_documents`) | Détail d'un document généré, pour affichage/impression. |
 | POST | `/api/documents/demandes` | `demander_document` | Le personnel demande un document (type + motif optionnel). |
 | GET | `/api/documents/demandes/me` | `demander_document` | Ses propres demandes. |
-| GET | `/api/documents/demandes/en-attente` | `manage_documents` | Demandes en attente de traitement RH. |
+| GET | `/api/documents/demandes/en-attente` | `manage_documents` | Demandes en attente de traitement RH (déjà vérifiées par le secrétariat). |
+| GET / POST | `/api/documents/demandes/en-attente-secretariat`, `/:id/review-secretariat` | `review_documents_secretariat` | File et vérification secrétariat, avant la file RH ci-dessus — mêmes règles de catégorie/repli que pour les congés. |
 | POST | `/api/documents/demandes/:id/traiter` | `manage_documents` | Génère le document et clôt la demande. |
 | POST | `/api/documents/demandes/:id/refuser` | `manage_documents` | Refuse la demande sans générer de document. |
 
@@ -447,14 +457,20 @@ erDiagram
     LIGNES_GRILLE_INDICIAIRE ||--o{ CARRIERE_EVENEMENTS : "indice résolu"
     PERSONNEL ||--o{ ALERTES_AVANCEMENT : "concerne"
     CARRIERE_EVENEMENTS ||--o| ALERTES_AVANCEMENT : "résout"
+    PERSONNEL ||--o{ PERSONNEL_ROLES : "porte (PE et/ou PAT)"
+    PERSONNEL ||--o| PERSONNEL_PE_INFOS : "infos PE (si rôle PE)"
+    ETABLISSEMENTS ||--o{ PERSONNEL_PE_INFOS : "rattache"
 ```
 
 | Table / vue | Colonnes observées et rôle |
 | --- | --- |
-| `personnel` | `id`, matricule, identité, e-mail, rôle, fonction, corps, grade, service, direction, téléphone, contrat, échéance, `photo_profil`, `solde_conges` (`numeric(6,1)`, défaut 0) et `derniere_recharge_annee` (dernière année de droits créditée). Fiche RH ; matricule validé à six chiffres par l'application. `photo_profil` contient le chemin relatif de la photo, pas l'image elle-même. |
+| `personnel` | `id`, matricule, identité, e-mail, rôle, fonction, corps, grade, service, direction, téléphone, contrat, échéance, `photo_profil`, `solde_conges` (`numeric(6,1)`, défaut 0) et `derniere_recharge_annee` (dernière année de droits créditée). Fiche RH ; matricule validé à six chiffres par l'application. `photo_profil` contient le chemin relatif de la photo, pas l'image elle-même. La colonne `role` (valeur unique) reste présente et resynchronisée automatiquement, mais `personnel_roles` fait foi depuis la migration `018` : une personne peut porter PE et PAT à la fois. |
+| `personnel_roles` | `personnel_id`, `role` (`PE`/`PAT`), unique `(personnel_id, role)` — 0 à 2 lignes par personne. Migration `018`. |
+| `personnel_pe_infos` | `personnel_id` (clé primaire, `ON DELETE CASCADE`), `etablissement_id`, `corps_pe` (grade académique type FOSIKA — AES/MC/PT/PES..., sans rapport avec `personnel.corps` qui est un régime d'emploi EFA/ELD/Fonctionnaire), `categorie_libelle`, `diplome`, `specialite`. Une ligne par personne ayant le rôle PE ; supprimée si le rôle PE est retiré. Migration `018`. |
+| `etablissements` | `id`, `nom` (unique), `statut` (`ACTIF`/`INACTIF` — désactivation seulement, jamais de suppression physique pour préserver l'historique des PE qui y sont/étaient rattachés). Migration `018`. |
 | `users` | `id`, rôle, e-mail, `password_hash`, `personnel_id`, statut, création. Statuts observés : `pending`, `active`, `inactive`. |
 | `user_details` | Lecture jointe compte/personnel : identité, matricule, rôle, fonction, statut, e-mail et contrat. |
-| `conges` | Identifiant utilisateur, type, dates, motif, statut, relecteur, date/avis de revue, validateur intermédiaire, `solde_avant` / `solde_apres` (solde figé à la date de la demande). Statuts : `en_attente`, `approuvee`, `refusee`. |
+| `conges` | Identifiant utilisateur, type, dates, motif, statut, relecteur, date/avis de revue, validateur intermédiaire, `solde_avant` / `solde_apres` (solde figé à la date de la demande), `decision_secretariat`/`decision_secretariat_le`/`avis_secretariat` (vérification secrétariat, migration `019`, colonne séparée de `decision_intermediaire`). Statuts : `en_attente`, `approuvee`, `refusee`. |
 | `conges_droits_annuels` | Un droit par personnel et par année (`droit`, `libelle_periode` comme « 2016-2017 », `source` `CALCULE`/`OUVERTURE`, `reference`). Unique `(personnel_id, annee)`. |
 | `conges_imputations` | Jours d'un congé annuel imputés à une année de droit (`annee` `NULL` = solde d'ouverture non ventilé) ; supprimées avec le congé (cascade), restaurées par la corbeille. |
 | `conges_historiques` | Congés pris avant le SGRH (année de droit, dates, jours, `lieu_jouissance`), rattachés à `personnel` : un agent sans compte peut en avoir. |
@@ -473,7 +489,7 @@ erDiagram
 | `situations_administratives` | `personnel_id`, `type_situation_id`, `date_debut`, `date_fin` (une seule ligne par personnel avec `date_fin` nulle à la fois), `reference_decision`, justificatif (nom + chemin), `observations`, `motif` (migration `004`), auteur, date. |
 | `types_situation_administrative` | Catalogue : `code` (unique), `libelle`, `categories_concernees`. |
 | `documents_generes` | `personnel_id`, `type_document` (`certificat_administratif`/`lettre_confirmation`), `donnees` (JSONB — contenu libre du document, notamment son numéro), auteur, date. |
-| `demandes_documents` | `personnel_id`, `type_document`, `motif`, `statut` (`en_attente`/`traitee`/`refusee`), `document_id` une fois traitée, `traite_par`, dates de demande/traitement. |
+| `demandes_documents` | `personnel_id`, `type_document`, `motif`, `statut` (`en_attente`/`traitee`/`refusee`), `document_id` une fois traitée, `traite_par`, dates de demande/traitement, `decision_secretariat`/`decision_secretariat_le`/`avis_secretariat` (vérification secrétariat, migration `019`). |
 | `directions` | `nom` (unique), `responsable_personnel_id` (unique — une seule direction par responsable). |
 | `services` | `nom`, `direction_id`, `responsable_personnel_id` (unique) ; unicité de `(nom, direction_id)`. |
 | `categories_professionnelles` | `numero` (1 à 8, jamais 7, unique), `code` (unique), `appellation`, `niveau_diplome`. Référencée par `personnel.categorie_id`. |
@@ -482,7 +498,7 @@ erDiagram
 | `lignes_grille_indiciaire` | `grille_id`, `cadre`/`echelle`/`categorie`/`corps` (dimensions optionnelles selon le régime), `classe`, `echelon`, `indice` (entier), `code_grille_affichage` (générique, jamais `'FOP'` en dur), `source_texte`/`source_article` (obligatoires), validité temporelle. `CHECK` garantissant 2 échelons en classe exceptionnelle et 3 pour les 3 autres classes (Loi 2003-011 Art.46). |
 | `alertes_avancement` | `personnel_id`, `type`, `date_echeance_theorique`, `statut` (`OUVERTE`/`TRAITEE`/`IGNOREE`), `details` (JSONB, snapshot de la situation au moment du scan), `evenement_resultant_id`, `traite_par`/`traite_at`. Index unique partiel `(personnel_id, type) WHERE statut='OUVERTE'` pour l'anti-doublon. |
 
-Relations utilisées : `users.personnel_id → personnel.id`, `conges.user_id → users.id`, `notifications.sender_id/recipient_id → users.id`, `fonction_history.user_id/changed_by → users.id`, `carriere_evenements.personnel_id → personnel.id`, `role_permissions.permission_id → permissions.id`, les jetons de mot de passe vers `users.id`, `contrats.personnel_id → personnel.id`, `contrats.contrat_precedent_id → contrats.id`, `documents_contrat.contrat_id → contrats.id`, `situations_administratives.personnel_id → personnel.id`, `situations_administratives.type_situation_id → types_situation_administrative.id`, `documents_generes.personnel_id → personnel.id`, `demandes_documents.personnel_id → personnel.id`, `demandes_documents.document_id → documents_generes.id`, `services.direction_id → directions.id`, `directions.responsable_personnel_id`/`services.responsable_personnel_id → personnel.id`, `personnel.categorie_id → categories_professionnelles.id`, `lignes_grille_indiciaire.grille_id → grilles_indiciaires.id`, `personnel.ligne_grille_actuelle_id`/`carriere_evenements.ligne_grille_id → lignes_grille_indiciaire.id`, `alertes_avancement.personnel_id → personnel.id` et `alertes_avancement.evenement_resultant_id → carriere_evenements.id`.
+Relations utilisées : `users.personnel_id → personnel.id`, `conges.user_id → users.id`, `notifications.sender_id/recipient_id → users.id`, `fonction_history.user_id/changed_by → users.id`, `carriere_evenements.personnel_id → personnel.id`, `role_permissions.permission_id → permissions.id`, les jetons de mot de passe vers `users.id`, `contrats.personnel_id → personnel.id`, `contrats.contrat_precedent_id → contrats.id`, `documents_contrat.contrat_id → contrats.id`, `situations_administratives.personnel_id → personnel.id`, `situations_administratives.type_situation_id → types_situation_administrative.id`, `documents_generes.personnel_id → personnel.id`, `demandes_documents.personnel_id → personnel.id`, `demandes_documents.document_id → documents_generes.id`, `services.direction_id → directions.id`, `directions.responsable_personnel_id`/`services.responsable_personnel_id → personnel.id`, `personnel.categorie_id → categories_professionnelles.id`, `lignes_grille_indiciaire.grille_id → grilles_indiciaires.id`, `personnel.ligne_grille_actuelle_id`/`carriere_evenements.ligne_grille_id → lignes_grille_indiciaire.id`, `alertes_avancement.personnel_id → personnel.id` et `alertes_avancement.evenement_resultant_id → carriere_evenements.id`, `personnel_roles.personnel_id → personnel.id` (`ON DELETE CASCADE`), `personnel_pe_infos.personnel_id → personnel.id` (`ON DELETE CASCADE`), `personnel_pe_infos.etablissement_id → etablissements.id`.
 
 Toutes les clés étrangères vers `users.id` ont un comportement `ON DELETE` explicite depuis la migration `002` : `SET NULL` pour les colonnes qui ne font que référencer l'auteur d'une action (la ligne d'origine reste intacte), `CASCADE` pour les colonnes qui définissent le propriétaire d'une ligne (congés, historique de fonction, notifications reçues, jetons de reset) — dans ce dernier cas, le code applicatif sauvegarde ces lignes dans la corbeille avant suppression, sauf les jetons de reset qui n'ont aucune valeur de restauration.
 
@@ -507,6 +523,8 @@ Toutes les clés étrangères vers `users.id` ont un comportement `ON DELETE` ex
 | `015_conges_historiques_lieu.sql` | Ajoute `conges_historiques.lieu_jouissance`. | Non |
 | `016_widen_site_settings_value.sql` | `site_settings.value` passe de `VARCHAR(20)` à `VARCHAR(255)` (les couleurs `#RRGGBB` tenaient dans 20 caractères, pas un chemin de fichier logo/favicon). | Non |
 | `017_create_reclamations.sql` | Crée `reclamations`. | Non |
+| `018_create_pe_pat_multi_role.sql` | Crée `personnel_roles`, `etablissements`, `personnel_pe_infos` ; rétro-remplit `personnel_roles` depuis `personnel.role`. `personnel.role` conservé, non supprimé. | Non |
+| `019_add_secretariat_roles.sql` | Élargit `users_role_check` à `SECRETAIRE_PE`/`SECRETAIRE_PAT` ; ajoute `decision_secretariat`/`decision_secretariat_le`/`avis_secretariat` sur `conges` et `demandes_documents` ; rétro-approuve les lignes déjà existantes (jamais bloquées rétroactivement par la nouvelle étape). | Non |
 
 Elles sont réexécutables sans risque (`IF NOT EXISTS` / `DROP CONSTRAINT IF EXISTS` avant chaque `ADD`) et n'altèrent jamais de données existantes. Les migrations `012` (type de colonne et `DEFAULT`) et `011` (contrainte) modifient la définition d'une colonne ou d'une contrainte, sans toucher aux lignes.
 

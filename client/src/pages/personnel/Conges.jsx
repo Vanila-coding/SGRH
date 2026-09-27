@@ -121,7 +121,7 @@ export default function Conges() {
         {personnel && (
           <div className="grid grid-cols-2 gap-3 mb-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
             <ReadOnlyField label="Matricule" value={personnel.matricule} />
-            <ReadOnlyField label="Nom et prénom" value={`${personnel.prenom} ${personnel.nom}`} />
+            <ReadOnlyField label="Nom et prénom" value={[personnel.prenom, personnel.nom].filter(Boolean).join(' ')} />
             <ReadOnlyField label="Fonction" value={personnel.fonction} />
             <ReadOnlyField label="Corps / Grade" value={[personnel.corps, personnel.grade].filter(Boolean).join(' / ')} />
           </div>

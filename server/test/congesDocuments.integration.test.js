@@ -32,6 +32,9 @@ const annuelApprouve = async (a, jours = 15, debut = `${ANNEE}-11-02`) => {
   const [y, m, d] = debut.split('-').map(Number);
   const fin = new Date(Date.UTC(y, m - 1, d + jours - 1)).toISOString().slice(0, 10);
   const demande = await congeService.createDemande(a.userId, { typeConge: 'Congé annuel', dateDebut: debut, dateFin: fin, lieuJouissance: 'Lieu Test' });
+  // La demande démarre "en attente de vérification secrétariat" (nouvelle étape,
+  // hors périmètre de ces tests de décision/document) : on la fait avancer directement.
+  await pool.query(`UPDATE conges SET decision_secretariat = 'approuvee' WHERE id = $1`, [demande.id]);
   await congeService.reviewDemande(demande.id, 'approuvee', a.userId, 'ok');
   return demande;
 };
@@ -68,6 +71,7 @@ test('décision : refusée si le congé n\'est pas approuvé, pas annuel, d\'un 
   const attente = await congeService.createDemande(a.userId, { typeConge: 'Congé annuel', dateDebut: `${ANNEE}-11-02`, dateFin: `${ANNEE}-11-16` });
   await assert.rejects(documentService.generateDocument(a.personnelId, 'decision_conge', { congeId: attente.id }, a.userId), /approuvé/);
   const perm = await congeService.createDemande(a.userId, { typeConge: 'Permission', dateDebut: `${ANNEE}-12-01`, dateFin: `${ANNEE}-12-02` });
+  await pool.query(`UPDATE conges SET decision_secretariat = 'approuvee' WHERE id = ANY($1)`, [[attente.id, perm.id]]);
   await congeService.reviewDemande(perm.id, 'approuvee', a.userId, 'ok');
   await assert.rejects(documentService.generateDocument(a.personnelId, 'decision_conge', { congeId: perm.id }, a.userId), /congé annuel/);
   await congeService.reviewDemande(attente.id, 'approuvee', a.userId, 'ok');

@@ -18,9 +18,39 @@ async function findPending() {
   const result = await pool.query(
     `SELECT d.*, p.matricule, p.nom, p.prenom, p.email
      FROM demandes_documents d JOIN personnel p ON p.id = d.personnel_id
-     WHERE d.statut = 'en_attente' ORDER BY d.date_demande ASC`
+     WHERE d.statut = 'en_attente' AND d.decision_secretariat = 'approuvee'
+     ORDER BY d.date_demande ASC`
   );
   return result.rows;
+}
+
+// File du secrétariat : `roleCible` = 'PE' | 'PAT' pour un compte SECRETAIRE_*
+// (ne voit que sa catégorie), ou null pour ADMIN_RH/SUPERADMIN (repli anti-blocage).
+async function findPendingForSecretariat(roleCible) {
+  const conditions = [`d.decision_secretariat = 'en_attente'`];
+  const values = [];
+  if (roleCible) { values.push(roleCible); conditions.push(`u.role = $${values.length}`); }
+  const result = await pool.query(
+    `SELECT d.*, p.matricule, p.nom, p.prenom, p.email, u.role AS requester_role
+     FROM demandes_documents d
+     JOIN personnel p ON p.id = d.personnel_id
+     JOIN users u ON u.personnel_id = p.id
+     WHERE ${conditions.join(' AND ')}
+     ORDER BY d.date_demande ASC`,
+    values
+  );
+  return result.rows;
+}
+
+// Conditionnel : une seule décision secrétariat possible (protège contre un double
+// traitement, même motif que congeRepository.setDecisionIntermediaire).
+async function setDecisionSecretariat(id, decision, avis) {
+  const result = await pool.query(
+    `UPDATE demandes_documents SET decision_secretariat = $2, decision_secretariat_le = NOW(), avis_secretariat = $3
+     WHERE id = $1 AND decision_secretariat = 'en_attente' RETURNING *`,
+    [id, decision, avis || null]
+  );
+  return result.rows[0] || null;
 }
 
 async function findByPersonnel(personnelId) {
@@ -49,4 +79,7 @@ async function marquerRefusee(id, traitePar) {
   return result.rows[0];
 }
 
-module.exports = { create, findById, findPending, findByPersonnel, marquerTraitee, marquerRefusee };
+module.exports = {
+  create, findById, findPending, findByPersonnel, marquerTraitee, marquerRefusee,
+  findPendingForSecretariat, setDecisionSecretariat,
+};

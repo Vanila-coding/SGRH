@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPersonnel } from '../services/personnelApi';
 import { fetchDirections, fetchServices } from '../services/organisationApi';
 import { fetchCategories } from '../services/categorieApi';
+import { fetchEtablissements } from '../services/etablissementApi';
 import Modal from './ui/Modal';
 
 const FONCTIONS_PAR_ROLE = {
@@ -12,9 +13,10 @@ const CORPS_OPTIONS = ['EFA', 'ELD', 'Fonctionnaire'];
 const TYPES_CONTRAT = ['CDI', 'CDD', 'Vacataire', 'Stagiaire'];
 
 const empty = {
-  matricule: '', nom: '', prenom: '', email: '', role: 'PE', fonction: '',
+  matricule: '', nom: '', prenom: '', email: '', roles: ['PE'], fonction: '',
   corps: '', grade: '', poste: '', categorieId: '', service: '', direction: '', telephone: '', typeContrat: '',
   dateRecrutement: '', dateEcheanceContrat: '', contratPermanent: false,
+  etablissementId: '', corpsPe: '', diplome: '', specialite: '',
 };
 
 export default function AjouterEmployeModal({ onClose, onSuccess }) {
@@ -26,10 +28,17 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
   const [services, setServices] = useState([]);
   const [selectedDirectionId, setSelectedDirectionId] = useState('');
   const [categories, setCategories] = useState([]);
+  const [etablissements, setEtablissements] = useState([]);
+
+  const fonctionOptions = [...new Set([
+    ...(form.roles.includes('PE') ? FONCTIONS_PAR_ROLE.PE : []),
+    ...(form.roles.includes('PAT') ? FONCTIONS_PAR_ROLE.PAT : []),
+  ])];
 
   useEffect(() => {
     fetchDirections().then(setDirections).catch(() => setDirections([]));
     fetchCategories().then(setCategories).catch(() => setCategories([]));
+    fetchEtablissements().then((list) => setEtablissements(list.filter((e) => e.statut === 'ACTIF'))).catch(() => setEtablissements([]));
   }, []);
 
   useEffect(() => {
@@ -39,6 +48,14 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
 
   function update(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function toggleRole(role) {
+    setForm((prev) => {
+      const has = prev.roles.includes(role);
+      const roles = has ? prev.roles.filter((r) => r !== role) : [...prev.roles, role];
+      return { ...prev, roles, fonction: '' };
+    });
   }
 
   function handleDirectionChange(e) {
@@ -57,6 +74,11 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (form.roles.length === 0) {
+      setStatus('error');
+      setMessage('Sélectionne au moins un rôle (PE ou PAT).');
+      return;
+    }
     if (!/^[0-9]{6}$/.test(form.matricule)) {
       setStatus('error');
       setMessage('Le matricule doit contenir exactement 6 chiffres.');
@@ -69,8 +91,12 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
     }
     setStatus('loading');
     setMessage('');
+    const { etablissementId, corpsPe, diplome, specialite, ...rest } = form;
+    const peInfos = form.roles.includes('PE')
+      ? { etablissementId: etablissementId || null, corpsPe: corpsPe || null, diplome: diplome || null, specialite: specialite || null }
+      : undefined;
     try {
-      await createPersonnel({ ...form, categorieId: form.categorieId || null });
+      await createPersonnel({ ...rest, categorieId: form.categorieId || null, peInfos });
       setStatus('success');
       setMessage('Fiche personnel créée.');
       setTimeout(() => onSuccess?.(), 800);
@@ -110,23 +136,25 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prénom *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prénom</label>
             <input
-              type="text" required value={form.prenom}
+              type="text" value={form.prenom}
               onChange={(e) => update('prenom', e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rôle *</label>
-            <select
-              required value={form.role}
-              onChange={(e) => { update('role', e.target.value); update('fonction', ''); }}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
-            >
-              <option value="PE">PE</option>
-              <option value="PAT">PAT</option>
-            </select>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rôle(s) *</label>
+            <div className="flex items-center gap-4 h-[42px]">
+              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input type="checkbox" checked={form.roles.includes('PE')} onChange={() => toggleRole('PE')} className="w-4 h-4 accent-navy" />
+                PE
+              </label>
+              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input type="checkbox" checked={form.roles.includes('PAT')} onChange={() => toggleRole('PAT')} className="w-4 h-4 accent-navy" />
+                PAT
+              </label>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fonction</label>
@@ -136,7 +164,7 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
             >
               <option value="">--</option>
-              {FONCTIONS_PAR_ROLE[form.role].map((f) => <option key={f} value={f}>{f}</option>)}
+              {fonctionOptions.map((f) => <option key={f} value={f}>{f}</option>)}
             </select>
           </div>
           <div>
@@ -177,6 +205,47 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
               {categories.map((c) => <option key={c.id} value={c.id}>{c.code} — {c.appellation}</option>)}
             </select>
           </div>
+          {form.roles.includes('PE') && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Établissement (PE)</label>
+                <select
+                  value={form.etablissementId}
+                  onChange={(e) => update('etablissementId', e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
+                >
+                  <option value="">--</option>
+                  {etablissements.map((e) => <option key={e.id} value={e.id}>{e.nom}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Corps académique (PE)</label>
+                <input
+                  type="text" value={form.corpsPe}
+                  onChange={(e) => update('corpsPe', e.target.value)}
+                  placeholder="Ex. AES, MC, PT..."
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Diplôme (PE)</label>
+                <input
+                  type="text" value={form.diplome}
+                  onChange={(e) => update('diplome', e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Spécialité (PE)</label>
+                <input
+                  type="text" value={form.specialite}
+                  onChange={(e) => update('specialite', e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
+                />
+              </div>
+            </>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Direction</label>
             <select
@@ -194,7 +263,7 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
               value={services.find((s) => s.nom === form.service)?.id || ''}
               onChange={handleServiceChange}
               disabled={!selectedDirectionId}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy disabled:bg-gray-100"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"
             >
               <option value="">--</option>
               {services.map((s) => <option key={s.id} value={s.id}>{s.nom}</option>)}

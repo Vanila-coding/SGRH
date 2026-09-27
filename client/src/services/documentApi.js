@@ -63,6 +63,24 @@ export async function getDemandesEnAttente() {
   return data.demandes;
 }
 
+export async function getDemandesEnAttenteSecretariat() {
+  const res = await fetch(`${API_URL}/documents/demandes/en-attente-secretariat`, { headers: authHeaders() });
+  const data = await res.json();
+  if (!res.ok) throw makeApiError(res, data, 'Erreur de chargement');
+  return data.demandes;
+}
+
+export async function reviewDemandeSecretariat(id, decision, avis) {
+  const res = await fetch(`${API_URL}/documents/demandes/${id}/review-secretariat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ decision, avis }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw makeApiError(res, data, 'Échec');
+  return data;
+}
+
 export async function traiterDemande(id, donnees = {}) {
   const res = await fetch(`${API_URL}/documents/demandes/${id}/traiter`, {
     method: 'POST',

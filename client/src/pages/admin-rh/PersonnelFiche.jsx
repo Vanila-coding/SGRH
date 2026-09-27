@@ -142,7 +142,7 @@ export default function PersonnelFiche() {
             <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-white/80 sm:justify-start">
               <span>Matricule : {present(personnel.matricule)}</span>
               <span>Fonction : {present(personnel.fonction)}</span>
-              <span>Catégorie : {present(personnel.role)}</span>
+              <span>Catégorie : {present((personnel.roles?.length > 0 ? personnel.roles : [personnel.role].filter(Boolean)).join(' + '))}</span>
             </div>
           </div>
         </div>

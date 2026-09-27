@@ -22,9 +22,37 @@ async function findPending() {
     `SELECT c.*, ud.email, ud.nom, ud.prenom, ud.role
      FROM conges c JOIN user_details ud ON ud.id = c.user_id
      WHERE c.status = 'en_attente' AND c.decision_intermediaire != 'en_attente'
+       AND c.decision_secretariat = 'approuvee'
      ORDER BY c.created_at ASC`
   );
   return result.rows;
+}
+
+// File du secrétariat : `roleCible` = 'PE' | 'PAT' pour un compte SECRETAIRE_*
+// (ne voit que sa catégorie), ou null pour ADMIN_RH/SUPERADMIN (repli anti-blocage,
+// voient les deux catégories).
+async function findPendingForSecretariat(roleCible) {
+  const conditions = [`c.decision_secretariat = 'en_attente'`];
+  const values = [];
+  if (roleCible) { values.push(roleCible); conditions.push(`ud.role = $${values.length}`); }
+  const result = await pool.query(
+    `SELECT c.*, ud.email, ud.nom, ud.prenom, ud.role
+     FROM conges c JOIN user_details ud ON ud.id = c.user_id
+     WHERE ${conditions.join(' AND ')}
+     ORDER BY c.created_at ASC`,
+    values
+  );
+  return result.rows;
+}
+
+// Conditionnel comme setDecisionIntermediaire : une seule décision secrétariat possible.
+async function setDecisionSecretariat(id, decision, avis, db = pool) {
+  const result = await db.query(
+    `UPDATE conges SET decision_secretariat = $2, decision_secretariat_le = NOW(), avis_secretariat = $3
+     WHERE id = $1 AND decision_secretariat = 'en_attente' RETURNING *`,
+    [id, decision, avis || null]
+  );
+  return result.rows[0] || null;
 }
 
 async function findPendingForValidateur(validateurUserId) {
@@ -163,6 +191,7 @@ async function setJustificatif(id, filename, filePath) {
 module.exports = {
   create, findByUser, findPending, findPendingForValidateur, findById,
   updateStatus, setValidateur, setDecisionIntermediaire,
+  findPendingForSecretariat, setDecisionSecretariat,
   findRecent, findForMonth, findByIdWithDetails, countCongesAnnuelCetteAnnee,
   setJustificatif, sommeJoursAnnuelsAnnee, findApprouveesSansDecision,
 };

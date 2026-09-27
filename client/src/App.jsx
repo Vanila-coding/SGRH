@@ -23,8 +23,10 @@ import Procedures from './pages/aide/Procedures';
 import Reclamation from './pages/aide/Reclamation';
 import Dashboard from './pages/admin-rh/Dashboard';
 import Personnel from './pages/admin-rh/Personnel';
+import PersonnelPE from './pages/admin-rh/PersonnelPE';
 import PersonnelFiche from './pages/admin-rh/PersonnelFiche';
 import OrganisationRH from './pages/admin-rh/OrganisationRH';
+import Etablissements from './pages/admin-rh/Etablissements';
 import Invitations from './pages/admin-rh/Invitations';
 import ComptesEnAttente from './pages/admin-rh/ComptesEnAttente';
 import EnvoyerNotification from './pages/admin-rh/EnvoyerNotification';
@@ -36,6 +38,8 @@ import CongesAdmin from './pages/admin-rh/CongesAdmin';
 import DocumentsAdmin from './pages/admin-rh/DocumentsAdmin';
 import DemandesDocuments from './pages/admin-rh/DemandesDocuments';
 import Historique from './pages/admin-rh/Historique';
+import CongesSecretariat from './pages/secretariat/CongesSecretariat';
+import DemandesDocumentsSecretariat from './pages/secretariat/DemandesDocumentsSecretariat';
 import ComptesSuperadmin from './pages/superadmin/Comptes';
 import PermissionsSuperadmin from './pages/superadmin/Permissions';
 import CorbeilleSuperadmin from './pages/superadmin/Corbeille';
@@ -51,8 +55,12 @@ import MonEquipe from './pages/personnel/MonEquipe';
 import ValidationEquipe from './pages/personnel/ValidationEquipe';
 import MesDocuments from './pages/personnel/MesDocuments';
 
-const ALL_ROLES = ['ADMIN_RH', 'SUPERADMIN', 'PE', 'PAT'];
-const PE_PAT = ['PE', 'PAT'];
+const ALL_ROLES = ['ADMIN_RH', 'SUPERADMIN', 'PE', 'PAT', 'SECRETAIRE_PE', 'SECRETAIRE_PAT'];
+// Les routes en libre-service (mon dossier, mes congés, aide...) n'ont pas de prop
+// `permission` : `allowedRoles` y est le seul verrou. Un compte Secrétaire garde son
+// propre espace personnel (la promotion ne change que le rôle d'accès système, pas
+// son identité de personnel PE/PAT), d'où leur présence ici.
+const PE_PAT = ['PE', 'PAT', 'SECRETAIRE_PE', 'SECRETAIRE_PAT'];
 const ADMIN_OR_SUPERADMIN = ['ADMIN_RH', 'SUPERADMIN'];
 
 function App() {
@@ -141,6 +149,16 @@ function App() {
                     <AppShell title="Personnel" subtitle="Gestion des Ressources Humaines"><PersonnelFiche /></AppShell>
                   </ProtectedRoute>
                 } />
+                <Route path="/admin/personnel/pe" element={
+                  <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="view_personnel">
+                    <AppShell title="Personnel enseignant" subtitle="Gestion des Ressources Humaines"><PersonnelPE /></AppShell>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/personnel/etablissements" element={
+                  <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="manage_etablissements">
+                    <AppShell title="Établissements" subtitle="Gestion des Ressources Humaines"><Etablissements /></AppShell>
+                  </ProtectedRoute>
+                } />
                 <Route path="/admin/personnel" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="view_personnel">
                     <AppShell title="Personnel" subtitle="Gestion des Ressources Humaines"><Personnel /></AppShell>
@@ -204,6 +222,16 @@ function App() {
                 <Route path="/admin/historique" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="view_historique">
                     <AppShell title="Audit & journal" subtitle="Gestion des Ressources Humaines"><Historique /></AppShell>
+                  </ProtectedRoute>
+                } />
+                <Route path="/secretariat/conges" element={
+                  <ProtectedRoute allowedRoles={[...ADMIN_OR_SUPERADMIN, 'SECRETAIRE_PE', 'SECRETAIRE_PAT']} permission="review_conges_secretariat">
+                    <AppShell title="Congés à vérifier" subtitle="Secrétariat"><CongesSecretariat /></AppShell>
+                  </ProtectedRoute>
+                } />
+                <Route path="/secretariat/documents" element={
+                  <ProtectedRoute allowedRoles={[...ADMIN_OR_SUPERADMIN, 'SECRETAIRE_PE', 'SECRETAIRE_PAT']} permission="review_documents_secretariat">
+                    <AppShell title="Demandes de documents" subtitle="Secrétariat"><DemandesDocumentsSecretariat /></AppShell>
                   </ProtectedRoute>
                 } />
 

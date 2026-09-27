@@ -15,6 +15,24 @@ function jours(n) {
   return `${Number(n).toLocaleString('fr-FR')} jour(s)`;
 }
 
+// Vérification du secrétariat (pièces, cohérence) : une étape purement formelle, avant
+// même l'avis du chef de service — pas de QR ici, ce n'est pas une décision.
+function AvisSecretariat({ demande }) {
+  if (demande.decision_secretariat === 'approuvee') {
+    return (
+      <p className="text-xs">
+        <span className="font-semibold">Vérifié par le secrétariat</span>
+        {demande.decision_secretariat_le ? ` — le ${fmt(demande.decision_secretariat_le)}` : ''}
+        {demande.avis_secretariat ? ` (${demande.avis_secretariat})` : ''}
+      </p>
+    );
+  }
+  if (demande.decision_secretariat === 'refusee') {
+    return <p className="text-xs">Renvoyée par le secrétariat : {demande.avis_secretariat || 'motif non précisé'}</p>;
+  }
+  return <p className="text-xs">En attente de vérification par le secrétariat.</p>;
+}
+
 // Avis du chef de service : le QR (authentifiant, vérifiable publiquement) remplace la
 // signature quand l'avis est favorable ; en cas de refus, le motif le remplace.
 function AvisChefService({ demande }) {
@@ -123,7 +141,11 @@ export default function FicheDemande() {
           <p><span className="font-semibold underline">REMPLAÇANT(E)</span> : {demande.remplacant || '—'}</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-6 mt-10 text-sm">
+        <div className="mt-10 text-sm">
+          <AvisSecretariat demande={demande} />
+        </div>
+
+        <div className="grid grid-cols-2 gap-6 mt-4 text-sm">
           <div>
             <p className="font-semibold underline mb-8">AVIS DU CHEF DE SERVICE</p>
             <AvisChefService demande={demande} />

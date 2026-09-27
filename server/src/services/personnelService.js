@@ -12,9 +12,16 @@ async function createPersonnel(data, createdBy) {
   const existing = await personnelRepository.findByMatricule(data.matricule);
   if (existing) throw new Error('Ce matricule existe déjà');
 
-  const personnel = await personnelRepository.create(data);
+  const roles = Array.isArray(data.roles) && data.roles.length > 0 ? data.roles : (data.role ? [data.role] : []);
+  if (roles.length === 0) throw new Error('Au moins un rôle (PE ou PAT) est requis');
+
+  const personnel = await personnelRepository.create({ ...data, role: roles[0] });
+  await personnelRepository.setRoles(personnel.id, roles);
+  if (roles.includes('PE') && data.peInfos) {
+    await personnelRepository.upsertPeInfos(personnel.id, data.peInfos);
+  }
   await organisationRepository.syncResponsable(personnel.id, data.fonction, data.service, data.direction);
-  await activityLogRepository.create(createdBy, 'personnel_cree', `Fiche personnel créée : ${data.matricule} — ${data.nom} ${data.prenom}`);
+  await activityLogRepository.create(createdBy, 'personnel_cree', `Fiche personnel créée : ${data.matricule} — ${[data.nom, data.prenom].filter(Boolean).join(' ')}`);
   return personnel;
 }
 
@@ -79,6 +86,20 @@ async function updatePersonnel(id, data, updatedBy) {
   });
 
   await organisationRepository.syncResponsable(id, existing.fonction, updated.service, updated.direction);
+
+  // Rôles PE/PAT et informations PE optionnels dans cette mise à jour : absents,
+  // le rôle et les infos PE existants restent inchangés (comportement historique).
+  if (Array.isArray(data.roles)) {
+    const roles = await personnelRepository.setRoles(id, data.roles);
+    if (roles.includes('PE') && data.peInfos) {
+      await personnelRepository.upsertPeInfos(id, data.peInfos);
+    } else if (!roles.includes('PE')) {
+      await personnelRepository.removePeInfos(id);
+    }
+  } else if (data.peInfos) {
+    await personnelRepository.upsertPeInfos(id, data.peInfos);
+  }
+
   await activityLogRepository.create(updatedBy, 'personnel_modifie_par_rh', `Fiche personnel #${id} modifiée par le RH`);
 
   return updated;
@@ -113,7 +134,7 @@ function validateRow(row) {
   if (!/^[0-9]{6}$/.test(matricule)) return 'Matricule invalide (doit contenir exactement 6 chiffres)';
   if (!ROLES_VALIDES.includes(role)) return 'Rôle invalide (doit être PE ou PAT)';
   if (!email || !email.includes('@')) return 'Email invalide ou manquant';
-  if (!row.nom || !row.prenom) return 'Nom et prénom requis';
+  if (!row.nom) return 'Nom requis';
   return null;
 }
 
@@ -191,12 +212,13 @@ async function importFromRows(rows, importedBy) {
       const direction = row.direction ? String(row.direction).trim() : null;
       const carriereResolue = resoudreClasseEchelonImport(row);
 
+      const roleImporte = String(row.role).trim().toUpperCase();
       const personnel = await personnelRepository.create({
         matricule,
         nom: String(row.nom).trim(),
-        prenom: String(row.prenom).trim(),
+        prenom: row.prenom ? String(row.prenom).trim() : null,
         email,
-        role: String(row.role).trim().toUpperCase(),
+        role: roleImporte,
         fonction,
         corps: row.corps ? String(row.corps).trim() : null,
         grade: row.grade ? String(row.grade).trim() : null,
@@ -207,6 +229,7 @@ async function importFromRows(rows, importedBy) {
         classe: carriereResolue.classe, echelon: carriereResolue.echelon,
         indice: carriereResolue.indice, indiceNum: carriereResolue.indiceNum, indiceSource: carriereResolue.indiceSource,
       });
+      await personnelRepository.setRoles(personnel.id, [roleImporte]);
       await organisationRepository.syncResponsable(personnel.id, fonction, service, direction);
       if (carriereResolue.warning) {
         results.warnings.push({ line: lineNumber, reason: carriereResolue.warning });

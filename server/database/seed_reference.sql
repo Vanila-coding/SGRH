@@ -14,10 +14,12 @@ INSERT INTO roles (code, libelle) VALUES
   ('SUPERADMIN', 'Super administrateur'),
   ('ADMIN_RH', 'Administrateur RH'),
   ('PE', 'Personnel enseignant'),
-  ('PAT', 'Personnel administratif et technique')
+  ('PAT', 'Personnel administratif et technique'),
+  ('SECRETAIRE_PE', 'Secrétaire PE'),
+  ('SECRETAIRE_PAT', 'Secrétaire PAT')
 ON CONFLICT DO NOTHING;
 
--- permissions (28 lignes)
+-- permissions (31 lignes)
 INSERT INTO permissions (id, key, label, category) VALUES (1, 'view_dashboard_admin', 'Voir le tableau de bord Admin RH', 'Admin RH') ON CONFLICT DO NOTHING;
 INSERT INTO permissions (id, key, label, category) VALUES (2, 'view_personnel', 'Voir la liste du personnel', 'Admin RH') ON CONFLICT DO NOTHING;
 INSERT INTO permissions (id, key, label, category) VALUES (3, 'create_personnel', 'Ajouter un employé', 'Admin RH') ON CONFLICT DO NOTHING;
@@ -46,8 +48,11 @@ INSERT INTO permissions (id, key, label, category) VALUES (25, 'manage_parametre
 INSERT INTO permissions (id, key, label, category) VALUES (26, 'manage_organisation', 'Gérer les directions et services', 'Admin RH') ON CONFLICT DO NOTHING;
 INSERT INTO permissions (id, key, label, category) VALUES (27, 'signaler_probleme', 'Signaler un problème (réclamation)', 'Personnel') ON CONFLICT DO NOTHING;
 INSERT INTO permissions (id, key, label, category) VALUES (28, 'manage_reclamations', 'Gérer les réclamations du personnel', 'Superadmin') ON CONFLICT DO NOTHING;
+INSERT INTO permissions (id, key, label, category) VALUES (29, 'manage_etablissements', 'Gérer les établissements (PE)', 'Admin RH') ON CONFLICT DO NOTHING;
+INSERT INTO permissions (id, key, label, category) VALUES (30, 'review_conges_secretariat', 'Vérifier les demandes de congé (secrétariat)', 'Secrétariat') ON CONFLICT DO NOTHING;
+INSERT INTO permissions (id, key, label, category) VALUES (31, 'review_documents_secretariat', 'Vérifier les demandes de documents (secrétariat)', 'Secrétariat') ON CONFLICT DO NOTHING;
 
--- role_permissions (57 lignes)
+-- role_permissions (80 lignes)
 INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (80, 'SUPERADMIN', 1, true) ON CONFLICT DO NOTHING;
 INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (81, 'SUPERADMIN', 2, true) ON CONFLICT DO NOTHING;
 INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (82, 'SUPERADMIN', 3, true) ON CONFLICT DO NOTHING;
@@ -105,6 +110,32 @@ INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (133, 'AD
 INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (134, 'PE', 27, true) ON CONFLICT DO NOTHING;
 INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (135, 'PAT', 27, true) ON CONFLICT DO NOTHING;
 INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (136, 'SUPERADMIN', 28, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (152, 'ADMIN_RH', 29, true) ON CONFLICT DO NOTHING;
+-- Secrétaire PE / Secrétaire PAT : le socle personnel déjà accordé à PE/PAT (notifications,
+-- congés, profil, documents, réclamation) + les deux permissions de vérification secrétariat.
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (153, 'SECRETAIRE_PE', 7, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (154, 'SECRETAIRE_PAT', 7, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (155, 'SECRETAIRE_PE', 10, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (156, 'SECRETAIRE_PAT', 10, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (157, 'SECRETAIRE_PE', 11, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (158, 'SECRETAIRE_PAT', 11, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (159, 'SECRETAIRE_PE', 13, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (160, 'SECRETAIRE_PAT', 13, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (161, 'SECRETAIRE_PE', 20, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (162, 'SECRETAIRE_PAT', 20, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (163, 'SECRETAIRE_PE', 21, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (164, 'SECRETAIRE_PAT', 21, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (165, 'SECRETAIRE_PE', 22, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (166, 'SECRETAIRE_PAT', 22, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (167, 'SECRETAIRE_PE', 27, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (168, 'SECRETAIRE_PAT', 27, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (169, 'SECRETAIRE_PE', 30, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (170, 'SECRETAIRE_PAT', 31, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (171, 'SECRETAIRE_PAT', 30, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (172, 'SECRETAIRE_PE', 31, true) ON CONFLICT DO NOTHING;
+-- ADMIN_RH (héritée par SUPERADMIN) : repli anti-blocage si aucun secrétaire n'est encore désigné.
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (173, 'ADMIN_RH', 30, true) ON CONFLICT DO NOTHING;
+INSERT INTO role_permissions (id, role, permission_id, enabled) VALUES (174, 'ADMIN_RH', 31, true) ON CONFLICT DO NOTHING;
 
 -- categories_professionnelles (7 lignes)
 INSERT INTO categories_professionnelles (id, numero, code, appellation, niveau_diplome) VALUES (1, 1, 'CAT1', 'Sous-opérateur', 'CEPE') ON CONFLICT DO NOTHING;

@@ -163,6 +163,43 @@ CREATE INDEX idx_personnel_service ON personnel (service);
 CREATE INDEX idx_personnel_direction ON personnel (direction);
 CREATE INDEX idx_personnel_categorie ON personnel (categorie_id);
 
+-- Un même personnel peut être PE et/ou PAT en même temps : remplace personnel.role
+-- (valeur unique, conservée pour compatibilité mais plus considérée comme source de
+-- vérité) par 0 à 2 lignes ici.
+CREATE TABLE personnel_roles (
+  id           SERIAL PRIMARY KEY,
+  personnel_id INTEGER NOT NULL REFERENCES personnel(id) ON DELETE CASCADE,
+  role         VARCHAR(20) NOT NULL CHECK (role IN ('PE', 'PAT')),
+  created_at   TIMESTAMP NOT NULL DEFAULT now(),
+  CONSTRAINT personnel_roles_unique UNIQUE (personnel_id, role)
+);
+CREATE INDEX idx_personnel_roles_personnel ON personnel_roles (personnel_id);
+CREATE INDEX idx_personnel_roles_role ON personnel_roles (role);
+
+-- Établissements de l'université pour les PE, gérés par le Superadmin/RH. Désactivation
+-- (statut) plutôt que suppression physique, pour ne jamais perdre l'historique des
+-- enseignants qui y sont/étaient rattachés.
+CREATE TABLE etablissements (
+  id         SERIAL PRIMARY KEY,
+  nom        VARCHAR(200) NOT NULL,
+  statut     VARCHAR(20) NOT NULL DEFAULT 'ACTIF' CHECK (statut IN ('ACTIF', 'INACTIF')),
+  created_at TIMESTAMP NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX idx_etablissements_nom ON etablissements (nom);
+
+-- Informations propres aux PE — sans rapport avec corps/categorie_id sur `personnel`,
+-- qui décrivent le régime PAT (EFA/ELD/Fonctionnaire), pas les grades académiques.
+CREATE TABLE personnel_pe_infos (
+  personnel_id      INTEGER PRIMARY KEY REFERENCES personnel(id) ON DELETE CASCADE,
+  etablissement_id  INTEGER REFERENCES etablissements(id),
+  corps_pe          VARCHAR(20),
+  categorie_libelle VARCHAR(150),
+  diplome           VARCHAR(150),
+  specialite        VARCHAR(200),
+  updated_at        TIMESTAMP
+);
+CREATE INDEX idx_personnel_pe_infos_etablissement ON personnel_pe_infos (etablissement_id);
+
 CREATE TABLE users (
   id            SERIAL PRIMARY KEY,
   email         VARCHAR(150) UNIQUE,
@@ -434,9 +471,13 @@ CREATE TABLE conges (
   justificatif_path         VARCHAR(255),
   solde_avant               NUMERIC(6,1),
   solde_apres               NUMERIC(6,1),
+  decision_secretariat      VARCHAR(20) NOT NULL DEFAULT 'en_attente',
+  decision_secretariat_le   TIMESTAMP,
+  avis_secretariat          TEXT,
   CONSTRAINT conges_check CHECK (date_fin >= date_debut),
   CONSTRAINT conges_status_check CHECK (status IN ('en_attente', 'approuvee', 'refusee')),
   CONSTRAINT conges_decision_intermediaire_check CHECK (decision_intermediaire IN ('en_attente', 'approuvee', 'refusee', 'non_requise')),
+  CONSTRAINT conges_decision_secretariat_check CHECK (decision_secretariat IN ('en_attente', 'approuvee', 'refusee')),
   CONSTRAINT conges_type_conge_check CHECK (type_conge IN ('Congé annuel', 'Permission', 'Autorisation d''absence', 'Congé de maternité', 'Congé de paternité', 'Congé de maladie', 'Formation', 'Autres'))
 );
 CREATE INDEX idx_conges_user ON conges (user_id);
@@ -511,7 +552,11 @@ CREATE TABLE demandes_documents (
   traite_par      INTEGER REFERENCES users(id) ON DELETE SET NULL,
   date_demande    TIMESTAMP NOT NULL DEFAULT now(),
   date_traitement TIMESTAMP,
+  decision_secretariat    VARCHAR(20) NOT NULL DEFAULT 'en_attente',
+  decision_secretariat_le TIMESTAMP,
+  avis_secretariat        TEXT,
   CONSTRAINT demandes_documents_statut_check CHECK (statut IN ('en_attente', 'traitee', 'refusee')),
+  CONSTRAINT demandes_documents_decision_secretariat_check CHECK (decision_secretariat IN ('en_attente', 'approuvee', 'refusee')),
   CONSTRAINT demandes_documents_type_check CHECK (type_document IN ('certificat_administratif', 'lettre_confirmation', 'etat_conge'))
 );
 CREATE INDEX idx_demandes_documents_personnel ON demandes_documents (personnel_id);

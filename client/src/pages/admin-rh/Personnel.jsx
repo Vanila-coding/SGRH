@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, ChevronDown, ChevronUp, GraduationCap, Search, UserPlus, Users, Wrench, Download, Upload } from 'lucide-react';
+import { Building2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search, UserPlus, Wrench, Download, Upload } from 'lucide-react';
 import { listPersonnel, exportPersonnelExcel, importPersonnelExcel } from '../../services/personnelApi';
 import { getFonctionHistory } from '../../services/userApi';
 import AjouterEmployeModal from '../../components/AjouterEmployeModal';
@@ -12,7 +12,6 @@ import { SkeletonTable } from '../../components/ui';
 const COLUMNS = [
   { key: 'nom', label: 'Nom' },
   { key: 'fonction', label: 'Fonction' },
-  { key: 'role', label: 'Rôle' },
   { key: 'corps', label: 'Corps' },
   { key: 'service', label: 'Service' },
   { key: 'direction', label: 'Direction' },
@@ -20,9 +19,16 @@ const COLUMNS = [
   { key: 'statut', label: 'Statut' },
 ];
 
+const PAGE_SIZE = 10;
+
+// Page PAT (Personnel Administratif et Technique) — le tableau lui-même est inchangé
+// depuis avant la séparation PE/PAT, seul le rôle « Personnel » de la sidebar est
+// devenu un sous-menu avec un lien dédié PE (voir menuConfig.js) ; cette page ne montre
+// donc plus que les fiches ayant le rôle PAT (`roles.includes('PAT')`, pas seulement
+// l'ancien champ `role` unique, pour rester correct si une personne est aussi PE).
 export default function Personnel() {
   const { can } = usePermissions();
-  const [personnel, setPersonnel] = useState([]);
+  const [personnelBrut, setPersonnelBrut] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
   const [history, setHistory] = useState([]);
@@ -33,7 +39,6 @@ export default function Personnel() {
   const fileInputRef = useRef(null);
 
   const [search, setSearch] = useState('');
-  const [filterRole, setFilterRole] = useState('');
   const [filterFonction, setFilterFonction] = useState('');
   const [filterCorps, setFilterCorps] = useState('');
   const [filterService, setFilterService] = useState('');
@@ -42,15 +47,21 @@ export default function Personnel() {
   const [filterStatut, setFilterStatut] = useState('');
   const [sortKey, setSortKey] = useState('nom');
   const [sortAsc, setSortAsc] = useState(true);
+  const [page, setPage] = useState(1);
 
   async function load() {
     setLoading(true);
     try {
-      setPersonnel(await listPersonnel());
+      setPersonnelBrut(await listPersonnel());
     } finally {
       setLoading(false);
     }
   }
+
+  const personnel = useMemo(
+    () => personnelBrut.filter((p) => (p.roles || []).includes('PAT')),
+    [personnelBrut]
+  );
 
   useEffect(() => { load(); }, []);
 
@@ -90,19 +101,16 @@ export default function Personnel() {
 
   const uniqueValues = (key) => [...new Set(personnel.map((p) => p[key]).filter(Boolean))].sort();
 
-  // Résumé du personnel total (toujours sur la liste complète, indépendant des filtres
-  // ci-dessous : c'est un effectif, pas un résultat de recherche).
+  // Résumé du personnel PAT (toujours sur la liste PAT complète, indépendant des
+  // filtres ci-dessous : c'est un effectif, pas un résultat de recherche).
   const effectifs = useMemo(() => ({
-    total: personnel.length,
-    pe: personnel.filter((p) => p.role === 'PE').length,
-    pat: personnel.filter((p) => p.role === 'PAT').length,
+    pat: personnel.length,
   }), [personnel]);
 
   const filtered = useMemo(() => {
     let list = personnel.filter((p) => {
       const fullName = `${p.prenom || ''} ${p.nom || ''} ${p.matricule || ''}`.toLowerCase();
       if (search && !fullName.includes(search.toLowerCase())) return false;
-      if (filterRole && p.role !== filterRole) return false;
       if (filterFonction && p.fonction !== filterFonction) return false;
       if (filterCorps && p.corps !== filterCorps) return false;
       if (filterService && p.service !== filterService) return false;
@@ -125,7 +133,17 @@ export default function Personnel() {
     });
 
     return list;
-  }, [personnel, search, filterRole, filterFonction, filterCorps, filterService, filterDirection, filterContrat, filterStatut, sortKey, sortAsc]);
+  }, [personnel, search, filterFonction, filterCorps, filterService, filterDirection, filterContrat, filterStatut, sortKey, sortAsc]);
+
+  // Revenir à la première page dès que la recherche, un filtre ou le tri change,
+  // pour ne jamais se retrouver sur une page vide (ex. filtré à 3 résultats depuis la page 5).
+  useEffect(() => { setPage(1); }, [search, filterFonction, filterCorps, filterService, filterDirection, filterContrat, filterStatut, sortKey, sortAsc]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filtered, page]
+  );
 
   function handleSort(key) {
     if (sortKey === key) setSortAsc((prev) => !prev);
@@ -150,24 +168,6 @@ export default function Personnel() {
       <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Personnel' }]} title="Personnel" subtitle="Recherchez, filtrez et gérez les fiches du personnel" />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-5 flex items-center gap-4">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-navy/5 text-navy dark:bg-gold/10 dark:text-gold">
-            <Users size={20} aria-hidden="true" />
-          </span>
-          <div>
-            <p className="text-xs text-gray-400">Personnel total</p>
-            <p className="text-2xl font-bold text-navy dark:text-gray-100">{effectifs.total}</p>
-          </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-5 flex items-center gap-4">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-navy/5 text-navy dark:bg-gold/10 dark:text-gold">
-            <GraduationCap size={20} aria-hidden="true" />
-          </span>
-          <div>
-            <p className="text-xs text-gray-400">Enseignants (PE)</p>
-            <p className="text-2xl font-bold text-navy dark:text-gray-100">{effectifs.pe}</p>
-          </div>
-        </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-5 flex items-center gap-4">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-navy/5 text-navy dark:bg-gold/10 dark:text-gold">
             <Wrench size={20} aria-hidden="true" />
@@ -259,16 +259,15 @@ export default function Personnel() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <FilterSelect value={filterRole} onChange={setFilterRole} options={['PE', 'PAT']} placeholder="Rôle" />
           <FilterSelect value={filterFonction} onChange={setFilterFonction} options={uniqueValues('fonction')} placeholder="Fonction" />
           <FilterSelect value={filterCorps} onChange={setFilterCorps} options={uniqueValues('corps')} placeholder="Corps" />
           <FilterSelect value={filterService} onChange={setFilterService} options={uniqueValues('service')} placeholder="Service" />
           <FilterSelect value={filterDirection} onChange={setFilterDirection} options={uniqueValues('direction')} placeholder="Direction" />
           <FilterSelect value={filterContrat} onChange={setFilterContrat} options={uniqueValues('type_contrat')} placeholder="Type de contrat" />
           <FilterSelect value={filterStatut} onChange={setFilterStatut} options={['present', 'en_conge']} placeholder="Statut" />
-          {(search || filterRole || filterFonction || filterCorps || filterService || filterDirection || filterContrat || filterStatut) && (
+          {(search || filterFonction || filterCorps || filterService || filterDirection || filterContrat || filterStatut) && (
             <button
-              onClick={() => { setSearch(''); setFilterRole(''); setFilterFonction(''); setFilterCorps(''); setFilterService(''); setFilterDirection(''); setFilterContrat(''); setFilterStatut(''); }}
+              onClick={() => { setSearch(''); setFilterFonction(''); setFilterCorps(''); setFilterService(''); setFilterDirection(''); setFilterContrat(''); setFilterStatut(''); }}
               className="text-xs text-navy underline"
             >
               Réinitialiser
@@ -305,17 +304,16 @@ export default function Personnel() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((p) => (
+              {paginated.map((p) => (
                 <Fragment key={p.id}>
                   <tr
                     onClick={() => toggleExpand(p)}
                     className="border-b last:border-0 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
                   >
                     <td className="px-4 py-2 text-navy dark:text-gray-100 font-medium whitespace-nowrap">
-                      {p.prenom ? `${p.prenom} ${p.nom}` : p.email}
+                      {p.nom ? [p.prenom, p.nom].filter(Boolean).join(' ') : p.email}
                     </td>
                     <td className="px-4 py-2 text-gray-600 dark:text-gray-300 whitespace-nowrap">{p.fonction || '—'}</td>
-                    <td className="px-4 py-2 text-gray-600 dark:text-gray-300">{p.role}</td>
                     <td className="px-4 py-2 text-gray-600 dark:text-gray-300">{p.corps || '—'}</td>
                     <td className="px-4 py-2 text-gray-600 dark:text-gray-300 whitespace-nowrap">{p.service || '—'}</td>
                     <td className="px-4 py-2 text-gray-600 dark:text-gray-300 whitespace-nowrap">{p.direction || '—'}</td>
@@ -379,6 +377,28 @@ export default function Personnel() {
               )}
             </tbody>
           </table>
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between gap-2 px-4 py-3 border-t dark:border-gray-700">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft size={14} /> Précédent
+              </button>
+              <p className="text-xs text-gray-400">Page {page} sur {totalPages}</p>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Suivant <ChevronRight size={14} />
+              </button>
+            </div>
+          )}
         </div>
       )}
 

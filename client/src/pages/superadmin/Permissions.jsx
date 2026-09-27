@@ -3,8 +3,11 @@ import { listAllPermissions, updatePermission } from '../../services/permissionA
 import PageHeader from '../../components/PageHeader';
 import { SkeletonTable } from '../../components/ui/Skeleton';
 
-const ROLES = ['ADMIN_RH', 'SUPERADMIN', 'PE', 'PAT'];
-const ROLE_LABELS = { ADMIN_RH: 'Admin RH', SUPERADMIN: 'Superadmin', PE: 'PE', PAT: 'PAT' };
+const ROLES = ['ADMIN_RH', 'SUPERADMIN', 'PE', 'PAT', 'SECRETAIRE_PE', 'SECRETAIRE_PAT'];
+const ROLE_LABELS = {
+  ADMIN_RH: 'Admin RH', SUPERADMIN: 'Superadmin', PE: 'PE', PAT: 'PAT',
+  SECRETAIRE_PE: 'Secrétaire PE', SECRETAIRE_PAT: 'Secrétaire PAT',
+};
 
 export default function Permissions() {
   const [raw, setRaw] = useState([]);

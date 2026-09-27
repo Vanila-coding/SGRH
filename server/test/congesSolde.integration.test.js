@@ -32,10 +32,15 @@ async function creerAgent({ dateRecrutement = '2020-01-01', solde, derniere = nu
 async function solde(a) {
   return Number((await pool.query(`SELECT solde_conges FROM personnel WHERE id = $1`, [a.personnelId])).rows[0].solde_conges);
 }
-const annuel = (a, jours, debut = `${ANNEE}-11-01`) => {
+// La demande démarre "en attente de vérification secrétariat" (nouvelle étape,
+// hors périmètre de ces tests de solde) : on la fait avancer directement pour
+// pouvoir tester reviewDemande comme avant.
+const annuel = async (a, jours, debut = `${ANNEE}-11-01`) => {
   const [y, m, d] = debut.split('-').map(Number);
   const fin = new Date(Date.UTC(y, m - 1, d + jours - 1)).toISOString().slice(0, 10);
-  return congeService.createDemande(a.userId, { typeConge: 'Congé annuel', dateDebut: debut, dateFin: fin });
+  const demande = await congeService.createDemande(a.userId, { typeConge: 'Congé annuel', dateDebut: debut, dateFin: fin });
+  await pool.query(`UPDATE conges SET decision_secretariat = 'approuvee' WHERE id = $1`, [demande.id]);
+  return demande;
 };
 
 test.after(async () => {

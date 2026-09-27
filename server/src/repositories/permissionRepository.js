@@ -23,7 +23,7 @@ async function listAll() {
   const result = await pool.query(
     `SELECT p.id, p.key, p.label, p.category, rp.role, COALESCE(rp.enabled, false) AS enabled
      FROM permissions p
-     CROSS JOIN (VALUES ('ADMIN_RH'), ('SUPERADMIN'), ('PE'), ('PAT')) AS roles(role)
+     CROSS JOIN (VALUES ('ADMIN_RH'), ('SUPERADMIN'), ('PE'), ('PAT'), ('SECRETAIRE_PE'), ('SECRETAIRE_PAT')) AS roles(role)
      LEFT JOIN role_permissions rp ON rp.permission_id = p.id AND rp.role = roles.role
      ORDER BY p.category, p.key, roles.role`
   );

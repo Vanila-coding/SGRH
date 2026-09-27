@@ -18,6 +18,8 @@ export default function MaCarriere() {
   if (error) return <p className="text-status-rejected text-sm">{error}</p>;
   if (!data) return <SkeletonPage cards={3} />;
 
+  const estPE = data.personnel.roles?.length > 0 ? data.personnel.roles.includes('PE') : data.personnel.role === 'PE';
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <PageHeader
@@ -26,10 +28,10 @@ export default function MaCarriere() {
         subtitle="Situation administrative, parcours et diplômes"
       />
 
-      {(situations?.actuelle || data.personnel.role === 'PE') && (
+      {(situations?.actuelle || estPE) && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {situations?.actuelle && (
-            <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 ${data.personnel.role !== 'PE' ? 'lg:col-span-2' : ''}`}>
+            <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 ${!estPE ? 'lg:col-span-2' : ''}`}>
               <h3 className="font-semibold text-navy dark:text-gold mb-2">Situation administrative</h3>
               <p className="text-sm text-navy dark:text-gray-100 font-medium">{situations.actuelle.libelle}</p>
               <p className="text-xs text-gray-400">Depuis le {new Date(situations.actuelle.date_debut).toLocaleDateString('fr-FR')}</p>
@@ -48,7 +50,7 @@ export default function MaCarriere() {
             </div>
           )}
 
-          {data.personnel.role === 'PE' && (
+          {estPE && (
             <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 ${!situations?.actuelle ? 'lg:col-span-2' : ''}`}>
               <h3 className="font-semibold text-navy dark:text-gold mb-3">Diplômes et qualifications</h3>
               {data.diplomes.length === 0 && <p className="text-sm text-gray-400">Aucun diplôme enregistré.</p>}

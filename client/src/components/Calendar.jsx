@@ -37,7 +37,7 @@ export default function MiniCalendar({ demandes }) {
           return (
             <div
               key={i}
-              title={dayDemandes.map((dm) => `${dm.prenom} ${dm.nom}`).join(', ')}
+              title={dayDemandes.map((dm) => [dm.prenom, dm.nom].filter(Boolean).join(' ')).join(', ')}
               className={`relative text-xs text-center rounded-md py-1.5 ${
                 isToday ? 'bg-navy dark:bg-gold text-white dark:text-navy font-bold' : 'text-gray-600 dark:text-gray-300'
               }`}>

@@ -159,7 +159,7 @@ export default function Contrats() {
           items={personnelList}
           value={selectedId}
           onChange={setSelectedId}
-          formatOption={(p) => `${p.matricule} — ${p.prenom} ${p.nom} (${p.role})`}
+          formatOption={(p) => `${p.matricule} — ${[p.prenom, p.nom].filter(Boolean).join(' ')} (${p.role})`}
           className="max-w-xl"
         />
       </div>

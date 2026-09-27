@@ -25,6 +25,8 @@ router.post('/ouverture/:personnelId', requireAuth, requirePermission('view_cong
 router.get('/sans-decision', requireAuth, requirePermission('view_conges_admin'), congeController.sansDecision);
 router.get('/pending', requireAuth, requirePermission('view_conges_admin'), congeController.pending);
 router.get('/pending-equipe', requireAuth, congeController.pendingPourValidateur);
+router.get('/pending-secretariat', requireAuth, requirePermission('review_conges_secretariat'), congeController.pendingSecretariat);
+router.post('/:id/review-secretariat', requireAuth, requirePermission('review_conges_secretariat'), congeController.reviewSecretariat);
 router.get('/recent', requireAuth, requirePermission('view_conges_admin'), congeController.recent);
 router.get('/calendar', requireAuth, requirePermission('view_conges_admin'), congeController.calendar);
 router.get('/:id', requireAuth, congeController.getOne);

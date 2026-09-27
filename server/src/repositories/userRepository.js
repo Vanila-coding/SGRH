@@ -124,6 +124,14 @@ async function setStatus(id, status) {
   return result.rows[0];
 }
 
+async function setRole(id, role) {
+  const result = await pool.query(
+    `UPDATE users SET role = $2 WHERE id = $1 RETURNING id, role, status`,
+    [id, role]
+  );
+  return result.rows[0];
+}
+
 async function deleteAccount(id) {
   await pool.query(`DELETE FROM users WHERE id = $1`, [id]);
 }
@@ -151,6 +159,6 @@ async function restore(row) {
 module.exports = {
   create, findByEmail, findById, findFullById, updatePassword,
   countByRole, countNewThisMonth, listActive, listPersonnelWithLeaveStatus, updateFonction,
-  findPending, activate, reject, listAllAccounts, setStatus, deleteAccount,
+  findPending, activate, reject, listAllAccounts, setStatus, setRole, deleteAccount,
   findFullByIdRaw, deleteRaw, restore,
 };

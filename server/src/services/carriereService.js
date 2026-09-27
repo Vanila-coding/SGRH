@@ -164,11 +164,13 @@ async function getCarriere(personnelId) {
   const personnel = await personnelRepository.findByIdRaw(personnelId);
   if (!personnel) throw new Error('Fiche personnel introuvable');
 
-  const [evenements, fonctionHistory, diplomes] = await Promise.all([
+  const [evenements, fonctionHistory, diplomes, roles] = await Promise.all([
     carriereRepository.findEvenementsByPersonnel(personnelId),
     carriereRepository.findFonctionHistoryByPersonnel(personnelId),
     carriereRepository.findDiplomesByPersonnel(personnelId),
+    personnelRepository.getRoles(personnelId),
   ]);
+  personnel.roles = roles;
 
   const timeline = [
     ...evenements.map((e) => ({

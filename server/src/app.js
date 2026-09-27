@@ -28,6 +28,7 @@ const contratRoutes = require('./routes/contrat.routes');
 const grilleIndiciaireRoutes = require('./routes/grilleIndiciaire.routes');
 const verificationRoutes = require('./routes/verification.routes');
 const reclamationRoutes = require('./routes/reclamation.routes');
+const etablissementRoutes = require('./routes/etablissement.routes');
 const contratEcheanceJob = require('./services/contratEcheanceJob');
 const avancementEcheanceJob = require('./services/avancementEcheanceJob');
 
@@ -73,6 +74,7 @@ app.use('/api/contrats', contratRoutes);
 app.use('/api/indiciaire', grilleIndiciaireRoutes);
 app.use('/api/verification', verificationRoutes);
 app.use('/api/reclamations', reclamationRoutes);
+app.use('/api/etablissements', etablissementRoutes);
 
 app.use((req, res) => res.status(404).json({ message: 'Route introuvable' }));
 

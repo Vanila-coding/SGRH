@@ -109,6 +109,20 @@ async function reviewIntermediaire(req, res) {
   }
 }
 
+async function pendingSecretariat(req, res) {
+  const demandes = await congeService.getPendingForSecretariat(req.user.role);
+  return res.status(200).json({ demandes });
+}
+
+async function reviewSecretariat(req, res) {
+  try {
+    const demande = await congeService.reviewSecretariat(req.params.id, req.body.decision, req.user.id, req.user.role, req.body.avis);
+    return res.status(200).json({ message: 'Vérification enregistrée', demande });
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+}
+
 async function review(req, res) {
   try {
     const demande = await congeService.reviewDemande(req.params.id, req.body.decision, req.user.id, req.body.avisChefService);
@@ -151,5 +165,5 @@ async function telechargerJustificatif(req, res) {
 
 module.exports = {
   create, myDemandes, solde, suivi, ouverture, sansDecision, pending, pendingPourValidateur, reviewIntermediaire, review, recent, calendar, getOne, uploadJustificatif,
-  telechargerJustificatif,
+  telechargerJustificatif, pendingSecretariat, reviewSecretariat,
 };

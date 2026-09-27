@@ -45,7 +45,12 @@ export function Card({ icon: Icon, title, action, children }) {
 // Informations personnelles et administratives.
 export function InfosDossier({ personnel }) {
   const contractStatus = personnel.contrat_permanent ? 'Permanent' : personnel.type_contrat;
+  // `roles` (personnel_roles, 0 à 2 valeurs) fait foi ; à défaut (fiches pas encore
+  // migrées), on retombe sur l'ancien champ `role` unique pour ne rien casser.
+  const roles = personnel.roles?.length > 0 ? personnel.roles : (personnel.role ? [personnel.role] : []);
+  const typePersonnelLabel = roles.map((r) => roleLabels[r] || r).join(' + ') || null;
   return (
+    <div className="space-y-6">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <Card icon={Users} title="Informations personnelles">
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
@@ -65,8 +70,7 @@ export function InfosDossier({ personnel }) {
           <Card icon={Briefcase} title="Informations administratives">
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
               <Field icon={Hash} label="Matricule" value={personnel.matricule} />
-              <Field icon={UserCog} label="Catégorie du personnel" value={roleLabels[personnel.role] || personnel.role} />
-              <Field icon={Users} label="Type de personnel" value={personnel.role} />
+              <Field icon={Users} label="Type de personnel" value={typePersonnelLabel} />
               <Field icon={ShieldCheck} label="Type de contrat" value={contractStatus} />
               <Field icon={Briefcase} label="Fonction" value={personnel.fonction} />
               <Field icon={Briefcase} label="Poste" value={personnel.poste} />
@@ -78,6 +82,18 @@ export function InfosDossier({ personnel }) {
             </div>
           </Card>
         </div>
+
+        {roles.includes('PE') && (
+          <Card icon={GraduationCap} title="Informations enseignant (PE)">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+              <Field icon={Building2} label="Établissement" value={personnel.etablissement_nom} />
+              <Field icon={ShieldCheck} label="Corps" value={personnel.corps_pe} />
+              <Field icon={Award} label="Diplôme" value={personnel.diplome} />
+              <Field icon={GraduationCap} label="Spécialité" value={personnel.specialite} />
+            </div>
+          </Card>
+        )}
+    </div>
   );
 }
 

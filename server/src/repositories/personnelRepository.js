@@ -27,12 +27,17 @@ async function create({
 async function findByUserId(userId) {
   const result = await pool.query(
     `SELECT p.*, cp.code AS categorie_code, cp.appellation AS categorie_appellation,
+       (SELECT array_agg(pr.role ORDER BY pr.role) FROM personnel_roles pr WHERE pr.personnel_id = p.id) AS roles,
+       pe.etablissement_id, pe.corps_pe, pe.categorie_libelle, pe.diplome, pe.specialite,
+       et.nom AS etablissement_nom,
        COALESCE(
          (SELECT resp.nom || ' ' || resp.prenom FROM services s JOIN personnel resp ON resp.id = s.responsable_personnel_id WHERE s.nom = p.service AND resp.id != p.id),
          (SELECT resp.nom || ' ' || resp.prenom FROM directions d JOIN personnel resp ON resp.id = d.responsable_personnel_id WHERE d.nom = p.direction AND resp.id != p.id)
        ) AS responsable_hierarchique
      FROM personnel p
      LEFT JOIN categories_professionnelles cp ON cp.id = p.categorie_id
+     LEFT JOIN personnel_pe_infos pe ON pe.personnel_id = p.id
+     LEFT JOIN etablissements et ON et.id = pe.etablissement_id
      JOIN users u ON u.personnel_id = p.id WHERE u.id = $1`,
     [userId]
   );
@@ -45,6 +50,9 @@ async function findDetailleById(id) {
   const result = await pool.query(
     `SELECT p.*, cp.code AS categorie_code, cp.appellation AS categorie_appellation,
        (u.id IS NOT NULL) AS a_un_compte, u.status AS statut_compte,
+       (SELECT array_agg(pr.role ORDER BY pr.role) FROM personnel_roles pr WHERE pr.personnel_id = p.id) AS roles,
+       pe.etablissement_id, pe.corps_pe, pe.categorie_libelle, pe.diplome, pe.specialite,
+       et.nom AS etablissement_nom,
        COALESCE(
          (SELECT resp.nom || ' ' || resp.prenom FROM services s JOIN personnel resp ON resp.id = s.responsable_personnel_id WHERE s.nom = p.service AND resp.id != p.id),
          (SELECT resp.nom || ' ' || resp.prenom FROM directions d JOIN personnel resp ON resp.id = d.responsable_personnel_id WHERE d.nom = p.direction AND resp.id != p.id)
@@ -52,6 +60,8 @@ async function findDetailleById(id) {
      FROM personnel p
      LEFT JOIN categories_professionnelles cp ON cp.id = p.categorie_id
      LEFT JOIN users u ON u.personnel_id = p.id
+     LEFT JOIN personnel_pe_infos pe ON pe.personnel_id = p.id
+     LEFT JOIN etablissements et ON et.id = pe.etablissement_id
      WHERE p.id = $1`,
     [id]
   );
@@ -88,10 +98,15 @@ async function findLinkedUserId(personnelId) {
 
 async function listAll() {
   const result = await pool.query(
-    `SELECT p.*, (u.id IS NOT NULL) AS a_un_compte, cp.code AS categorie_code, cp.appellation AS categorie_appellation
+    `SELECT p.*, (u.id IS NOT NULL) AS a_un_compte, cp.code AS categorie_code, cp.appellation AS categorie_appellation,
+       (SELECT array_agg(pr.role ORDER BY pr.role) FROM personnel_roles pr WHERE pr.personnel_id = p.id) AS roles,
+       pe.etablissement_id, pe.corps_pe, pe.categorie_libelle, pe.diplome, pe.specialite,
+       et.nom AS etablissement_nom
      FROM personnel p
      LEFT JOIN users u ON u.personnel_id = p.id
      LEFT JOIN categories_professionnelles cp ON cp.id = p.categorie_id
+     LEFT JOIN personnel_pe_infos pe ON pe.personnel_id = p.id
+     LEFT JOIN etablissements et ON et.id = pe.etablissement_id
      ORDER BY p.nom NULLS LAST, p.matricule`
   );
   return result.rows;
@@ -262,6 +277,52 @@ async function syncSituationCourante(id, { cadre, echelle, classe, echelon, indi
   return result.rows[0] || null;
 }
 
+// Remplace entièrement les rôles d'un personnel (0 à 2 lignes : PE, PAT, ou les deux).
+// personnel.role (colonne historique) est maintenu en synchronisation avec le premier
+// rôle de la liste, uniquement pour compatibilité descendante — voir plan PE/PAT.
+async function setRoles(personnelId, roles, db = pool) {
+  const rolesValides = [...new Set((roles || []).filter((r) => r === 'PE' || r === 'PAT'))];
+  await db.query(`DELETE FROM personnel_roles WHERE personnel_id = $1`, [personnelId]);
+  for (const role of rolesValides) {
+    await db.query(`INSERT INTO personnel_roles (personnel_id, role) VALUES ($1, $2)`, [personnelId, role]);
+  }
+  await db.query(`UPDATE personnel SET role = $2 WHERE id = $1`, [personnelId, rolesValides[0] || null]);
+  return rolesValides;
+}
+
+async function getRoles(personnelId) {
+  const result = await pool.query(`SELECT role FROM personnel_roles WHERE personnel_id = $1 ORDER BY role`, [personnelId]);
+  return result.rows.map((r) => r.role);
+}
+
+// Crée ou remplace les informations PE d'un personnel. Passer `null` explicitement pour
+// un champ l'efface (ex. retrait de l'établissement) ; `undefined` (champ absent du
+// payload) conserve la valeur existante.
+async function upsertPeInfos(personnelId, { etablissementId, corpsPe, categorieLibelle, diplome, specialite }) {
+  const existing = await pool.query(`SELECT * FROM personnel_pe_infos WHERE personnel_id = $1`, [personnelId]);
+  const actuel = existing.rows[0] || {};
+  const result = await pool.query(
+    `INSERT INTO personnel_pe_infos (personnel_id, etablissement_id, corps_pe, categorie_libelle, diplome, specialite, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, now())
+     ON CONFLICT (personnel_id) DO UPDATE SET
+       etablissement_id = $2, corps_pe = $3, categorie_libelle = $4, diplome = $5, specialite = $6, updated_at = now()
+     RETURNING *`,
+    [
+      personnelId,
+      etablissementId !== undefined ? etablissementId : actuel.etablissement_id ?? null,
+      corpsPe !== undefined ? corpsPe : actuel.corps_pe ?? null,
+      categorieLibelle !== undefined ? categorieLibelle : actuel.categorie_libelle ?? null,
+      diplome !== undefined ? diplome : actuel.diplome ?? null,
+      specialite !== undefined ? specialite : actuel.specialite ?? null,
+    ]
+  );
+  return result.rows[0];
+}
+
+async function removePeInfos(personnelId) {
+  await pool.query(`DELETE FROM personnel_pe_infos WHERE personnel_id = $1`, [personnelId]);
+}
+
 module.exports = {
   create, findByUserId, updatePhoto, findByMatricule, findByEmailRaw, isLinkedToUser, findLinkedUserId,
   listAll, findByIdRaw, findDetailleById, listWithoutAccount,
@@ -269,4 +330,5 @@ module.exports = {
   findChefDeServiceUser, findResponsableDirectionUser,
   findEquipeParService, findEquipeParDirection,
   updateInfosPersonnelles, updateFiche, syncSituationCourante,
+  setRoles, getRoles, upsertPeInfos, removePeInfos,
 };

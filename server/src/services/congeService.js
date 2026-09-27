@@ -55,7 +55,7 @@ async function createDemande(userId, { typeConge, dateDebut, dateFin, motif, lie
   // Tout ce qui touche au solde (recharge, contrôles, création, débit) se fait dans
   // UNE transaction qui verrouille la fiche : deux demandes simultanées sont
   // sérialisées, le solde ne peut pas devenir négatif et un échec annule tout.
-  const { demande, validateurId } = await pool.withTransaction(async (client) => {
+  const { demande } = await pool.withTransaction(async (client) => {
     // Acquisition des droits : 2,5 jours par mois de service effectif (années manquantes incluses).
     await congeDroitsService.rechargerSiNecessaire(user.personnel_id, client);
 
@@ -89,25 +89,19 @@ async function createDemande(userId, { typeConge, dateDebut, dateFin, motif, lie
     return { demande: created, validateurId: validateur.validateurId };
   });
 
-  if (validateurId) {
+  // La notification du validateur (ou du RH s'il n'y en a pas) n'a lieu qu'une fois
+  // le secrétariat satisfait — voir reviewSecretariat. À la création, seul le
+  // secrétariat de la catégorie du demandeur (et le RH en repli anti-blocage) est prévenu.
+  const secretaires = await userRepository.listActive({ role: user.role === 'PE' ? 'SECRETAIRE_PE' : 'SECRETAIRE_PAT' });
+  const admins = await userRepository.listActive({ role: 'ADMIN_RH' });
+  for (const destinataire of [...secretaires, ...admins]) {
     await notificationRepository.create({
       senderId: userId,
-      recipientId: validateurId,
-      title: 'Nouvelle demande de congé (votre équipe)',
-      message: `Une demande de "${typeConge}" de ${user.prenom} ${user.nom} attend votre avis.`,
+      recipientId: destinataire.id,
+      title: 'Nouvelle demande de congé à vérifier',
+      message: `Une demande de "${typeConge}" de ${user.prenom} ${user.nom} attend la vérification du secrétariat.`,
       type: 'conge',
     });
-  } else {
-    const admins = await userRepository.listActive({ role: 'ADMIN_RH' });
-    for (const admin of admins) {
-      await notificationRepository.create({
-        senderId: userId,
-        recipientId: admin.id,
-        title: 'Nouvelle demande de congé',
-        message: `Une demande de "${typeConge}" a été soumise.`,
-        type: 'conge',
-      });
-    }
   }
 
   await activityLogRepository.create(userId, 'conge_demande', `Demande de "${typeConge}" soumise (${jours} jour(s))`);
@@ -190,6 +184,80 @@ async function reviewIntermediaire(id, decision, validateurUserId, avis) {
   return updated;
 }
 
+// `secretaireRole` : 'SECRETAIRE_PE' | 'SECRETAIRE_PAT' | 'ADMIN_RH' | 'SUPERADMIN'
+// (ADMIN_RH/SUPERADMIN servent de repli anti-blocage si aucun secrétaire n'est
+// désigné pour une catégorie — ils passent sans restriction de catégorie).
+async function getPendingForSecretariat(secretaireRole) {
+  const roleCible = secretaireRole === 'SECRETAIRE_PE' ? 'PE' : secretaireRole === 'SECRETAIRE_PAT' ? 'PAT' : null;
+  return congeRepository.findPendingForSecretariat(roleCible);
+}
+
+async function reviewSecretariat(id, decision, secretaireUserId, secretaireRole, avis) {
+  if (!['approuvee', 'refusee'].includes(decision)) {
+    throw new Error('Décision invalide');
+  }
+  const demande = await congeRepository.findByIdWithDetails(id);
+  if (!demande) throw new Error('Demande introuvable');
+  if (demande.decision_secretariat !== 'en_attente') {
+    throw new Error('Cette demande a déjà été vérifiée par le secrétariat');
+  }
+  const roleCible = secretaireRole === 'SECRETAIRE_PE' ? 'PE' : secretaireRole === 'SECRETAIRE_PAT' ? 'PAT' : null;
+  if (roleCible && demande.role !== roleCible) {
+    throw new Error("Cette demande ne relève pas de votre secrétariat");
+  }
+
+  // Décision, changement de statut et restitution des jours : atomiques, comme
+  // reviewIntermediaire (chaque écriture est conditionnelle "en_attente", donc rejouer
+  // ou doubler la décision ne peut pas restituer les jours deux fois).
+  const updated = await pool.withTransaction(async (client) => {
+    const row = await congeRepository.setDecisionSecretariat(id, decision, avis, client);
+    if (!row) throw new Error('Cette demande a déjà été vérifiée par le secrétariat');
+
+    if (decision === 'refusee') {
+      const refused = await congeRepository.updateStatus(id, 'refusee', null, avis, client);
+      if (!refused) throw new Error('Demande introuvable ou déjà traitée');
+      await restituerJoursSiCongeAnnuel(demande, client);
+    }
+    return row;
+  });
+
+  if (decision === 'refusee') {
+    await notificationRepository.create({
+      senderId: secretaireUserId,
+      recipientId: demande.user_id,
+      title: 'Congé renvoyé par le secrétariat',
+      message: `Votre demande de "${demande.type_conge}" a été renvoyée par le secrétariat${avis ? ` : ${avis}` : ''}.`,
+      type: 'conge',
+    });
+  } else {
+    // Le circuit existant démarre ici, inchangé : avis du chef de service si un
+    // validateur a été assigné à la création, sinon décision RH directe.
+    if (demande.validateur_id) {
+      await notificationRepository.create({
+        senderId: secretaireUserId,
+        recipientId: demande.validateur_id,
+        title: 'Nouvelle demande de congé (votre équipe)',
+        message: `Une demande de "${demande.type_conge}" a été vérifiée par le secrétariat et attend votre avis.`,
+        type: 'conge',
+      });
+    } else {
+      const admins = await userRepository.listActive({ role: 'ADMIN_RH' });
+      for (const admin of admins) {
+        await notificationRepository.create({
+          senderId: secretaireUserId,
+          recipientId: admin.id,
+          title: 'Nouvelle demande de congé',
+          message: `Une demande de "${demande.type_conge}" a été vérifiée par le secrétariat.`,
+          type: 'conge',
+        });
+      }
+    }
+  }
+
+  await activityLogRepository.create(secretaireUserId, 'conge_avis_secretariat', `Demande #${id} : vérification secrétariat "${decision}"`);
+  return updated;
+}
+
 async function reviewDemande(id, decision, reviewedBy, avisChefService) {
   if (!['approuvee', 'refusee'].includes(decision)) {
     throw new Error('Décision invalide');
@@ -201,6 +269,9 @@ async function reviewDemande(id, decision, reviewedBy, avisChefService) {
   }
   if (demande.decision_intermediaire === 'en_attente') {
     throw new Error("Cette demande attend encore l'avis du responsable direct");
+  }
+  if (demande.decision_secretariat !== 'approuvee') {
+    throw new Error('Cette demande attend encore la vérification du secrétariat');
   }
   if (decision === 'approuvee' && JUSTIFICATIF_REQUIS_VALIDATION.includes(demande.type_conge) && !demande.justificatif_path) {
     throw new Error('Un justificatif est requis avant de valider ce type de congé');
@@ -253,7 +324,8 @@ async function getDemandeDetails(id, requestingUser) {
   const isOwner = demande.user_id === requestingUser.id;
   const isAdmin = requestingUser.role === 'ADMIN_RH' || requestingUser.role === 'SUPERADMIN';
   const isValidateur = demande.validateur_id === requestingUser.id;
-  if (!isOwner && !isAdmin && !isValidateur) throw new Error('Accès refusé à cette demande');
+  const isSecretaire = requestingUser.role === 'SECRETAIRE_PE' || requestingUser.role === 'SECRETAIRE_PAT';
+  if (!isOwner && !isAdmin && !isValidateur && !isSecretaire) throw new Error('Accès refusé à cette demande');
 
   // Chiffres « à la date de la demande » (numeric -> nombre) et QR de l'avis favorable
   // qui remplace la signature du chef de service.
@@ -274,7 +346,8 @@ async function getJustificatifPourTelechargement(id, requestingUser) {
   const isOwner = demande.user_id === requestingUser.id;
   const isAdmin = requestingUser.role === 'ADMIN_RH' || requestingUser.role === 'SUPERADMIN';
   const isValidateur = demande.validateur_id === requestingUser.id;
-  if (!isOwner && !isAdmin && !isValidateur) throw new Error('Accès refusé à ce document');
+  const isSecretaire = requestingUser.role === 'SECRETAIRE_PE' || requestingUser.role === 'SECRETAIRE_PAT';
+  if (!isOwner && !isAdmin && !isValidateur && !isSecretaire) throw new Error('Accès refusé à ce document');
 
   return demande;
 }
@@ -290,4 +363,5 @@ module.exports = {
   getRecentDemandes, getCalendarDemandes, getDemandeDetails,
   getPendingForValidateur, reviewIntermediaire, uploadJustificatif,
   getJustificatifPourTelechargement,
+  getPendingForSecretariat, reviewSecretariat,
 };

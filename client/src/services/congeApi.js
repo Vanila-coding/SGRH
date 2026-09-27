@@ -103,6 +103,24 @@ export async function reviewIntermediaire(id, decision, avis) {
   return data;
 }
 
+export async function getPendingSecretariat() {
+  const res = await fetch(`${API_URL}/conges/pending-secretariat`, { headers: authHeaders() });
+  const data = await res.json();
+  if (!res.ok) throw makeApiError(res, data, 'Erreur de chargement');
+  return data.demandes;
+}
+
+export async function reviewSecretariat(id, decision, avis) {
+  const res = await fetch(`${API_URL}/conges/${id}/review-secretariat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ decision, avis }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw makeApiError(res, data, 'Échec');
+  return data;
+}
+
 export async function getRecentDemandes() {
   const res = await fetch(`${API_URL}/conges/recent`, { headers: authHeaders() });
   const data = await res.json();

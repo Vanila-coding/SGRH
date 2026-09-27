@@ -7,6 +7,8 @@ const router = express.Router();
 router.post('/demandes', requireAuth, requirePermission('demander_document'), documentController.demander);
 router.get('/demandes/me', requireAuth, requirePermission('demander_document'), documentController.mesDemandes);
 router.get('/demandes/en-attente', requireAuth, requirePermission('manage_documents'), documentController.demandesEnAttente);
+router.get('/demandes/en-attente-secretariat', requireAuth, requirePermission('review_documents_secretariat'), documentController.demandesEnAttenteSecretariat);
+router.post('/demandes/:id/review-secretariat', requireAuth, requirePermission('review_documents_secretariat'), documentController.reviewSecretariat);
 router.post('/demandes/:id/traiter', requireAuth, requirePermission('manage_documents'), documentController.traiter);
 router.post('/demandes/:id/refuser', requireAuth, requirePermission('manage_documents'), documentController.refuser);
 

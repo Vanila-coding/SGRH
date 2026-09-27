@@ -1,7 +1,8 @@
 import {
-  LayoutDashboard, Users, UserPlus, UserCheck, Bell, Briefcase, GitBranch, FileSignature, SlidersHorizontal,
+  LayoutDashboard, UserPlus, UserCheck, Bell, Briefcase, GitBranch, FileSignature, SlidersHorizontal,
   CalendarClock, FileText, FileStack, History, ShieldCheck, Trash2, KeyRound, Palette, Building2,
   UserRound, Award, Users2, ClipboardCheck, FolderOpen, HelpCircle, Info, BookOpen, MessageSquareWarning,
+  GraduationCap, Wrench, School, ClipboardList,
 } from 'lucide-react';
 
 const CHEF_OU_RESPONSABLE = (u) => u?.fonction === 'Chef de service' || u?.fonction === 'Responsable/Directeur';
@@ -20,8 +21,10 @@ const ADMIN_RH_MENU = [
   {
     title: 'Personnel',
     items: [
-      { label: 'Personnel', path: '/admin/personnel', icon: Users, permission: 'view_personnel' },
+      { label: 'PE', path: '/admin/personnel/pe', icon: GraduationCap, permission: 'view_personnel' },
+      { label: 'PAT', path: '/admin/personnel', icon: Wrench, permission: 'view_personnel' },
       { label: 'Directions & services', path: '/admin/organisation', icon: Building2, permission: 'manage_organisation' },
+      { label: 'Établissements', path: '/admin/personnel/etablissements', icon: School, permission: 'manage_etablissements' },
     ],
   },
   {
@@ -103,6 +106,25 @@ function personnelMenu() {
   ];
 }
 
+// Secrétaire PE / Secrétaire PAT : même espace personnel que PE/PAT (ils gardent
+// leur propre fiche, leurs propres congés — la promotion ne change que le rôle
+// d'accès système, pas leur identité de personnel), plus un bloc « Secrétariat »
+// pour vérifier les demandes de leur catégorie avant transmission au RH.
+function secretariatMenu() {
+  const [monEspace, aide] = personnelMenu();
+  return [
+    monEspace,
+    {
+      title: 'Secrétariat',
+      items: [
+        { label: 'Congés à vérifier', path: '/secretariat/conges', icon: CalendarClock, permission: 'review_conges_secretariat' },
+        { label: 'Demandes de documents', path: '/secretariat/documents', icon: ClipboardList, permission: 'review_documents_secretariat' },
+      ],
+    },
+    aide,
+  ];
+}
+
 export const menuConfig = {
   ADMIN_RH: ADMIN_RH_MENU,
   // Le Super Admin voit exactement le menu Admin RH (Sidebar.jsx les fusionne déjà),
@@ -122,4 +144,6 @@ export const menuConfig = {
   ],
   PE: personnelMenu(),
   PAT: personnelMenu(),
+  SECRETAIRE_PE: secretariatMenu(),
+  SECRETAIRE_PAT: secretariatMenu(),
 };

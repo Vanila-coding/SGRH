@@ -26,6 +26,17 @@ export async function reactivateAccount(id) {
   return data;
 }
 
+export async function changeAccountRole(id, role) {
+  const res = await fetch(`${API_URL}/account-admin/${id}/role`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ role }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Échec');
+  return data;
+}
+
 export async function deleteAccount(id) {
   const res = await fetch(`${API_URL}/account-admin/${id}`, { method: 'DELETE', headers: authHeaders() });
   const data = await res.json();

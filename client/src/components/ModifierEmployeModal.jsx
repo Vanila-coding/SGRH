@@ -3,6 +3,7 @@ import { updatePersonnel } from '../services/personnelApi';
 import { toInputDate } from '../utils/dossier';
 import { fetchDirections, fetchServices } from '../services/organisationApi';
 import { fetchCategories } from '../services/categorieApi';
+import { fetchEtablissements } from '../services/etablissementApi';
 import GrilleIndiciaireSelector from './GrilleIndiciaireSelector';
 import Modal from './ui/Modal';
 
@@ -12,6 +13,7 @@ const TYPES_CONTRAT = ['CDI', 'CDD', 'Vacataire', 'Stagiaire'];
 export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) {
   const [form, setForm] = useState({
     nom: personnel.nom || '', prenom: personnel.prenom || '', email: personnel.email || '',
+    roles: personnel.roles?.length > 0 ? personnel.roles : (personnel.role ? [personnel.role] : []),
     corps: personnel.corps || '', grade: personnel.grade || '', poste: personnel.poste || '',
     categorieId: personnel.categorie_id || '',
     service: personnel.service || '', direction: personnel.direction || '',
@@ -21,6 +23,8 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
     contratPermanent: !!personnel.contrat_permanent,
     classe: personnel.classe || '', echelon: personnel.echelon || '', indice: personnel.indice || '',
     categorie: '', cadre: '', echelle: '',
+    etablissementId: personnel.etablissement_id || '', corpsPe: personnel.corps_pe || '',
+    diplome: personnel.diplome || '', specialite: personnel.specialite || '',
   });
   const [grilleResolved, setGrilleResolved] = useState(false);
   const [status, setStatus] = useState(null);
@@ -30,6 +34,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
   const [services, setServices] = useState([]);
   const [selectedDirectionId, setSelectedDirectionId] = useState('');
   const [categories, setCategories] = useState([]);
+  const [etablissements, setEtablissements] = useState([]);
 
   useEffect(() => {
     fetchDirections().then((list) => {
@@ -38,6 +43,9 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
       if (current) setSelectedDirectionId(String(current.id));
     }).catch(() => setDirections([]));
     fetchCategories().then(setCategories).catch(() => setCategories([]));
+    fetchEtablissements()
+      .then((list) => setEtablissements(list.filter((e) => e.statut === 'ACTIF' || e.id === personnel.etablissement_id)))
+      .catch(() => setEtablissements([]));
   }, []);
 
   useEffect(() => {
@@ -47,6 +55,14 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
 
   function update(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function toggleRole(role) {
+    setForm((prev) => {
+      const has = prev.roles.includes(role);
+      const roles = has ? prev.roles.filter((r) => r !== role) : [...prev.roles, role];
+      return { ...prev, roles };
+    });
   }
 
   function handleDirectionChange(e) {
@@ -65,6 +81,11 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (form.roles.length === 0) {
+      setStatus('error');
+      setMessage('Sélectionne au moins un rôle (PE ou PAT).');
+      return;
+    }
     setStatus('loading');
     setMessage('');
     try {
@@ -76,6 +97,10 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
         };
       }
       delete payload.categorie; delete payload.cadre; delete payload.echelle;
+      payload.peInfos = form.roles.includes('PE')
+        ? { etablissementId: form.etablissementId || null, corpsPe: form.corpsPe || null, diplome: form.diplome || null, specialite: form.specialite || null }
+        : undefined;
+      delete payload.etablissementId; delete payload.corpsPe; delete payload.diplome; delete payload.specialite;
       await updatePersonnel(personnel.id, payload);
       setStatus('success');
       setMessage('Fiche mise à jour.');
@@ -87,12 +112,26 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
   }
 
   return (
-    <Modal onClose={onClose} title={`Modifier ${personnel.prenom} ${personnel.nom}`} maxWidth="max-w-2xl">
+    <Modal onClose={onClose} title={`Modifier ${[personnel.prenom, personnel.nom].filter(Boolean).join(' ')}`} maxWidth="max-w-2xl">
         <p className="text-xs text-gray-400 mb-4">
           Matricule {personnel.matricule} — la fonction se modifie depuis la page "Fonctions".
+          Décocher un rôle retire les informations propres à ce rôle (ex. établissement pour PE).
         </p>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rôle(s) *</label>
+            <div className="flex items-center gap-4 h-[42px]">
+              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input type="checkbox" checked={form.roles.includes('PE')} onChange={() => toggleRole('PE')} className="w-4 h-4 accent-navy" />
+                PE
+              </label>
+              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input type="checkbox" checked={form.roles.includes('PAT')} onChange={() => toggleRole('PAT')} className="w-4 h-4 accent-navy" />
+                PAT
+              </label>
+            </div>
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom</label>
             <input
@@ -195,6 +234,47 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
               </div>
             </>
           )}
+          {form.roles.includes('PE') && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Établissement (PE)</label>
+                <select
+                  value={form.etablissementId}
+                  onChange={(e) => update('etablissementId', e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
+                >
+                  <option value="">--</option>
+                  {etablissements.map((e) => <option key={e.id} value={e.id}>{e.nom}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Corps académique (PE)</label>
+                <input
+                  type="text" value={form.corpsPe}
+                  onChange={(e) => update('corpsPe', e.target.value)}
+                  placeholder="Ex. AES, MC, PT..."
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Diplôme (PE)</label>
+                <input
+                  type="text" value={form.diplome}
+                  onChange={(e) => update('diplome', e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Spécialité (PE)</label>
+                <input
+                  type="text" value={form.specialite}
+                  onChange={(e) => update('specialite', e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
+                />
+              </div>
+            </>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Direction</label>
             <select
@@ -212,7 +292,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
               value={services.find((s) => s.nom === form.service)?.id || ''}
               onChange={handleServiceChange}
               disabled={!selectedDirectionId}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy disabled:bg-gray-100"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"
             >
               <option value="">--</option>
               {services.map((s) => <option key={s.id} value={s.id}>{s.nom}</option>)}

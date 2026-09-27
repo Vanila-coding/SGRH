@@ -111,10 +111,10 @@ export default function OrganisationRH() {
         subtitle="Structure de l'université : ajoutez ou supprimez une direction et ses services"
       />
 
-      <form onSubmit={handleCreateDirection} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-4 flex gap-2">
+      <form onSubmit={handleCreateDirection} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-4 flex flex-wrap gap-2">
         <input
           type="text" value={nouvelleDirection} onChange={(e) => setNouvelleDirection(e.target.value)}
-          placeholder="Nom de la nouvelle direction" maxLength={150} required className={inputClass}
+          placeholder="Nom de la nouvelle direction" maxLength={150} required className={`${inputClass} min-w-0`}
         />
         <button
           type="submit" disabled={creatingDirection}
@@ -181,13 +181,13 @@ export default function OrganisationRH() {
                       ))}
                     </ul>
                   )}
-                  <form onSubmit={(e) => handleCreateService(e, direction)} className="flex gap-2">
+                  <form onSubmit={(e) => handleCreateService(e, direction)} className="flex flex-wrap gap-2">
                     <input
                       type="text"
                       value={nouveauServiceNom[direction.id] || ''}
                       onChange={(e) => setNouveauServiceNom((prev) => ({ ...prev, [direction.id]: e.target.value }))}
                       placeholder="Nom du nouveau service" maxLength={150} required
-                      className={`${inputClass} text-xs py-1`}
+                      className={`${inputClass} text-xs py-1 min-w-0`}
                     />
                     <button
                       type="submit" disabled={creatingServiceFor === direction.id}

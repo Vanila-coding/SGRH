@@ -290,14 +290,16 @@ export default function Carriere() {
           items={personnelList}
           value={selectedId}
           onChange={(id) => { setSelectedId(id); resetForm(); }}
-          formatOption={(p) => `${p.matricule} — ${p.prenom} ${p.nom} (${p.role})`}
+          formatOption={(p) => `${p.matricule} — ${[p.prenom, p.nom].filter(Boolean).join(' ')} (${p.role})`}
           className="max-w-xl"
         />
       </div>
 
       {loading && <SkeletonPage cards={3} />}
 
-      {data && (
+      {data && (() => {
+        const estPE = data.personnel.roles?.length > 0 ? data.personnel.roles.includes('PE') : data.personnel.role === 'PE';
+        return (
         <>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h3 className="font-semibold text-navy dark:text-gold mb-3">Situation administrative</h3>
@@ -654,7 +656,7 @@ export default function Carriere() {
             <h3 className="font-semibold text-navy dark:text-gold mb-4">
               Timeline — {data.personnel.prenom} {data.personnel.nom}
               <span className="ml-2 text-xs font-normal text-gray-400">
-                ({data.personnel.role === 'PE' ? 'Enseignant-chercheur' : 'PATS'} — {data.personnel.corps || 'statut non renseigné'})
+                ({estPE ? 'Enseignant-chercheur' : 'PATS'} — {data.personnel.corps || 'statut non renseigné'})
               </span>
             </h3>
             {data.timeline.length === 0 && <p className="text-sm text-gray-400">Aucun événement enregistré.</p>}
@@ -718,7 +720,7 @@ export default function Carriere() {
             </div>
           </div>
 
-          {data.personnel.role === 'PE' && (
+          {estPE && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h3 className="font-semibold text-navy dark:text-gold mb-3">Diplômes et qualifications</h3>
               <form onSubmit={handleAddDiplome} className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
@@ -776,7 +778,8 @@ export default function Carriere() {
             </div>
           )}
         </>
-      )}
+        );
+      })()}
     </div>
   );
 }

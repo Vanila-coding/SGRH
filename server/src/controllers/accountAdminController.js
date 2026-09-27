@@ -21,6 +21,35 @@ async function reactivate(req, res) {
   return res.status(200).json({ message: 'Compte réactivé', user });
 }
 
+// Transitions strictement limitées : promouvoir/rétrograder un compte PE/PAT en
+// secrétaire de sa propre catégorie. Jamais touché : ADMIN_RH, SUPERADMIN, ni un
+// changement de catégorie (PE ne devient jamais SECRETAIRE_PAT).
+const TRANSITIONS_AUTORISEES = {
+  PE: 'SECRETAIRE_PE',
+  SECRETAIRE_PE: 'PE',
+  PAT: 'SECRETAIRE_PAT',
+  SECRETAIRE_PAT: 'PAT',
+};
+
+async function changeRole(req, res) {
+  const { role } = req.body;
+  const current = await userRepository.findById(req.params.id);
+  if (!current) return res.status(404).json({ message: 'Compte introuvable' });
+
+  if (TRANSITIONS_AUTORISEES[current.role] !== role) {
+    return res.status(400).json({ message: 'Changement de rôle non autorisé pour ce compte' });
+  }
+
+  const user = await userRepository.setRole(req.params.id, role);
+  const promotion = role.startsWith('SECRETAIRE_');
+  await activityLogRepository.create(
+    req.user.id,
+    promotion ? 'compte_promu_secretariat' : 'compte_retrograde_secretariat',
+    `Compte #${req.params.id} ${promotion ? 'désigné secrétaire' : 'retiré du secrétariat'} (${current.role} → ${role})`
+  );
+  return res.status(200).json({ message: promotion ? 'Compte désigné secrétaire' : 'Rôle de secrétaire retiré', user });
+}
+
 async function remove(req, res) {
   if (Number(req.params.id) === req.user.id) {
     return res.status(400).json({ message: 'Impossible de supprimer son propre compte' });
@@ -38,4 +67,4 @@ async function remove(req, res) {
   }
 }
 
-module.exports = { list, deactivate, reactivate, remove };
+module.exports = { list, deactivate, reactivate, changeRole, remove };

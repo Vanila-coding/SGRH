@@ -62,6 +62,20 @@ async function demandesEnAttente(req, res) {
   return res.status(200).json({ demandes });
 }
 
+async function demandesEnAttenteSecretariat(req, res) {
+  const demandes = await documentService.getDemandesEnAttenteSecretariat(req.user.role);
+  return res.status(200).json({ demandes });
+}
+
+async function reviewSecretariat(req, res) {
+  try {
+    const demande = await documentService.reviewDemandeSecretariat(req.params.id, req.body.decision, req.user.id, req.user.role, req.body.avis);
+    return res.status(200).json({ message: 'Vérification enregistrée', demande });
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+}
+
 async function traiter(req, res) {
   try {
     const document = await documentService.traiterDemande(req.params.id, req.body.donnees || {}, req.user.id);
@@ -83,4 +97,5 @@ async function refuser(req, res) {
 module.exports = {
   generate, getOne, historiquePersonnel, mesDocuments,
   demander, mesDemandes, demandesEnAttente, traiter, refuser,
+  demandesEnAttenteSecretariat, reviewSecretariat,
 };

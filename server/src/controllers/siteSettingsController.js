@@ -23,6 +23,11 @@ async function update(req, res) {
   }
 }
 
+async function resetColors(req, res) {
+  const settings = await siteSettingsService.resetColors(req.user.id);
+  return res.status(200).json({ message: 'Couleurs réinitialisées', settings });
+}
+
 // Logo principal, favicon, logo de la page de connexion : des chemins de fichier, pas des
 // couleurs hexadécimales — ils ne passent donc pas par siteSettingsService.updateSetting
 // (qui valide strictement le format #RRGGBB) mais écrivent directement dans site_settings,
@@ -68,6 +73,7 @@ function makeImageUploadHandler(slot) {
 module.exports = {
   get,
   update,
+  resetColors,
   uploadLogo: makeImageUploadHandler('logo'),
   uploadFavicon: makeImageUploadHandler('favicon'),
   uploadLogoConnexion: makeImageUploadHandler('logo-connexion'),

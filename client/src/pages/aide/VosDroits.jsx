@@ -13,7 +13,7 @@ export default function VosDroits() {
   const contenu = useText('aide.vos_droits', DEFAUT, 'Aide');
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-[1600px] mx-auto">
       <PageHeader crumbs={[{ label: 'Aide' }, { label: 'Vos droits' }]} title="Vos droits" />
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{contenu}</p>

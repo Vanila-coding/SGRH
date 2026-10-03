@@ -43,3 +43,14 @@ export async function deleteAccount(id) {
   if (!res.ok) throw new Error(data.message || 'Échec');
   return data;
 }
+
+export async function contacterCompteParEmail(id, sujet, message) {
+  const res = await fetch(`${API_URL}/account-admin/${id}/contacter-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ sujet, message }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Échec de l'envoi");
+  return data;
+}

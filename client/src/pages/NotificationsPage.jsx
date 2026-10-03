@@ -50,7 +50,7 @@ export default function NotificationsPage() {
   });
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-[1600px] mx-auto">
       <PageHeader crumbs={[{ label: 'Notifications' }]} title="Notifications" />
       <div className="flex items-center justify-between gap-2 mb-6 flex-wrap">
         <div className="flex gap-2">

@@ -15,7 +15,15 @@ async function createPersonnel(data, createdBy) {
   const roles = Array.isArray(data.roles) && data.roles.length > 0 ? data.roles : (data.role ? [data.role] : []);
   if (roles.length === 0) throw new Error('Au moins un rôle (PE ou PAT) est requis');
 
-  const personnel = await personnelRepository.create({ ...data, role: roles[0] });
+  // Un PE n'est jamais secrétaire : la désignation n'est acceptée que pour un agent PAT.
+  if (data.secretariatRole && !roles.includes('PAT')) {
+    throw new Error('Seul un agent PAT peut être désigné secrétaire');
+  }
+  if (data.secretariatRole && !['SECRETAIRE_PE', 'SECRETAIRE_PAT'].includes(data.secretariatRole)) {
+    throw new Error('Catégorie de secrétariat invalide');
+  }
+
+  const personnel = await personnelRepository.create({ ...data, role: roles[0], secretariatRole: data.secretariatRole || null });
   await personnelRepository.setRoles(personnel.id, roles);
   if (roles.includes('PE') && data.peInfos) {
     await personnelRepository.upsertPeInfos(personnel.id, data.peInfos);

@@ -1,5 +1,6 @@
 const corbeilleRepository = require('../repositories/corbeilleRepository');
 const activityLogRepository = require('../repositories/activityLogRepository');
+const { sendAccountRestoredEmail } = require('../config/mailer');
 
 async function list(req, res) {
   const items = await corbeilleRepository.listAll();
@@ -11,8 +12,9 @@ async function restore(req, res) {
   if (!item) return res.status(404).json({ message: 'Élément introuvable dans la corbeille' });
 
   try {
+    let restored;
     if (item.type_element === 'compte') {
-      const restored = await corbeilleRepository.restoreCompte(item.donnees);
+      restored = await corbeilleRepository.restoreCompte(item.donnees);
       if (!restored) {
         return res.status(400).json({ message: 'Restauration impossible : un compte avec ce même id, email ou fiche personnel existe déjà' });
       }
@@ -22,6 +24,18 @@ async function restore(req, res) {
 
     await corbeilleRepository.removeFromCorbeille(req.params.id);
     await activityLogRepository.create(req.user.id, 'element_restaure', `${item.type_element} restauré depuis la corbeille`);
+
+    // Notification best-effort : la restauration reste acquise même si l'e-mail échoue
+    // (ex. service mail temporairement indisponible) — ce n'est qu'une information, pas
+    // une condition de l'action elle-même. Par e-mail uniquement, aucun fournisseur SMS
+    // n'étant configuré dans ce projet.
+    if (restored.email) {
+      try {
+        await sendAccountRestoredEmail(restored.email);
+      } catch (mailErr) {
+        console.error('Échec de la notification de restauration par e-mail:', mailErr);
+      }
+    }
 
     return res.status(200).json({ message: 'Élément restauré' });
   } catch (err) {

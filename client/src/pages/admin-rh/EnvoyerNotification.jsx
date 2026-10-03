@@ -67,7 +67,7 @@ export default function EnvoyerNotification() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-[1600px] mx-auto">
       <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Envoyer une notification' }]} title="Envoyer une notification" subtitle="Ciblez un groupe, une fonction ou une personne précise" />
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 sm:p-8 w-full">
       <form onSubmit={handleSubmit} className="space-y-4">

@@ -21,7 +21,7 @@ export default function MaCarriere() {
   const estPE = data.personnel.roles?.length > 0 ? data.personnel.roles.includes('PE') : data.personnel.role === 'PE';
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-[1600px] mx-auto space-y-6">
       <PageHeader
         crumbs={[{ label: 'Mon espace', path: '/dashboard' }, { label: 'Ma carrière' }]}
         title="Ma carrière"

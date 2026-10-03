@@ -1,23 +1,46 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Search } from 'lucide-react';
 import { listAccounts, deactivateAccount, reactivateAccount, changeAccountRole, deleteAccount } from '../../services/accountAdminApi';
 import PageHeader from '../../components/PageHeader';
 import { SkeletonCard } from '../../components/ui/Skeleton';
+import ContacterCompteModal from '../../components/ContacterCompteModal';
+
+// Textes par défaut proposés dans la fenêtre de contact obligatoire, modifiables par
+// le Superadmin avant l'envoi — jamais envoyés tels quels sans relecture.
+const TEXTES_ACTION = {
+  desactiver: {
+    libelleBouton: 'Envoyer et désactiver',
+    sujetDefaut: 'Votre compte va être désactivé',
+    messageDefaut: "Bonjour,\n\nNous vous informons que votre compte sur la plateforme de gestion RH de l'Université de Mahajanga va être désactivé.\n\nPour toute question, contactez l'administration RH.",
+  },
+  supprimer: {
+    libelleBouton: 'Envoyer et supprimer',
+    sujetDefaut: 'Votre compte va être supprimé',
+    messageDefaut: "Bonjour,\n\nNous vous informons que votre compte sur la plateforme de gestion RH de l'Université de Mahajanga va être supprimé.\n\nPour toute question, contactez l'administration RH.",
+  },
+};
 
 const ROLE_LABELS = {
   ADMIN_RH: 'Admin RH', SUPERADMIN: 'Superadmin', PE: 'Personnel PE', PAT: 'Personnel PAT',
   SECRETAIRE_PE: 'Secrétaire PE', SECRETAIRE_PAT: 'Secrétaire PAT',
 };
-// Promotion réversible : un compte PE/PAT devient secrétaire de sa propre catégorie
-// (et inversement), sans jamais toucher sa fiche personnel — même transitions que
-// accountAdminController.changeRole côté backend.
-const TRANSITIONS_SECRETARIAT = { PE: 'SECRETAIRE_PE', SECRETAIRE_PE: 'PE', PAT: 'SECRETAIRE_PAT', SECRETAIRE_PAT: 'PAT' };
+// Promotion réversible : seul un compte PAT peut être désigné secrétaire (un PE n'est
+// jamais secrétaire), avec le choix de la catégorie affectée (PE ou PAT) puisque c'est
+// une fonction administrative, pas liée à sa propre catégorie. Le retrait ramène
+// toujours à PAT. Mêmes transitions que accountAdminController.changeRole côté backend.
+// Mêmes rôles protégés que accountAdminController (backend) — masquer les boutons ici
+// évite un aller-retour pour rien, mais le vrai verrou est côté serveur.
+const ROLES_PROTEGES = ['ADMIN_RH', 'SUPERADMIN'];
 
 export default function Comptes() {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterRole, setFilterRole] = useState('');
+  const [recherche, setRecherche] = useState('');
   const [error, setError] = useState('');
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  // { compte, type: 'desactiver' | 'supprimer' } | null — ouvre directement la fenêtre
+  // de contact obligatoire, qui exécute l'action elle-même une fois l'e-mail envoyé.
+  const [actionEnCours, setActionEnCours] = useState(null);
 
   async function load() {
     setLoading(true);
@@ -32,46 +55,59 @@ export default function Comptes() {
 
   useEffect(() => { load(); }, []);
 
-  async function handleToggleStatus(account) {
+  async function handleReactivate(account) {
     setError('');
     try {
-      if (account.status === 'active') {
-        await deactivateAccount(account.id);
-      } else {
-        await reactivateAccount(account.id);
-      }
+      await reactivateAccount(account.id);
       load();
     } catch (err) {
       setError(err.message);
     }
   }
 
-  async function handleChangeRole(account) {
+  async function handleChangeRole(account, nouveauRole) {
     setError('');
     try {
-      await changeAccountRole(account.id, TRANSITIONS_SECRETARIAT[account.role]);
+      await changeAccountRole(account.id, nouveauRole);
       load();
     } catch (err) {
       setError(err.message);
     }
   }
 
-  async function handleDelete(id) {
-    setError('');
-    try {
-      await deleteAccount(id);
-      setConfirmDeleteId(null);
-      load();
-    } catch (err) {
-      setError(err.message);
-    }
+  // Appelée par ContacterCompteModal une fois l'e-mail envoyé avec succès — l'action
+  // (désactivation ou suppression) n'a jamais lieu sans être passée par cette étape.
+  async function executerActionEnCours() {
+    if (actionEnCours.type === 'desactiver') await deactivateAccount(actionEnCours.compte.id);
+    else await deleteAccount(actionEnCours.compte.id);
+    await load();
   }
 
-  const filtered = filterRole ? accounts.filter((a) => a.role === filterRole) : accounts;
+  const filtered = useMemo(() => {
+    const terme = recherche.trim().toLowerCase();
+    return accounts.filter((a) => {
+      const matchRole = !filterRole || a.role === filterRole;
+      const matchRecherche = !terme || [a.nom, a.prenom, a.email, a.matricule]
+        .some((champ) => champ && champ.toLowerCase().includes(terme));
+      return matchRole && matchRecherche;
+    });
+  }, [accounts, filterRole, recherche]);
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-[1600px] mx-auto">
       <PageHeader crumbs={[{ label: 'Administration' }, { label: 'Gestion des comptes' }]} title="Gestion des comptes" subtitle="Activer, désactiver ou supprimer un compte utilisateur" />
+
+      <div className="relative mb-4 max-w-md">
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+        <input
+          type="text"
+          value={recherche}
+          onChange={(e) => setRecherche(e.target.value)}
+          placeholder="Rechercher par nom, email ou matricule..."
+          className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
+        />
+      </div>
+
       <div className="flex items-center gap-2 mb-6 flex-wrap">
         <button
           onClick={() => setFilterRole('')}
@@ -99,10 +135,14 @@ export default function Comptes() {
           <SkeletonCard lines={2} />
           <SkeletonCard lines={2} />
         </div>
+      ) : filtered.length === 0 ? (
+        <p className="text-sm text-gray-400 px-1">
+          {accounts.length === 0 ? 'Aucun compte enregistré.' : 'Aucun compte ne correspond à cette recherche.'}
+        </p>
       ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {filtered.map((a) => (
-          <div key={a.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-center justify-between gap-3">
+          <div key={a.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col sm:flex-row sm:items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="font-medium text-navy dark:text-gray-100 truncate">
@@ -122,52 +162,73 @@ export default function Comptes() {
             </div>
 
             <div className="flex flex-wrap justify-end gap-2 shrink-0">
-              {TRANSITIONS_SECRETARIAT[a.role] && (
+              {a.role === 'PAT' && (
+                <>
+                  <button
+                    onClick={() => handleChangeRole(a, 'SECRETAIRE_PE')}
+                    className="px-3 py-1.5 rounded-md text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    Désigner secrétaire PE
+                  </button>
+                  <button
+                    onClick={() => handleChangeRole(a, 'SECRETAIRE_PAT')}
+                    className="px-3 py-1.5 rounded-md text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    Désigner secrétaire PAT
+                  </button>
+                </>
+              )}
+              {(a.role === 'SECRETAIRE_PE' || a.role === 'SECRETAIRE_PAT') && (
                 <button
-                  onClick={() => handleChangeRole(a)}
+                  onClick={() => handleChangeRole(a, 'PAT')}
                   className="px-3 py-1.5 rounded-md text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  {a.role.startsWith('SECRETAIRE_') ? 'Retirer le secrétariat' : 'Désigner secrétaire'}
+                  Retirer le secrétariat
                 </button>
               )}
-              <button
-                onClick={() => handleToggleStatus(a)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium border ${
-                  a.status === 'active'
-                    ? 'border-status-rejected text-status-rejected hover:bg-red-50'
-                    : 'border-status-approved text-status-approved hover:bg-green-50'
-                }`}
-              >
-                {a.status === 'active' ? 'Désactiver' : 'Activer'}
-              </button>
-
-              {confirmDeleteId === a.id ? (
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => handleDelete(a.id)}
-                    className="px-3 py-1.5 rounded-md text-xs font-medium bg-status-rejected text-white"
-                  >
-                    Confirmer
-                  </button>
-                  <button
-                    onClick={() => setConfirmDeleteId(null)}
-                    className="px-3 py-1.5 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-                  >
-                    Annuler
-                  </button>
-                </div>
+              {ROLES_PROTEGES.includes(a.role) ? (
+                <span className="px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 dark:text-gray-500" title="Les comptes Admin RH et Superadmin ne peuvent pas être désactivés ou supprimés.">
+                  Protégé
+                </span>
               ) : (
-                <button
-                  onClick={() => setConfirmDeleteId(a.id)}
-                  className="px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 hover:text-status-rejected"
-                >
-                  Supprimer
-                </button>
+                <>
+                  {a.status !== 'active' ? (
+                    <button
+                      onClick={() => handleReactivate(a)}
+                      className="px-3 py-1.5 rounded-md text-xs font-medium border border-status-approved text-status-approved hover:bg-green-50"
+                    >
+                      Activer
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setActionEnCours({ compte: a, type: 'desactiver' })}
+                      className="px-3 py-1.5 rounded-md text-xs font-medium border border-status-rejected text-status-rejected hover:bg-red-50"
+                    >
+                      Désactiver
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => setActionEnCours({ compte: a, type: 'supprimer' })}
+                    className="px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 hover:text-status-rejected"
+                  >
+                    Supprimer
+                  </button>
+                </>
               )}
             </div>
           </div>
         ))}
       </div>
+      )}
+
+      {actionEnCours && (
+        <ContacterCompteModal
+          compte={actionEnCours.compte}
+          onClose={() => setActionEnCours(null)}
+          onConfirmerAction={executerActionEnCours}
+          {...TEXTES_ACTION[actionEnCours.type]}
+        />
       )}
     </div>
   );

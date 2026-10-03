@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Search } from 'lucide-react';
 import { getActivityLog } from '../../services/activityLogApi';
 import PageHeader from '../../components/PageHeader';
 import { Skeleton } from '../../components/ui/Skeleton';
@@ -8,21 +9,40 @@ export default function Historique() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('');
+  const [recherche, setRecherche] = useState('');
 
   useEffect(() => {
-    getActivityLog(100).then(setLogs).finally(() => setLoading(false));
+    getActivityLog(200).then(setLogs).finally(() => setLoading(false));
   }, []);
 
-  const filtered = filterType ? logs.filter((l) => l.action_type === filterType) : logs;
+  const filtered = useMemo(() => {
+    const terme = recherche.trim().toLowerCase();
+    return logs.filter((l) => {
+      const matchType = !filterType || l.action_type === filterType;
+      const matchRecherche = !terme || [l.description, l.email, l.nom, l.prenom]
+        .some((champ) => champ && champ.toLowerCase().includes(terme));
+      return matchType && matchRecherche;
+    });
+  }, [logs, filterType, recherche]);
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-[1600px] mx-auto">
       <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Audit & journal' }]} title="Audit & journal" subtitle="Historique des actions effectuées dans le SGRH" />
-      <div className="mb-6">
+      <div className="mb-6 flex flex-wrap items-center gap-2">
+        <div className="relative flex-1 min-w-[220px]">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+          <input
+            type="text"
+            value={recherche}
+            onChange={(e) => setRecherche(e.target.value)}
+            placeholder="Rechercher par personne ou description..."
+            className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
+          />
+        </div>
         <select
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
-          className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
+          className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy shrink-0"
         >
           <option value="">Tous les types d'action</option>
           {Object.entries(ACTION_LABELS).map(([type, { label }]) => (
@@ -32,7 +52,9 @@ export default function Historique() {
       </div>
 
       {!loading && filtered.length === 0 && (
-        <p className="text-gray-400 text-sm">Aucune activité enregistrée.</p>
+        <p className="text-gray-400 text-sm">
+          {logs.length === 0 ? 'Aucune activité enregistrée.' : 'Aucune activité ne correspond à ce filtre.'}
+        </p>
       )}
 
       {loading && (

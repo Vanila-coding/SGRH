@@ -13,16 +13,15 @@ import {
   contratActuel, dureeRestante, formatDate, formatJours, joursRestants, present, progressionContrat, roleLabels, seniority,
 } from '../../utils/dossier';
 
-export function Field({ icon: Icon, label, value }) {
+// Pas d'icône par champ : une pastille colorée devant chaque ligne d'un dossier de
+// plusieurs dizaines de champs charge l'œil sans rien distinguer (tout a la même
+// pastille) — une simple paire étiquette/valeur, comme un vrai dossier papier, se lit
+// mieux. `icon` reste accepté (nombreux appels existants) mais n'est plus affiché.
+export function Field({ label, value }) {
   return (
-    <div className="flex items-start gap-3">
-      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-navy/5 text-navy dark:bg-gold/10 dark:text-gold">
-        <Icon size={16} aria-hidden="true" />
-      </span>
-      <div className="min-w-0">
-        <p className="text-xs text-slate-500 dark:text-gray-400">{label}</p>
-        <p className="mt-0.5 break-words text-sm font-semibold text-slate-800 dark:text-gray-100">{present(value)}</p>
-      </div>
+    <div className="min-w-0">
+      <p className="text-xs text-slate-500 dark:text-gray-400">{label}</p>
+      <p className="mt-0.5 break-words text-sm font-semibold text-slate-800 dark:text-gray-100">{present(value)}</p>
     </div>
   );
 }

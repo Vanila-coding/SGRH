@@ -18,6 +18,17 @@ export async function updateSiteSetting(key, value) {
   return data;
 }
 
+export async function resetSiteColors() {
+  const token = localStorage.getItem('rh_token');
+  const res = await fetch(`${API_URL}/site-settings/reset-colors`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Échec de la réinitialisation');
+  return data;
+}
+
 // 'logo' | 'favicon' | 'logo-connexion' — voir server/src/routes/siteSettings.routes.js
 async function uploadSiteImage(slot, file) {
   const token = localStorage.getItem('rh_token');

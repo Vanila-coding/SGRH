@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { getAllTexts, updateText } from '../../services/siteTextsApi';
-import { updateSiteSetting, uploadLogo, uploadFavicon, uploadLogoConnexion } from '../../services/siteSettingsAdminApi';
+import { updateSiteSetting, resetSiteColors, uploadLogo, uploadFavicon, uploadLogoConnexion } from '../../services/siteSettingsAdminApi';
 import { useTextContext } from '../../context/TextContext';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
 import PageHeader from '../../components/PageHeader';
 import { toast } from '../../utils/toast';
 import { Skeleton } from '../../components/ui/Skeleton';
-import { Moon } from 'lucide-react';
+import { ConfirmDialog } from '../../components/ui';
+import { Moon, RotateCcw } from 'lucide-react';
 
 const COLOR_LABELS = {
   color_navy: 'Couleur principale (boutons, accents, sidebar)',
@@ -30,6 +31,7 @@ const CHAMPS_FOOTER = [
   { key: 'footer.nom_application', label: "Nom de l'application", defaut: 'Université de Mahajanga' },
   { key: 'footer.description', label: 'Description (optionnelle)', defaut: '' },
   { key: 'footer.copyright', label: 'Mention de copyright', defaut: 'Tous droits réservés' },
+  { key: 'footer.developpeur', label: 'Développé par (laisser vide pour masquer)', defaut: 'JAOSOA Tanaël Faustin' },
 ];
 const CHAMPS_SYSTEME = [
   { key: 'systeme.message_compte_attente', label: 'Message — compte en attente', defaut: "Votre compte est en attente de validation par l'administration RH.", multiligne: true },
@@ -126,7 +128,7 @@ function ChampTexte({ champ }) {
   const Champ = champ.multiligne ? 'textarea' : 'input';
 
   return (
-    <div>
+    <div className={champ.multiligne ? 'max-w-3xl' : 'max-w-xl'}>
       <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{champ.label}</label>
       <div className="flex gap-2 items-start">
         <Champ
@@ -209,6 +211,8 @@ export default function ApparenceSite() {
   const [loading, setLoading] = useState(true);
   const [autresOuvert, setAutresOuvert] = useState(false);
   const [autresEdits, setAutresEdits] = useState({});
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const { reload: reloadSettings, settings } = useSiteSettings();
   const { loaded: textsLoaded } = useTextContext();
 
@@ -231,6 +235,21 @@ export default function ApparenceSite() {
       toast.error(err.message);
     } finally {
       setSavingKey(null);
+    }
+  }
+
+  async function handleResetColors() {
+    setResetting(true);
+    try {
+      await resetSiteColors();
+      await reloadSettings();
+      setColorEdits({});
+      toast.success('Couleurs réinitialisées à la palette par défaut.');
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setResetting(false);
+      setConfirmReset(false);
     }
   }
 
@@ -261,7 +280,7 @@ export default function ApparenceSite() {
   const enChargement = loading || !textsLoaded;
 
   return (
-    <div className="max-w-5xl">
+    <div className="mx-auto max-w-[1600px]">
       <PageHeader crumbs={[{ label: 'Administration' }, { label: 'Personnalisation' }]} title="Personnalisation" subtitle="Apparence, contenu et informations institutionnelles du site" />
       <div className="flex flex-wrap gap-2 mb-6">
         {[
@@ -301,7 +320,16 @@ export default function ApparenceSite() {
             <ChampImage label="Logo — page de connexion (optionnel)" hint="Si vide, le logo principal est utilisé." valeurActuelle={settings.logo_connexion_url} onUpload={async (f) => { await uploadLogoConnexion(f); await reloadSettings(); }} />
           </Section>
 
-          <Section title="Couleurs">
+          <Section title="Couleurs" description="La couleur de base (bleu marine institutionnel, en référence au logo) est restaurable à tout moment.">
+            <div className="flex justify-end -mt-2">
+              <button
+                type="button"
+                onClick={() => setConfirmReset(true)}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-navy dark:hover:text-gold"
+              >
+                <RotateCcw size={13} aria-hidden="true" /> Réinitialiser à la couleur de base
+              </button>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Object.entries(settings).filter(([key]) => key.startsWith('color_')).map(([key, storedValue]) => {
                 const value = colorEdits[key] ?? storedValue;
@@ -373,7 +401,7 @@ export default function ApparenceSite() {
           </div>
 
           {autresOuvert && (
-            <div>
+            <div className="max-w-3xl">
               <input
                 type="text"
                 placeholder="Rechercher un texte..."
@@ -419,6 +447,16 @@ export default function ApparenceSite() {
           {CHAMPS_INSTITUTION.map((c) => <ChampTexte key={c.key} champ={c} />)}
         </Section>
       )}
+
+      <ConfirmDialog
+        open={confirmReset}
+        title="Réinitialiser les couleurs"
+        message="Les 5 couleurs personnalisées seront remplacées par la palette de base (bleu marine institutionnel et or, en référence au logo). Cette action s'applique immédiatement sur tout le site, y compris les pages de connexion et d'inscription."
+        confirmLabel="Réinitialiser"
+        loading={resetting}
+        onConfirm={handleResetColors}
+        onCancel={() => setConfirmReset(false)}
+      />
     </div>
   );
 }

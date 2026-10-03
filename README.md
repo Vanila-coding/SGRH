@@ -146,10 +146,10 @@ L'API Express est montée sous `/api`, active CORS et le JSON, puis répond `404
 1. `POST /api/auth/login` compare le mot de passe avec `bcryptjs`.
 2. Le serveur signe un JWT (identifiant et rôle) valable huit heures.
 3. Le client le transmet avec `Authorization: Bearer <token>`.
-4. `requireAuth` vérifie le jeton et recharge l'utilisateur.
+4. `requireAuth` vérifie le jeton, recharge l'utilisateur et rejette tout compte désactivé (`401 Compte inactif`), même avec un jeton encore valide.
 5. `requireRole` ou `requirePermission` applique l'autorisation demandée.
 
-Une seule route est volontairement publique et limitée en débit : la vérification des QR d'avis (`GET /api/verification/avis/:token`, middleware `rateLimit`, en mémoire, par IP). Les repositories emploient des requêtes paramétrées PostgreSQL. Les services portent les règles métier, notamment la validité des dates de congé, les fonctions admises pour PE/PAT, les statuts de compte et les notifications associées.
+Protections transverses : `helmet` (en-têtes de sécurité, `Cross-Origin-Resource-Policy: cross-origin` pour que le frontend séparé charge les images), CORS restreint à `FRONTEND_URL`/`CORS_ORIGINS`, corps JSON limité à 2 Mo, en-tête `X-Powered-By` désactivé, et un middleware d'erreur global qui ne renvoie jamais de trace de pile. Limitation de débit en mémoire (`rateLimit.js`, par IP) sur la vérification des QR d'avis, le mot de passe oublié, la réinitialisation, les codes OTP, l'inscription et la soumission d'invitation. Le blocage de connexion est **par compte** et ne concerne que les rôles PE, PAT, SECRETAIRE_PE et SECRETAIRE_PAT : après 10 échecs, le compte est verrouillé 30 minutes et tous les Superadmin reçoivent une notification. Les rôles ADMIN_RH et SUPERADMIN ne sont jamais verrouillés. Le compteur est en mémoire et repart à zéro au redémarrage du serveur. Les repositories emploient des requêtes paramétrées PostgreSQL. Les services portent les règles métier, notamment la validité des dates de congé, les fonctions admises pour PE/PAT, les statuts de compte et les notifications associées.
 
 La suppression d'un compte (`DELETE /api/account-admin/:id`) est transactionnelle et réversible : `corbeilleRepository.archiveAndDeleteCompte` capture le compte et tout ce qui lui appartient substantiellement (congés, historique de fonction, notifications reçues) dans la corbeille avant de le supprimer ; `restoreCompte` recrée ces lignes avec leurs identifiants d'origine. Les autres tables qui ne font que référencer l'utilisateur comme auteur d'une action (`activity_log`, `carriere_evenements`, `documents_generes`...) passent à `NULL` automatiquement grâce aux contraintes `ON DELETE` posées par la migration `002` et restent intactes.
 
@@ -212,6 +212,8 @@ Fiche personnel → lien d'inscription → POST /api/register
 → contrôle e-mail/matricule et mot de passe → users.status = pending
 → notification des Admin RH → approbation ou refus
 ```
+
+Le rôle d'accès créé (`users.role`) vient de `personnel.secretariat_role` s'il est renseigné, sinon de `personnel.role` (PE ou PAT). L'Admin RH désigne ce secrétariat au moment de l'ajout de l'employé (« Secrétariat » : Aucun, Secrétaire PE, Secrétaire PAT), uniquement pour un agent PAT ; un PE n'est jamais secrétaire. La fiche garde sa catégorie PE/PAT métier.
 
 Une voie distincte d'invitation par jeton existe également : invitation, formulaire, confirmation ou refus par l'Admin RH.
 
@@ -307,7 +309,7 @@ Les réponses sont JSON, sauf l'export Excel et le téléchargement de documents
 
 | Méthode | URL | Accès | Objectif |
 | --- | --- | --- | --- |
-| GET / POST | `/api/personnel` | `view_personnel` / `create_personnel` | Liste ou crée une fiche ; chaque fiche renvoie `roles` (tableau `PE`/`PAT`, une personne peut avoir les deux) et, si PE, `etablissement_id`/`etablissement_nom`/`corps_pe`/`diplome`/`specialite`. Création/modification acceptent `roles: []` (au moins un requis) et `peInfos: {}` (établissement, corps, diplôme, spécialité). |
+| GET / POST | `/api/personnel` | `view_personnel` / `create_personnel` | Liste ou crée une fiche ; chaque fiche renvoie `roles` (tableau `PE`/`PAT`, une personne peut avoir les deux) et, si PE, `etablissement_id`/`etablissement_nom`/`corps_pe`/`diplome`/`specialite`. Création/modification acceptent `roles: []` (au moins un requis) et `peInfos: {}` (établissement, corps, diplôme, spécialité). La création accepte aussi `secretariatRole` (`SECRETAIRE_PE` ou `SECRETAIRE_PAT`), refusé si la fiche n'est pas PAT. |
 | GET / POST / PATCH | `/api/etablissements`, `/:id/desactiver`, `/:id/reactiver` | `view_personnel` (lecture) / `manage_etablissements` (écriture) | Établissements auxquels rattacher un PE ; désactivation seulement, jamais de suppression physique. |
 | GET | `/api/personnel/me` | `view_profil` | Fiche de l'utilisateur courant. |
 | PATCH | `/api/personnel/me/photo` | `view_profil` | Enregistre la photo personnelle multipart `photo` (JPG/PNG/WebP, 3 Mo maximum). |
@@ -525,6 +527,7 @@ Toutes les clés étrangères vers `users.id` ont un comportement `ON DELETE` ex
 | `017_create_reclamations.sql` | Crée `reclamations`. | Non |
 | `018_create_pe_pat_multi_role.sql` | Crée `personnel_roles`, `etablissements`, `personnel_pe_infos` ; rétro-remplit `personnel_roles` depuis `personnel.role`. `personnel.role` conservé, non supprimé. | Non |
 | `019_add_secretariat_roles.sql` | Élargit `users_role_check` à `SECRETAIRE_PE`/`SECRETAIRE_PAT` ; ajoute `decision_secretariat`/`decision_secretariat_le`/`avis_secretariat` sur `conges` et `demandes_documents` ; rétro-approuve les lignes déjà existantes (jamais bloquées rétroactivement par la nouvelle étape). | Non |
+| `020_add_personnel_secretariat_role.sql` | Ajoute la colonne nullable `personnel.secretariat_role` (`SECRETAIRE_PE`/`SECRETAIRE_PAT`, `CHECK`) désignée par l'Admin RH à la création de la fiche. | Non |
 
 Elles sont réexécutables sans risque (`IF NOT EXISTS` / `DROP CONSTRAINT IF EXISTS` avant chaque `ADD`) et n'altèrent jamais de données existantes. Les migrations `012` (type de colonne et `DEFAULT`) et `011` (contrainte) modifient la définition d'une colonne ou d'une contrainte, sans toucher aux lignes.
 

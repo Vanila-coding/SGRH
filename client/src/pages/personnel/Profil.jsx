@@ -161,9 +161,9 @@ export default function Profil() {
 
   if (!personnel && !error) {
     return (
-      <div className="mx-auto max-w-6xl space-y-6 pb-2" role="status" aria-label="Chargement du dossier personnel">
+      <div className="mx-auto max-w-[1600px] space-y-6 pb-2" role="status" aria-label="Chargement du dossier personnel">
         <Skeleton className="h-8 w-64 rounded" />
-        <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-navy/80 p-7">
+        <div className="overflow-hidden rounded-2xl bg-navy p-7">
           <div className="flex items-center gap-5">
             <SkeletonAvatar size={96} className="bg-white/20" />
             <div className="flex-1 space-y-3">
@@ -190,14 +190,14 @@ export default function Profil() {
   const estActif = (user?.status || 'active') === 'active';
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 pb-2">
+    <div className="mx-auto max-w-[1600px] space-y-6 pb-2">
       <PageHeader
         crumbs={[{ label: 'Mon espace', path: '/dashboard' }, { label: 'Mon dossier' }]}
         title="Mon dossier"
         subtitle="Informations personnelles et administratives"
       />
 
-      <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-navy/80 shadow-sm">
+      <div className="overflow-hidden rounded-2xl bg-navy shadow-sm">
         <div className="flex flex-col gap-5 p-5 text-white sm:flex-row sm:items-center sm:justify-between sm:p-7">
           <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
             <div className="relative shrink-0">

@@ -25,6 +25,27 @@
   button, input, select, textarea { font: inherit; }
 
   button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+
+  /* Chevron cohérent avec le reste du design (au lieu de la flèche native du
+     navigateur, visuellement "sèche" et inconsistante d'un OS à l'autre) — une seule
+     règle globale plutôt que de retoucher chaque `<select>` individuellement (une
+     quarantaine, répartis dans toute l'app), pour rester certain qu'aucun n'est oublié
+     et que les futurs select en bénéficient automatiquement. Ne s'applique pas aux
+     select `multiple` (listes déroulantes classiques uniquement) — aucun dans ce projet. */
+  select:not([multiple]) {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.65rem center;
+    background-size: 1.1rem;
+    /* !important : la plupart des select portent leur propre px-3/px-4 (Tailwind,
+       @layer utilities) qui écraserait sinon ce padding-right — avec !important, les
+       cascade layers de Tailwind v4 inversent leur priorité et @layer base l'emporte. */
+    padding-right: 2.25rem !important;
+  }
+  html.dark select:not([multiple]) {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  }
 }
 
 :root[data-text-size="small"] { font-size: 14px; }

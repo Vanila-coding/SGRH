@@ -9,6 +9,7 @@ export const ACTION_LABELS = {
   compte_desactive: { label: 'Compte désactivé', color: 'bg-red-50 text-status-rejected' },
   compte_reactive: { label: 'Compte réactivé', color: 'bg-green-50 text-status-approved' },
   compte_supprime: { label: 'Compte supprimé', color: 'bg-red-50 text-status-rejected' },
+  compte_contacte: { label: 'Compte contacté par e-mail', color: 'bg-blue-50 text-blue-600' },
   element_restaure: { label: 'Élément restauré', color: 'bg-green-50 text-status-approved' },
   element_supprime_definitivement: { label: 'Suppression définitive', color: 'bg-red-50 text-status-rejected' },
   corbeille_videe: { label: 'Corbeille vidée', color: 'bg-red-50 text-status-rejected' },

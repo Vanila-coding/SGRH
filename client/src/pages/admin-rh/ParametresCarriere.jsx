@@ -212,7 +212,7 @@ export default function ParametresCarriere() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-[1600px] mx-auto">
       <PageHeader
         crumbs={[{ label: 'Admin RH' }, { label: 'Carrière' }, { label: 'Paramètres carrière' }]}
         title="Paramètres carrière"

@@ -57,7 +57,7 @@ async function updatePhoto(req, res) {
 }
 
 async function create(req, res) {
-  const { matricule, nom, prenom, email, role, roles, fonction, corps, grade, poste, service, direction, telephone, typeContrat, dateRecrutement, dateEcheanceContrat, contratPermanent, categorieId, peInfos } = req.body;
+  const { matricule, nom, prenom, email, role, roles, fonction, corps, grade, poste, service, direction, telephone, typeContrat, dateRecrutement, dateEcheanceContrat, contratPermanent, categorieId, peInfos, secretariatRole } = req.body;
 
   const rolesFinal = Array.isArray(roles) && roles.length > 0 ? roles : (role ? [role] : []);
   if (!matricule || !nom || !email || rolesFinal.length === 0) {
@@ -69,7 +69,7 @@ async function create(req, res) {
 
   try {
     const personnel = await personnelService.createPersonnel(
-      { matricule, nom, prenom, email, roles: rolesFinal, fonction, corps, grade, poste, service, direction, telephone, typeContrat, dateRecrutement, dateEcheanceContrat, contratPermanent, categorieId, peInfos },
+      { matricule, nom, prenom, email, roles: rolesFinal, fonction, corps, grade, poste, service, direction, telephone, typeContrat, dateRecrutement, dateEcheanceContrat, contratPermanent, categorieId, peInfos, secretariatRole },
       req.user.id
     );
     return res.status(201).json({ message: 'Fiche personnel créée', personnel });

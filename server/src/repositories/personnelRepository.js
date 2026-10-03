@@ -3,22 +3,22 @@ const pool = require('../config/db');
 async function create({
   matricule, nom, prenom, email, role, fonction, corps, grade, poste, service, direction, telephone, typeContrat,
   dateRecrutement, dateEcheanceContrat, contratPermanent, indice, chapitreIb, categorieId,
-  classe, echelon, indiceNum, indiceSource,
+  classe, echelon, indiceNum, indiceSource, secretariatRole,
 }) {
   const result = await pool.query(
     `INSERT INTO personnel (
        matricule, nom, prenom, email, role, fonction, corps, grade, poste, service, direction, telephone, type_contrat,
        date_recrutement, date_echeance_contrat, contrat_permanent, indice, chapitre_ib, categorie_id,
-       classe, echelon, indice_num, indice_source
+       classe, echelon, indice_num, indice_source, secretariat_role
      )
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24)
      RETURNING *`,
     [
       matricule, nom, prenom, email, role, fonction || null, corps || null, grade || null, poste || null,
       service || null, direction || null, telephone || null, typeContrat || null,
       dateRecrutement || null, contratPermanent ? null : (dateEcheanceContrat || null), !!contratPermanent,
       indice || null, chapitreIb || null, categorieId || null,
-      classe || null, echelon || null, indiceNum ?? null, indiceSource || 'A_CONFIRMER',
+      classe || null, echelon || null, indiceNum ?? null, indiceSource || 'A_CONFIRMER', secretariatRole || null,
     ]
   );
   return result.rows[0];

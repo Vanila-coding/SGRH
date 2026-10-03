@@ -16,6 +16,7 @@ export default function Footer() {
   const nomApplication = useText('footer.nom_application', 'Université de Mahajanga', 'Footer');
   const description = useText('footer.description', '', 'Footer');
   const copyright = useText('footer.copyright', 'Tous droits réservés', 'Footer');
+  const developpeur = useText('footer.developpeur', 'JAOSOA Tanaël Faustin', 'Footer');
 
   const nomInstitution = useText('institution.nom', 'Université de Mahajanga', 'Institution');
   const adresse = useText('institution.adresse', '', 'Institution');
@@ -33,7 +34,10 @@ export default function Footer() {
     return (
       <footer className="text-center text-xs text-gray-400 dark:text-gray-500 py-4 space-y-0.5">
         {description && <p>{description}</p>}
-        <p>© {new Date().getFullYear()} {nomApplication} — {copyright}</p>
+        <p>
+          © {new Date().getFullYear()} {nomApplication} — {copyright}
+          {developpeur && <span className="text-gray-300 dark:text-gray-600"> · Développé par {developpeur}</span>}
+        </p>
       </footer>
     );
   }
@@ -63,7 +67,10 @@ export default function Footer() {
 
       <div className="mt-4 text-center space-y-0.5">
         {description && <p>{description}</p>}
-        <p>© {new Date().getFullYear()} {nomApplication} — {copyright}</p>
+        <p>
+          © {new Date().getFullYear()} {nomApplication} — {copyright}
+          {developpeur && <span className="text-gray-300 dark:text-gray-600"> · Développé par {developpeur}</span>}
+        </p>
       </div>
     </footer>
   );

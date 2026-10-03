@@ -13,6 +13,10 @@ async function requireAuth(req, res, next) {
     const payload = jwt.verify(header.split(' ')[1], JWT_SECRET);
     const user = await userRepository.findById(payload.sub);
     if (!user) return res.status(401).json({ message: 'Utilisateur introuvable' });
+    // Un token émis pendant que le compte était actif reste sinon valide jusqu'à son
+    // expiration (8h) même après désactivation — login() bloque déjà pending/inactive
+    // à la connexion, donc seul un compte désactivé EN COURS de session peut arriver ici.
+    if (user.status !== 'active') return res.status(401).json({ message: 'Compte inactif' });
 
     req.user = user;
     next();

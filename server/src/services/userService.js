@@ -58,11 +58,15 @@ async function registerWithMatricule(email, matricule, password) {
   if (password.length < 8) throw new Error('Le mot de passe doit contenir au moins 8 caractères');
   const passwordHash = await bcrypt.hash(password, 10);
 
+  // Un agent désigné secrétaire par l'Admin RH à la création de sa fiche (secretariat_role)
+  // obtient directement ce rôle d'accès au lieu de son rôle PE/PAT métier habituel.
+  const role = personnel.secretariat_role || personnel.role;
+
   const result = await pool.query(
-    `INSERT INTO users (role, personnel_id, password_hash, status)
-     VALUES ($1, $2, $3, 'pending')
-     RETURNING id, role, personnel_id, status`,
-    [personnel.role, personnel.id, passwordHash]
+    `INSERT INTO users (email, role, personnel_id, password_hash, status)
+     VALUES ($1, $2, $3, $4, 'pending')
+     RETURNING id, email, role, personnel_id, status`,
+    [email, role, personnel.id, passwordHash]
   );
 
   return result.rows[0];

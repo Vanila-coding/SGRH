@@ -45,6 +45,20 @@ async function sendAccountConfirmedEmail(toEmail) {
   });
 }
 
+async function sendAccountRestoredEmail(toEmail) {
+  await transporter.sendMail({
+    from: `"RH Université de Mahajanga" <${process.env.GMAIL_USER}>`,
+    to: toEmail,
+    subject: 'Votre compte a été restauré',
+    html: `
+      <p>Bonjour,</p>
+      <p>Votre compte sur la plateforme de gestion RH de l'Université de Mahajanga, précédemment supprimé, vient d'être restauré par l'administration.</p>
+      <p>Vous pouvez à nouveau vous connecter : <a href="${process.env.FRONTEND_URL}/login">${process.env.FRONTEND_URL}/login</a></p>
+      <p>Si vous ne vous attendiez pas à ce message, contactez l'administration RH.</p>
+    `,
+  });
+}
+
 async function sendOtpEmail(toEmail, code) {
   await transporter.sendMail({
     from: `"RH Université de Mahajanga" <${process.env.GMAIL_USER}>`,
@@ -87,4 +101,19 @@ async function sendPasswordResetEmail(toEmail, resetLink) {
   });
 }
 
-module.exports = { sendInvitationEmail, sendAccountConfirmedEmail, sendOtpEmail, sendRegistrationLinkEmail, sendPasswordResetEmail };
+// Message libre envoyé par un Superadmin à une personne précise (ex. avant de
+// supprimer son compte, ou pour l'avertir que son compte vient d'être créé/validé) —
+// sujet et corps saisis dans l'interface, pas un modèle figé comme les autres emails.
+async function sendCustomMessage(toEmail, subject, message) {
+  await transporter.sendMail({
+    from: `"RH Université de Mahajanga" <${process.env.GMAIL_USER}>`,
+    to: toEmail,
+    subject,
+    html: `<p>${String(message).replace(/\n/g, '<br>')}</p>`,
+  });
+}
+
+module.exports = {
+  sendInvitationEmail, sendAccountConfirmedEmail, sendOtpEmail, sendRegistrationLinkEmail, sendPasswordResetEmail,
+  sendCustomMessage, sendAccountRestoredEmail,
+};

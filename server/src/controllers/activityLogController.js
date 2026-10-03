@@ -8,11 +8,15 @@ const activityLogRepository = require('../repositories/activityLogRepository');
 // déduite dynamiquement : `activity_log.action_type` n'est pas relié à une permission en
 // base, chaque service l'écrit en dur.
 const TYPES_RESERVES_SUPERADMIN = [
-  'compte_desactive', 'compte_reactive', 'compte_supprime',
+  'compte_desactive', 'compte_reactive', 'compte_supprime', 'compte_contacte',
   'element_restaure', 'element_supprime_definitivement', 'corbeille_videe',
   'permission_modifiee',
   'apparence_modifiee', 'texte_modifie',
   'reclamation_deposee', 'reclamation_traitee',
+  // Qui s'est connecté et les modifications génériques de compte (mot de passe) ne
+  // concernent pas le périmètre métier de l'Admin RH (personnel, carrière, congés,
+  // contrats, documents) — seul le Superadmin les voit.
+  'connexion', 'mot_de_passe_modifie', 'mot_de_passe_reinitialise',
 ];
 
 async function list(req, res) {

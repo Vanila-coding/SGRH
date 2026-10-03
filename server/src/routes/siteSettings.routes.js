@@ -24,6 +24,7 @@ const router = express.Router();
 
 router.get('/', siteSettingsController.get); // public, volontairement sans requireAuth — nécessaire dès la page de login
 router.patch('/', requireAuth, requirePermission('manage_site_settings'), siteSettingsController.update);
+router.post('/reset-colors', requireAuth, requirePermission('manage_site_settings'), siteSettingsController.resetColors);
 router.post('/logo', ...upload(siteSettingsController.uploadLogo));
 router.post('/favicon', ...upload(siteSettingsController.uploadFavicon));
 router.post('/logo-connexion', ...upload(siteSettingsController.uploadLogoConnexion));

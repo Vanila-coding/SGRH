@@ -14,7 +14,7 @@ import { getMesDocuments } from '../../services/documentApi';
 import { getMyNotifications } from '../../services/notificationApi';
 import { Card, Badge, Skeleton, SkeletonText, EmptyState } from '../../components/ui';
 import { RH_ASSISTANT_QUESTIONS, answerRhQuestion } from '../../utils/rhAssistant';
-import { STATUT_CONTRAT_BADGE, STATUT_CONTRAT_LABELS, contratActuel, joursRestants } from '../../utils/dossier';
+import { STATUT_CONTRAT_BADGE, STATUT_CONTRAT_LABELS, contratActuel, joursRestants, formatJours } from '../../utils/dossier';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 function photoUrl(photo) {
@@ -33,15 +33,16 @@ const QUICK_LINKS = [
   { label: 'Mes documents', to: '/mes-documents', icon: FileStack },
 ];
 
-const ASSISTANT_CATEGORIES = [...new Set(RH_ASSISTANT_QUESTIONS.map((q) => q.category))];
+const CATEGORY_ICONS = { 'Contrat': FileSignature, 'Congés': CalendarClock, 'Situation / carrière': Award, 'Documents': FileStack };
 
 function DashboardSkeleton() {
   return (
     <div className="space-y-6" role="status" aria-label="Chargement du tableau de bord">
       <PageHeader crumbs={[{ label: 'Mon espace' }]} title="Tableau de bord" subtitle="Vue d'ensemble de votre espace personnel" />
       <Skeleton className="h-24 rounded-xl" />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
+      <Skeleton className="h-28 rounded-lg" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {Array.from({ length: 5 }).map((_, i) => (
           <Card key={i} padding="p-5">
             <Skeleton className="h-3 w-1/2 rounded mb-3" />
             <Skeleton className="h-5 w-2/3 rounded" />
@@ -108,7 +109,7 @@ export default function Dashboard() {
 
   if (!data) return <DashboardSkeleton />;
 
-  const { personnel, contrats, situations, carriere, demandes, documents, notifications } = data;
+  const { personnel, contrats, situations, carriere, demandes, documents, notifications, solde } = data;
 
   if (!personnel) {
     return (
@@ -122,6 +123,11 @@ export default function Dashboard() {
   const contrat = contratActuel(contrats);
   const jours = contrat?.date_fin ? joursRestants(contrat.date_fin) : null;
   const indice = personnel.indice || (personnel.indice_num ? String(personnel.indice_num) : null);
+  const demandesEnCours = demandes.filter((d) => d.status === 'en_attente').length
+    + documents.filter((d) => d.statut === 'en_attente').length;
+  const progressionSolde = solde?.dateRecrutementConnue && solde.droitsAnnee > 0
+    ? Math.max(0, Math.min(100, Math.round((solde.joursPrisAnnee / solde.droitsAnnee) * 100)))
+    : null;
 
   const activite = [
     situations?.actuelle && {
@@ -151,12 +157,8 @@ export default function Dashboard() {
       <PageHeader crumbs={[{ label: 'Mon espace' }]} title="Tableau de bord" subtitle="Vue d'ensemble de votre espace personnel" />
 
       {/* En-tête personnel */}
-      <div className="bg-navy rounded-xl p-6 text-white relative overflow-hidden">
-        <svg className="absolute inset-0 w-full h-full opacity-20" preserveAspectRatio="none" viewBox="0 0 400 150">
-          <circle cx="370" cy="10" r="90" fill="#F2B705" opacity="0.4" />
-          <path d="M0 130 Q 100 100 200 130 T 400 120 L400 150 L0 150 Z" fill="#F2B705" opacity="0.5" />
-        </svg>
-        <div className="relative z-10 flex items-center gap-4">
+      <div className="bg-navy rounded-xl p-6 text-white">
+        <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-full bg-white/10 overflow-hidden flex items-center justify-center text-xl font-bold shrink-0">
             {personnel.photo_profil ? (
               <img src={photoUrl(personnel.photo_profil)} alt="" className="w-full h-full object-cover" />
@@ -165,15 +167,53 @@ export default function Dashboard() {
             )}
           </div>
           <div>
-            <h2 className="text-xl font-bold">Bonjour, {personnel.prenom || personnel.email} 👋</h2>
+            <h2 className="text-xl font-bold">Bonjour, {personnel.prenom || personnel.email}</h2>
             <p className="text-sm text-white/70 mt-1">Voici un aperçu de votre situation administrative.</p>
           </div>
         </div>
       </div>
 
+      {/* Chiffre-clé : le solde de congé est l'information la plus consultée côté
+          personnel — elle était calculée (getSoldeConges) mais jamais affichée ici. */}
+      <Card as={Link} to="/conges" className="block transition hover:shadow-md hover:ring-1 hover:ring-navy/20 dark:hover:ring-gold/20" padding="p-6">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs text-gray-400 dark:text-gray-500">Solde de congés disponible</p>
+            {solde ? (
+              <p className="mt-1 text-4xl font-bold text-navy dark:text-gold">{formatJours(solde.soldeDisponible)}</p>
+            ) : (
+              <p className="mt-1 text-sm text-gray-400">Non disponible</p>
+            )}
+          </div>
+          {solde?.dateRecrutementConnue && (
+            <div className="flex gap-6 text-sm sm:border-l sm:border-gray-100 sm:pl-6 sm:dark:border-gray-700">
+              <div>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Droits acquis en {solde.annee}</p>
+                <p className="font-semibold text-navy dark:text-gray-100">{formatJours(solde.droitsAnnee)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Reliquat</p>
+                <p className="font-semibold text-navy dark:text-gray-100">{formatJours(solde.reliquat)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Déjà posés en {solde.annee}</p>
+                <p className="font-semibold text-navy dark:text-gray-100">{formatJours(solde.joursPrisAnnee)}</p>
+              </div>
+            </div>
+          )}
+        </div>
+        {progressionSolde !== null && (
+          <div className="mt-4" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressionSolde} aria-label="Part des droits annuels déjà posée">
+            <div className="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-gray-700">
+              <div className="h-full rounded-full bg-gold" style={{ width: `${progressionSolde}%` }} />
+            </div>
+          </div>
+        )}
+      </Card>
+
       {/* Cartes de synthèse */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card padding="p-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <Card as={Link} to="/carriere" className="block transition hover:shadow-md hover:ring-1 hover:ring-navy/20 dark:hover:ring-gold/20" padding="p-5">
           <p className="text-xs text-gray-400 mb-1">Situation administrative</p>
           {situations?.actuelle ? (
             <>
@@ -187,7 +227,7 @@ export default function Dashboard() {
           )}
         </Card>
 
-        <Card padding="p-5">
+        <Card as={Link} to="/mes-contrats" className="block transition hover:shadow-md hover:ring-1 hover:ring-navy/20 dark:hover:ring-gold/20" padding="p-5">
           <p className="text-xs text-gray-400 mb-1">Contrat actuel</p>
           {contrat ? (
             <>
@@ -201,7 +241,7 @@ export default function Dashboard() {
           )}
         </Card>
 
-        <Card padding="p-5">
+        <Card as={Link} to="/mes-contrats" className="block transition hover:shadow-md hover:ring-1 hover:ring-navy/20 dark:hover:ring-gold/20" padding="p-5">
           <p className="text-xs text-gray-400 mb-1">Échéance</p>
           {!contrat ? (
             <p className="text-sm text-gray-400">Aucun contrat enregistré</p>
@@ -220,7 +260,7 @@ export default function Dashboard() {
           )}
         </Card>
 
-        <Card padding="p-5">
+        <Card as={Link} to="/carriere" className="block transition hover:shadow-md hover:ring-1 hover:ring-navy/20 dark:hover:ring-gold/20" padding="p-5">
           <p className="text-xs text-gray-400 mb-1">Indice actuel</p>
           {indice ? (
             <p className="text-lg font-bold text-navy dark:text-gray-100">{indice}</p>
@@ -228,46 +268,48 @@ export default function Dashboard() {
             <p className="text-sm text-gray-400">Non renseigné</p>
           )}
         </Card>
+
+        <Card as={Link} to="/conges" className="block transition hover:shadow-md hover:ring-1 hover:ring-navy/20 dark:hover:ring-gold/20" padding="p-5">
+          <p className="text-xs text-gray-400 mb-1">Demandes en cours</p>
+          <p className="text-lg font-bold text-navy dark:text-gray-100">{demandesEnCours}</p>
+          <p className="text-xs text-gray-400 mt-1">Congés + documents en attente</p>
+        </Card>
       </div>
 
-      {/* Assistant RH */}
-      <Card>
-        <div className="flex items-center gap-2 mb-1">
-          <MessageCircleQuestion size={18} className="text-navy dark:text-gold" />
+      {/* Assistant RH : une grille compacte de petites cartes-questions (icône par
+          catégorie) plutôt qu'un mur de boutons ou un select caché — la liste reste
+          visible et scannable, sans prendre plus de deux rangées. */}
+      <Card padding="p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <MessageCircleQuestion size={18} className="text-navy dark:text-gold shrink-0" />
           <h3 className="font-semibold text-navy dark:text-gold">Assistant RH</h3>
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          Choisissez une question pour obtenir rapidement une information sur votre situation.
-        </p>
 
-        {ASSISTANT_CATEGORIES.map((cat) => (
-          <div key={cat} className="mb-3 last:mb-0">
-            <p className="text-[11px] font-semibold uppercase text-gray-400 mb-1.5">{cat}</p>
-            <div className="flex flex-wrap gap-2">
-              {RH_ASSISTANT_QUESTIONS.filter((q) => q.category === cat).map((q) => (
-                <button
-                  key={q.key}
-                  type="button"
-                  onClick={() => setAssistantKey(q.key)}
-                  aria-pressed={assistantKey === q.key}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition ${
-                    assistantKey === q.key
-                      ? 'bg-navy text-white border-navy dark:bg-gold dark:text-navy dark:border-gold'
-                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-navy dark:hover:border-gold'
-                  }`}
-                >
-                  {q.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+          {RH_ASSISTANT_QUESTIONS.map((q) => {
+            const Icon = CATEGORY_ICONS[q.category] || MessageCircleQuestion;
+            const active = assistantKey === q.key;
+            return (
+              <button
+                key={q.key}
+                type="button"
+                onClick={() => setAssistantKey(active ? null : q.key)}
+                aria-pressed={active}
+                className={`flex flex-col items-start gap-1.5 rounded-lg border p-3 text-left transition ${
+                  active
+                    ? 'border-navy bg-navy/5 dark:border-gold dark:bg-gold/10'
+                    : 'border-gray-200 dark:border-gray-600 hover:border-navy/40 dark:hover:border-gold/40'
+                }`}
+              >
+                <Icon size={16} className="text-navy dark:text-gold shrink-0" aria-hidden="true" />
+                <span className="text-xs font-medium leading-snug text-gray-700 dark:text-gray-200 line-clamp-2">{q.label}</span>
+              </button>
+            );
+          })}
+        </div>
 
         {assistantKey && (
-          <div className="mt-4 bg-navy/5 dark:bg-gold/5 rounded-md p-4" role="status">
-            <p className="text-xs text-gray-400 mb-1">
-              {RH_ASSISTANT_QUESTIONS.find((q) => q.key === assistantKey)?.label}
-            </p>
+          <div className="mt-3 bg-navy/5 dark:bg-gold/5 rounded-md p-4" role="status">
             <p className="text-sm text-navy dark:text-gray-100">
               {answerRhQuestion(assistantKey, data)}
             </p>

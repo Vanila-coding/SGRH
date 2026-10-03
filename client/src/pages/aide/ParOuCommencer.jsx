@@ -10,7 +10,7 @@ export default function ParOuCommencer() {
   const contenu = useText('aide.par_ou_commencer', DEFAUT, 'Aide');
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-[1600px] mx-auto">
       <PageHeader
         crumbs={[{ label: 'Aide' }, { label: 'Par où commencer' }]}
         title="Par où commencer ?"

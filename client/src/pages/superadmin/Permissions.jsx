@@ -54,7 +54,7 @@ export default function Permissions() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-[1600px] mx-auto">
         <PageHeader
           crumbs={[{ label: 'Administration' }, { label: 'Rôles & permissions' }]}
           title="Rôles & permissions"
@@ -68,7 +68,7 @@ export default function Permissions() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-[1600px] mx-auto">
       <PageHeader
         crumbs={[{ label: 'Administration' }, { label: 'Rôles & permissions' }]}
         title="Rôles & permissions"

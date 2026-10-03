@@ -47,7 +47,7 @@ export default function Reclamation() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-[1600px] mx-auto">
       <PageHeader
         crumbs={[{ label: 'Aide' }, { label: 'Signaler un problème' }]}
         title="Signaler un problème"

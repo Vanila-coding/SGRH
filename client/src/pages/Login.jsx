@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, Sparkle } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useText } from '../context/TextContext';
 import { useSiteSettings } from '../context/SiteSettingsContext';
@@ -54,18 +54,11 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-indigo-50 to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-gray-950">
       <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-4xl grid md:grid-cols-2 rounded-3xl shadow-2xl overflow-hidden bg-white dark:bg-gray-800">
-          <div
-            className="relative overflow-hidden flex flex-col justify-between p-8 sm:p-10 min-h-[220px] md:min-h-[520px]"
-            style={{ background: 'radial-gradient(circle at 25% 15%, #a78bfa 0%, #7c6ee6 30%, #5b6ee8 60%, #3b82f6 100%)' }}
-          >
-            <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
-            <div className="absolute -left-10 bottom-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
-
+          <div className="relative overflow-hidden flex flex-col justify-between p-8 sm:p-10 min-h-[220px] md:min-h-[520px] bg-navy">
             <div className="relative z-10 flex items-center gap-2">
-              <Sparkle size={20} className="text-white fill-white" aria-hidden="true" />
               <img
                 src={settings.logo_connexion_url || settings.logo_principal_url || '/logo-univ-mahajanga.png'}
                 alt="Université de Mahajanga"
@@ -83,12 +76,7 @@ export default function Login() {
 
           <div className="flex items-center justify-center p-8 sm:p-10">
             <div className="w-full max-w-sm">
-              <div className="flex items-center gap-2 mb-5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-500/10">
-                  <Sparkle size={16} className="text-indigo-500" aria-hidden="true" />
-                </span>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{labelConnexion}</p>
-              </div>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">{labelConnexion}</p>
               <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">{titreFormulaire}</h2>
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -101,7 +89,7 @@ export default function Login() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
                     />
                   </div>
                 </div>
@@ -115,12 +103,12 @@ export default function Login() {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl pl-10 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl pl-10 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-500"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-navy dark:hover:text-gold"
                       tabIndex={-1}
                     >
                       {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
@@ -134,11 +122,11 @@ export default function Login() {
                       type="checkbox"
                       checked={remember}
                       onChange={(e) => setRemember(e.target.checked)}
-                      className="w-4 h-4 accent-indigo-500"
+                      className="w-4 h-4 accent-navy"
                     />
                     {labelRemember}
                   </label>
-                  <Link to="/mot-de-passe-oublie" className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
+                  <Link to="/mot-de-passe-oublie" className="text-navy dark:text-gold font-medium hover:underline">
                     {labelMdpOublie}
                   </Link>
                 </div>
@@ -146,8 +134,7 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full text-white rounded-xl py-3 font-medium hover:opacity-90 disabled:opacity-50 transition"
-                  style={{ background: 'linear-gradient(90deg, #7c6ee6, #3b82f6)' }}
+                  className="w-full bg-navy text-white rounded-xl py-3 font-medium hover:opacity-90 disabled:opacity-50 transition"
                 >
                   {loading ? boutonConnexionChargement : boutonConnexion}
                 </button>
@@ -156,7 +143,7 @@ export default function Login() {
               </form>
 
               <p className="text-xs text-gray-400 text-center mt-6">
-                {texteInscription} <Link to="/register" className="text-indigo-600 dark:text-indigo-400 font-medium">{lienInscription}</Link>
+                {texteInscription} <Link to="/register" className="text-navy dark:text-gold font-medium">{lienInscription}</Link>
               </p>
             </div>
           </div>

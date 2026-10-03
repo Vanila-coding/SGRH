@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Trash2, Search } from 'lucide-react';
 import { listCorbeille, restoreFromCorbeille, deletePermanently, emptyCorbeille } from '../../services/corbeilleApi';
 import PageHeader from '../../components/PageHeader';
 import { SkeletonCard } from '../../components/ui/Skeleton';
@@ -13,6 +13,7 @@ export default function Corbeille() {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [confirmEmptyAll, setConfirmEmptyAll] = useState(false);
   const [emptying, setEmptying] = useState(false);
+  const [recherche, setRecherche] = useState('');
 
   async function load() {
     setLoading(true);
@@ -62,8 +63,18 @@ export default function Corbeille() {
     }
   }
 
+  const filtered = useMemo(() => {
+    const terme = recherche.trim().toLowerCase();
+    if (!terme) return items;
+    return items.filter((item) => {
+      const donnees = item.type_element === 'compte' ? item.donnees?.user : item.donnees;
+      return [donnees?.email, donnees?.role, donnees?.id, item.supprime_par_email]
+        .some((champ) => champ != null && String(champ).toLowerCase().includes(terme));
+    });
+  }, [items, recherche]);
+
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-[1600px] mx-auto">
       <PageHeader
         crumbs={[{ label: 'Administration' }, { label: 'Corbeille' }]}
         title="Corbeille"
@@ -71,7 +82,17 @@ export default function Corbeille() {
       />
 
       {!loading && items.length > 0 && (
-        <div className="flex justify-end mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div className="relative flex-1 min-w-[200px] max-w-md">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+            <input
+              type="text"
+              value={recherche}
+              onChange={(e) => setRecherche(e.target.value)}
+              placeholder="Rechercher par email, rôle ou supprimé par..."
+              className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md pl-9 pr-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
+            />
+          </div>
           {confirmEmptyAll ? (
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">Supprimer définitivement les {items.length} éléments ?</span>
@@ -103,6 +124,9 @@ export default function Corbeille() {
 
       {error && <p className="text-sm text-status-rejected mb-4">{error}</p>}
       {!loading && items.length === 0 && <p className="text-gray-500">La corbeille est vide.</p>}
+      {!loading && items.length > 0 && filtered.length === 0 && (
+        <p className="text-gray-500">Aucun élément ne correspond à cette recherche.</p>
+      )}
 
       {loading ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -111,7 +135,7 @@ export default function Corbeille() {
         </div>
       ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        {items.map((item) => {
+        {filtered.map((item) => {
           // Un compte utilisateur (`archiveAndDeleteCompte`) est archivé avec ses données
           // liées (congés, notifications...) : l'utilisateur lui-même est imbriqué sous
           // `donnees.user`. Les autres types (`personnel_modifie`...) stockent la ligne

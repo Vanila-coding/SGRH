@@ -1,5 +1,14 @@
 const pool = require('../config/db');
 
+// La vue `user_details` inclut password_hash (nécessaire à authService.login et
+// changePassword) — toute fonction dont le résultat peut remonter jusqu'à une réponse
+// API (req.user via requireAuth, GET /auth/me, GET /pending-accounts...) doit sélectionner
+// des colonnes explicites plutôt que `SELECT *`, pour ne jamais renvoyer le hash au client.
+const COLONNES_PUBLIQUES = `
+  id, role, status, personnel_id, created_at, email,
+  matricule, nom, prenom, fonction, corps, grade, service, direction, telephone, type_contrat
+`;
+
 async function create({ role, email, passwordHash, personnelId }) {
   const result = await pool.query(
     `INSERT INTO users (role, email, password_hash, personnel_id, status)
@@ -11,12 +20,19 @@ async function create({ role, email, passwordHash, personnelId }) {
 }
 
 async function findByEmail(email) {
+  const result = await pool.query(`SELECT ${COLONNES_PUBLIQUES} FROM user_details WHERE email = $1`, [email]);
+  return result.rows[0] || null;
+}
+
+// Réservée à authService.login (seul endroit qui a réellement besoin du hash pour
+// bcrypt.compare) — jamais renvoyée telle quelle par un contrôleur.
+async function findByEmailAvecMotDePasse(email) {
   const result = await pool.query(`SELECT * FROM user_details WHERE email = $1`, [email]);
   return result.rows[0] || null;
 }
 
 async function findById(id) {
-  const result = await pool.query(`SELECT * FROM user_details WHERE id = $1`, [id]);
+  const result = await pool.query(`SELECT ${COLONNES_PUBLIQUES} FROM user_details WHERE id = $1`, [id]);
   return result.rows[0] || null;
 }
 
@@ -91,7 +107,7 @@ async function updateFonction(userId, fonction) {
 
 async function findPending() {
   const result = await pool.query(
-    `SELECT * FROM user_details WHERE status = 'pending' ORDER BY created_at ASC`
+    `SELECT ${COLONNES_PUBLIQUES} FROM user_details WHERE status = 'pending' ORDER BY created_at ASC`
   );
   return result.rows;
 }
@@ -110,7 +126,7 @@ async function reject(id) {
 
 async function listAllAccounts() {
   const result = await pool.query(
-    `SELECT id, role, status, email, matricule, nom, prenom, created_at
+    `SELECT id, role, status, email, matricule, nom, prenom, telephone, created_at
      FROM user_details ORDER BY created_at DESC`
   );
   return result.rows;
@@ -157,7 +173,7 @@ async function restore(row) {
 }
 
 module.exports = {
-  create, findByEmail, findById, findFullById, updatePassword,
+  create, findByEmail, findByEmailAvecMotDePasse, findById, findFullById, updatePassword,
   countByRole, countNewThisMonth, listActive, listPersonnelWithLeaveStatus, updateFonction,
   findPending, activate, reject, listAllAccounts, setStatus, setRole, deleteAccount,
   findFullByIdRaw, deleteRaw, restore,

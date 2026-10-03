@@ -52,7 +52,7 @@ export default function Reclamations() {
   const traitees = reclamations.filter((r) => r.statut === 'traitee');
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-[1600px] mx-auto">
       <PageHeader crumbs={[{ label: 'Administration' }, { label: 'Réclamations' }]} title="Réclamations" subtitle="Problèmes signalés par le personnel" />
 
       {error && <p className="text-sm text-status-rejected mb-4">{error}</p>}

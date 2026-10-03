@@ -104,7 +104,7 @@ export default function OrganisationRH() {
   }
 
   return (
-    <div className="max-w-4xl">
+    <div className="mx-auto max-w-[1600px]">
       <PageHeader
         crumbs={[{ label: 'Admin RH' }, { label: 'Personnel', path: '/admin/personnel' }, { label: 'Directions & services' }]}
         title="Directions & services"

@@ -16,7 +16,7 @@ const empty = {
   matricule: '', nom: '', prenom: '', email: '', roles: ['PE'], fonction: '',
   corps: '', grade: '', poste: '', categorieId: '', service: '', direction: '', telephone: '', typeContrat: '',
   dateRecrutement: '', dateEcheanceContrat: '', contratPermanent: false,
-  etablissementId: '', corpsPe: '', diplome: '', specialite: '',
+  etablissementId: '', corpsPe: '', diplome: '', specialite: '', secretariatRole: '',
 };
 
 export default function AjouterEmployeModal({ onClose, onSuccess }) {
@@ -54,7 +54,9 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
     setForm((prev) => {
       const has = prev.roles.includes(role);
       const roles = has ? prev.roles.filter((r) => r !== role) : [...prev.roles, role];
-      return { ...prev, roles, fonction: '' };
+      // Un PE n'est jamais secrétaire : si PAT est décoché, la désignation retombe.
+      const secretariatRole = roles.includes('PAT') ? prev.secretariatRole : '';
+      return { ...prev, roles, fonction: '', secretariatRole };
     });
   }
 
@@ -156,6 +158,20 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
               </label>
             </div>
           </div>
+          {form.roles.includes('PAT') && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Secrétariat</label>
+              <select
+                value={form.secretariatRole}
+                onChange={(e) => update('secretariatRole', e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
+              >
+                <option value="">Aucun</option>
+                <option value="SECRETAIRE_PE">Secrétaire PE</option>
+                <option value="SECRETAIRE_PAT">Secrétaire PAT</option>
+              </select>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fonction</label>
             <select

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { resolveIndice, CLASSES_GRILLE } from '../services/grilleIndiciaireApi';
+import SelectMenu from './ui/SelectMenu';
 
 const CATEGORIES = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 
@@ -62,17 +63,17 @@ export default function GrilleIndiciaireSelector({ regime, value, onChange, date
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Classe</label>
-          <select className={inputClass} value={value.classe || ''} onChange={(e) => update('classe', e.target.value)}>
+          <SelectMenu className={inputClass} value={value.classe || ''} onChange={(e) => update('classe', e.target.value)}>
             <option value="">-- Choisir --</option>
             {CLASSES_GRILLE.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-          </select>
+          </SelectMenu>
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Échelon</label>
-          <select className={inputClass} value={value.echelon || ''} onChange={(e) => update('echelon', e.target.value)} disabled={!classeInfo}>
+          <SelectMenu className={inputClass} value={value.echelon || ''} onChange={(e) => update('echelon', e.target.value)} disabled={!classeInfo}>
             <option value="">-- Choisir --</option>
             {echelons.map((e) => <option key={e} value={e}>{e}</option>)}
-          </select>
+          </SelectMenu>
         </div>
       </div>
 
@@ -81,10 +82,10 @@ export default function GrilleIndiciaireSelector({ regime, value, onChange, date
           <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
             Catégorie (régime transitoire — Décret n°97-009, Circulaire n°132/2005)
           </label>
-          <select className={inputClass} value={value.categorie || ''} onChange={(e) => update('categorie', e.target.value)}>
+          <SelectMenu className={inputClass} value={value.categorie || ''} onChange={(e) => update('categorie', e.target.value)}>
             <option value="">-- Choisir --</option>
             {CATEGORIES.map((c) => <option key={c} value={c}>Catégorie {c}</option>)}
-          </select>
+          </SelectMenu>
         </div>
       )}
 

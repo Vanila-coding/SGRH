@@ -4,6 +4,8 @@ import { getPendingSecretariat, reviewSecretariat, telechargerJustificatifConge 
 import PageHeader from '../../components/PageHeader';
 import { JUSTIFICATIF_OBLIGATOIRE } from '../../constants/conges';
 import { SkeletonCard, EmptyState } from '../../components/ui';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe, { classeConteneur } from '../../hooks/useVueListe';
 
 // Vérification formelle avant transmission au RH : le secrétariat contrôle les
 // pièces et la cohérence, il ne décide pas d'accorder ou refuser le congé sur le
@@ -11,6 +13,7 @@ import { SkeletonCard, EmptyState } from '../../components/ui';
 // vocabulaire différent de CongesAdmin.jsx (« Transmettre »/« Renvoyer », pas
 // « Approuver »/« Refuser »).
 export default function CongesSecretariat() {
+  const [vue, setVue] = useVueListe('conges-secretariat');
   const [demandes, setDemandes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState('');
@@ -51,17 +54,20 @@ export default function CongesSecretariat() {
   return (
     <div>
       <PageHeader crumbs={[{ label: 'Secrétariat' }, { label: 'Congés à vérifier' }]} title="Congés à vérifier" subtitle="Vérifiez les pièces et la cohérence avant transmission au RH" />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
 
       {actionError && <p className="text-sm text-status-rejected mb-4">{actionError}</p>}
       {loading && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className={classeConteneur(vue, 4)}>
           <SkeletonCard lines={2} />
           <SkeletonCard lines={2} />
         </div>
       )}
       {!loading && demandes.length === 0 && <EmptyState title="Aucune demande en attente de vérification." />}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className={classeConteneur(vue, 4)}>
         {demandes.map((d) => (
           <div key={d.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
             <div className="mb-3">

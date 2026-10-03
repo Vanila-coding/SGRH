@@ -3,6 +3,8 @@ import { Search } from 'lucide-react';
 import { getDemandesEnAttenteSecretariat, reviewDemandeSecretariat } from '../../services/documentApi';
 import PageHeader from '../../components/PageHeader';
 import { SkeletonCard } from '../../components/ui/Skeleton';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe from '../../hooks/useVueListe';
 
 const TYPE_LABELS = { certificat_administratif: 'Certificat administratif', lettre_confirmation: 'Lettre de confirmation', etat_conge: 'État de congé' };
 
@@ -10,6 +12,7 @@ const TYPE_LABELS = { certificat_administratif: 'Certificat administratif', lett
 // CongesSecretariat.jsx : le secrétariat filtre, il ne génère jamais le document
 // lui-même (ça reste une action RH, cf. DemandesDocuments.jsx).
 export default function DemandesDocumentsSecretariat() {
+  const [vue, setVue] = useVueListe('demandes-secretariat');
   const [demandes, setDemandes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -52,6 +55,9 @@ export default function DemandesDocumentsSecretariat() {
   return (
     <div>
       <PageHeader crumbs={[{ label: 'Secrétariat' }, { label: 'Demandes de documents' }]} title="Demandes de documents" subtitle="Vérifiez les demandes avant transmission au RH" />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
 
       {error && <p className="text-sm text-status-rejected mb-4">{error}</p>}
       {!loading && demandes.length === 0 && <p className="text-gray-500">Aucune demande en attente de vérification.</p>}
@@ -79,7 +85,7 @@ export default function DemandesDocumentsSecretariat() {
       {demandes.length > 0 && filtered.length === 0 && (
         <p className="text-sm text-gray-400">Aucune demande ne correspond à « {search} ».</p>
       )}
-      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
+      <div className={vue === 'liste' ? 'flex flex-col gap-4' : 'grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'}>
         {filtered.map((d) => (
           <div key={d.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
             <div className="min-w-0 mb-3">

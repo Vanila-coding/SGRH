@@ -5,6 +5,7 @@ import { generateDocument, getHistoriquePersonnel } from '../../services/documen
 import PageHeader from '../../components/PageHeader';
 import PersonnelSearchSelect from '../../components/PersonnelSearchSelect';
 import { Skeleton } from '../../components/ui/Skeleton';
+import SelectMenu from '../../components/ui/SelectMenu';
 
 const TYPES_DOCUMENT = [
   { value: 'certificat_administratif', label: 'Certificat administratif' },
@@ -74,13 +75,13 @@ export default function DocumentsAdmin() {
           />
           )}
 
-          <select
+          <SelectMenu
             value={typeDocument}
             onChange={(e) => setTypeDocument(e.target.value)}
             className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
           >
             {TYPES_DOCUMENT.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-          </select>
+          </SelectMenu>
 
           <button
             type="submit"

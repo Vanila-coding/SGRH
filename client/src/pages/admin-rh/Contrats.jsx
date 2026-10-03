@@ -11,12 +11,32 @@ import { SkeletonCard } from '../../components/ui';
 import Modal from '../../components/ui/Modal';
 import PersonnelSearchSelect from '../../components/PersonnelSearchSelect';
 import { toast } from '../../utils/toast';
+import SelectMenu from '../../components/ui/SelectMenu';
 
 const STATUT_CONTRAT_LABELS = {
   actif: 'Actif', expire: 'Expiré', renouvele: 'Renouvelé', non_renouvele: 'Non renouvelé', resilie: 'Résilié',
 };
 
 const emptyContratForm = { typeContrat: TYPES_CONTRAT[0], dateDebut: '', dateFin: '', referenceDecision: '', observations: '' };
+
+// Le sélecteur natif affiche « jj/mm/aaaa » quand il est vide et ce texte n'est pas
+// modifiable ; on pose donc le libellé « Début » ou « Fin » par-dessus, sans bloquer le
+// clic ni l'icône du calendrier.
+function ChampDate({ libelle, value, className, ...props }) {
+  return (
+    <div className="relative min-w-0">
+      <input type="date" value={value} className={`w-full ${className}`} {...props} />
+      {!value && (
+        <span
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-px right-9 flex items-center rounded-l-md bg-white px-3 text-gray-400 dark:bg-gray-700 dark:text-gray-500 ${className.includes('text-xs') ? 'text-xs' : 'text-sm'}`}
+        >
+          {libelle}
+        </span>
+      )}
+    </div>
+  );
+}
 
 export default function Contrats() {
   const [searchParams] = useSearchParams();
@@ -178,23 +198,23 @@ export default function Contrats() {
           </h3>
 
           <form onSubmit={handleImportContrat} className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
-            <select
+            <SelectMenu
               required value={contratForm.typeContrat}
               onChange={(e) => setContratForm((p) => ({ ...p, typeContrat: e.target.value }))}
               className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
             >
               {TYPES_CONTRAT.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
-            <input
-              type="date" required placeholder="Date de début" value={contratForm.dateDebut}
+            </SelectMenu>
+            <ChampDate libelle="Début"
+              type="date" required value={contratForm.dateDebut}
               onChange={(e) => setContratForm((p) => ({ ...p, dateDebut: e.target.value }))}
               className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
-            />
-            <input
-              type="date" placeholder="Date de fin" value={contratForm.dateFin}
+              />
+            <ChampDate libelle="Fin"
+              type="date" value={contratForm.dateFin}
               onChange={(e) => setContratForm((p) => ({ ...p, dateFin: e.target.value }))}
               className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
-            />
+              />
             <input
               type="text" placeholder="Référence décision" value={contratForm.referenceDecision}
               onChange={(e) => setContratForm((p) => ({ ...p, referenceDecision: e.target.value }))}
@@ -287,23 +307,23 @@ export default function Contrats() {
                         <p className="sm:col-span-4 text-xs text-gray-400">
                           Renégociation en cours — renseignez le nouveau contrat une fois signé.
                         </p>
-                        <select
+                        <SelectMenu
                           required value={renouvelForm.typeContrat}
                           onChange={(e) => setRenouvelForm((p) => ({ ...p, typeContrat: e.target.value }))}
                           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                         >
                           {TYPES_CONTRAT.map((t) => <option key={t} value={t}>{t}</option>)}
-                        </select>
-                        <input
-                          type="date" required value={renouvelForm.dateDebut}
-                          onChange={(e) => setRenouvelForm((p) => ({ ...p, dateDebut: e.target.value }))}
-                          className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
-                        />
-                        <input
-                          type="date" placeholder="Date de fin" value={renouvelForm.dateFin}
-                          onChange={(e) => setRenouvelForm((p) => ({ ...p, dateFin: e.target.value }))}
-                          className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
-                        />
+                        </SelectMenu>
+                        <ChampDate libelle="Début"
+                            type="date" required value={renouvelForm.dateDebut}
+                            onChange={(e) => setRenouvelForm((p) => ({ ...p, dateDebut: e.target.value }))}
+                            className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
+                          />
+                        <ChampDate libelle="Fin"
+                            type="date" value={renouvelForm.dateFin}
+                            onChange={(e) => setRenouvelForm((p) => ({ ...p, dateFin: e.target.value }))}
+                            className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
+                          />
                         <input
                           type="file" required accept="application/pdf"
                           onChange={(e) => setRenouvelFile(e.target.files[0] || null)}

@@ -48,4 +48,24 @@ async function changerStatut(idRaw, statut, parId) {
   return updated;
 }
 
-module.exports = { EtablissementError, creer, changerStatut };
+async function renommer(idRaw, nomRaw, parId) {
+  const id = Number(idRaw);
+  if (!Number.isInteger(id) || id < 1) throw new EtablissementError('Identifiant d\'établissement invalide.');
+  const nom = nettoyerNom(nomRaw);
+
+  const etablissement = await etablissementRepository.findById(id);
+  if (!etablissement) throw new EtablissementError('Établissement introuvable.', 404);
+  if (etablissement.nom === nom) return etablissement;
+
+  let updated;
+  try {
+    updated = await etablissementRepository.setNom(id, nom);
+  } catch (err) {
+    if (err.code === '23505') throw new EtablissementError('Un établissement porte déjà ce nom.', 409);
+    throw err;
+  }
+  await activityLogRepository.create(parId, 'etablissement_renomme', `Établissement renommé : ${etablissement.nom} → ${nom}`);
+  return updated;
+}
+
+module.exports = { EtablissementError, creer, renommer, changerStatut };

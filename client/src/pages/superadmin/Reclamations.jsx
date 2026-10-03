@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { getToutesReclamations, traiterReclamation } from '../../services/reclamationApi';
 import PageHeader from '../../components/PageHeader';
 import { SkeletonCard } from '../../components/ui/Skeleton';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe from '../../hooks/useVueListe';
 
 const STATUT_LABELS = {
   ouverte: { label: 'En attente', color: 'bg-amber-50 text-status-pending' },
@@ -14,6 +16,7 @@ function nomAuteur(r) {
 }
 
 export default function Reclamations() {
+  const [vue, setVue] = useVueListe('reclamations-superadmin');
   const [reclamations, setReclamations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -54,6 +57,9 @@ export default function Reclamations() {
   return (
     <div className="max-w-[1600px] mx-auto">
       <PageHeader crumbs={[{ label: 'Administration' }, { label: 'Réclamations' }]} title="Réclamations" subtitle="Problèmes signalés par le personnel" />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
 
       {error && <p className="text-sm text-status-rejected mb-4">{error}</p>}
 
@@ -69,7 +75,7 @@ export default function Reclamations() {
           {ouvertes.length > 0 && (
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-navy dark:text-gold mb-3">En attente ({ouvertes.length})</h3>
-              <div className="space-y-3">
+              <div className={vue === 'liste' ? 'space-y-3' : 'grid grid-cols-1 lg:grid-cols-2 gap-3'}>
                 {ouvertes.map((r) => (
                   <div key={r.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                     <div className="flex items-start justify-between gap-3">
@@ -125,7 +131,7 @@ export default function Reclamations() {
           {traitees.length > 0 && (
             <div>
               <h3 className="text-sm font-semibold text-navy dark:text-gold mb-3">Traitées ({traitees.length})</h3>
-              <div className="space-y-3">
+              <div className={vue === 'liste' ? 'space-y-3' : 'grid grid-cols-1 lg:grid-cols-2 gap-3'}>
                 {traitees.map((r) => (
                   <div key={r.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 opacity-75">
                     <div className="flex items-start justify-between gap-3">

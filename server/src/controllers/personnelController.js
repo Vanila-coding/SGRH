@@ -6,6 +6,28 @@ const pool = require('../config/db');
 const personnelRepository = require('../repositories/personnelRepository');
 const personnelService = require('../services/personnelService');
 const { imageExtension } = require('../utils/imageType');
+const { FONCTIONS_PAR_ROLE } = require('../services/userService');
+
+const ROLES_EXCEL = ['PE', 'PAT'];
+const CORPS_OPTIONS = ['EFA', 'ELD', 'Fonctionnaire'];
+const TYPES_CONTRAT_OPTIONS = ['CDI', 'CDD', 'Vacataire', 'Stagiaire'];
+const COLONNES_IMPORT = [
+  { header: 'Matricule', key: 'matricule', width: 12 },
+  { header: 'Nom', key: 'nom', width: 20 },
+  { header: 'Prénom', key: 'prenom', width: 20 },
+  { header: 'Email', key: 'email', width: 28 },
+  { header: 'Rôle', key: 'role', width: 8 },
+  { header: 'Fonction', key: 'fonction', width: 22 },
+  { header: 'Corps', key: 'corps', width: 12 },
+  { header: 'Grade', key: 'grade', width: 18 },
+  { header: 'Service', key: 'service', width: 20 },
+  { header: 'Direction', key: 'direction', width: 20 },
+  { header: 'Téléphone', key: 'telephone', width: 16 },
+  { header: 'Type de contrat', key: 'type_contrat', width: 16 },
+  { header: 'Classe', key: 'classe', width: 20 },
+  { header: 'Échelon', key: 'echelon', width: 10 },
+  { header: 'Indice', key: 'indice', width: 12 },
+];
 
 async function me(req, res) {
   const fiche = await personnelRepository.findByUserId(req.user.id);
@@ -117,35 +139,26 @@ async function sendRegistrationLink(req, res) {
 }
 
 async function exportExcel(req, res) {
+  const roleFiltre = ROLES_EXCEL.includes(req.query.role) ? req.query.role : null;
   try {
-    const result = await pool.query(`SELECT * FROM personnel ORDER BY nom NULLS LAST, matricule`);
+    const result = await pool.query(
+      `SELECT p.* FROM personnel p
+       WHERE ($1::text IS NULL OR EXISTS (SELECT 1 FROM personnel_roles pr WHERE pr.personnel_id = p.id AND pr.role = $1))
+       ORDER BY p.nom NULLS LAST, p.matricule`,
+      [roleFiltre]
+    );
 
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Personnel');
 
-    sheet.columns = [
-      { header: 'Matricule', key: 'matricule', width: 12 },
-      { header: 'Nom', key: 'nom', width: 20 },
-      { header: 'Prénom', key: 'prenom', width: 20 },
-      { header: 'Email', key: 'email', width: 28 },
-      { header: 'Rôle', key: 'role', width: 8 },
-      { header: 'Fonction', key: 'fonction', width: 22 },
-      { header: 'Corps', key: 'corps', width: 12 },
-      { header: 'Grade', key: 'grade', width: 18 },
-      { header: 'Service', key: 'service', width: 20 },
-      { header: 'Direction', key: 'direction', width: 20 },
-      { header: 'Téléphone', key: 'telephone', width: 16 },
-      { header: 'Type de contrat', key: 'type_contrat', width: 16 },
-      { header: 'Classe', key: 'classe', width: 20 },
-      { header: 'Échelon', key: 'echelon', width: 10 },
-      { header: 'Indice', key: 'indice', width: 12 },
-    ];
+    sheet.columns = COLONNES_IMPORT;
     sheet.getRow(1).font = { bold: true };
 
     result.rows.forEach((row) => sheet.addRow(row));
 
+    const nomFichier = roleFiltre ? `personnel-${roleFiltre}.xlsx` : 'personnel.xlsx';
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename="personnel.xlsx"');
+    res.setHeader('Content-Disposition', `attachment; filename="${nomFichier}"`);
 
     await workbook.xlsx.write(res);
     res.end();
@@ -153,6 +166,62 @@ async function exportExcel(req, res) {
     console.error('Erreur export Excel:', err);
     res.status(500).json({ message: "Erreur lors de l'export" });
   }
+}
+
+async function modeleImportExcel(req, res) {
+  const role = ROLES_EXCEL.includes(req.query.role) ? req.query.role : 'PE';
+  const workbook = new ExcelJS.Workbook();
+
+  const sheet = workbook.addWorksheet('Personnel');
+  sheet.columns = COLONNES_IMPORT;
+  sheet.getRow(1).font = { bold: true };
+  sheet.addRow({
+    matricule: '123456', nom: 'EXEMPLE', prenom: 'Jean', email: 'jean.exemple@univ.mg', role,
+    fonction: FONCTIONS_PAR_ROLE[role][0], corps: 'Fonctionnaire', type_contrat: 'CDI',
+  });
+  sheet.getRow(2).font = { italic: true, color: { argb: 'FF888888' } };
+
+  const listes = {
+    role: '"PE,PAT"',
+    corps: `"${CORPS_OPTIONS.join(',')}"`,
+    type_contrat: `"${TYPES_CONTRAT_OPTIONS.join(',')}"`,
+    fonction: `"${[...new Set([...FONCTIONS_PAR_ROLE.PE, ...FONCTIONS_PAR_ROLE.PAT])].join(',')}"`,
+  };
+  const colonne = { role: 'E', fonction: 'F', corps: 'G', type_contrat: 'L' };
+  for (let ligne = 2; ligne <= 500; ligne++) {
+    for (const [cle, lettre] of Object.entries(colonne)) {
+      sheet.getCell(`${lettre}${ligne}`).dataValidation = { type: 'list', allowBlank: true, formulae: [listes[cle]] };
+    }
+  }
+
+  const aide = workbook.addWorksheet('Instructions');
+  aide.getColumn(1).width = 110;
+  const lignes = [
+    'Mode d’emploi de l’import du personnel',
+    '',
+    '1. Remplissez la feuille « Personnel ». Supprimez la ligne d’exemple (en grisé) avant d’importer.',
+    '2. Une ligne = une fiche. Les colonnes Matricule, Nom, Email et Rôle sont obligatoires.',
+    '3. Matricule : exactement 6 chiffres, unique.',
+    '4. Email : unique, au format adresse@domaine.',
+    '5. Rôle : PE (enseignant) ou PAT (administratif et technique).',
+    `6. Fonction (valeurs admises) : ${[...new Set([...FONCTIONS_PAR_ROLE.PE, ...FONCTIONS_PAR_ROLE.PAT])].join(', ')}.`,
+    `7. Corps : ${CORPS_OPTIONS.join(', ')}.`,
+    `8. Type de contrat : ${TYPES_CONTRAT_OPTIONS.join(', ')}.`,
+    '9. Service et Direction : nom tel qu’il figure dans Directions & services.',
+    '10. Classe, Échelon et Indice sont facultatifs ; une valeur non reconnue est conservée et signalée au RH.',
+    '',
+    'Les lignes en erreur sont ignorées et listées après l’import ; le reste est importé.',
+  ];
+  lignes.forEach((texte, i) => {
+    const cellule = aide.getCell(`A${i + 1}`);
+    cellule.value = texte;
+    if (i === 0) cellule.font = { bold: true, size: 13 };
+  });
+
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename="modele-import-personnel-${role}.xlsx"`);
+  await workbook.xlsx.write(res);
+  res.end();
 }
 
 async function importExcel(req, res) {
@@ -222,4 +291,4 @@ async function updateMesInfos(req, res) {
   }
 }
 
-module.exports = { me, getOne, updatePhoto, create, update, list, listWithoutAccount, sendRegistrationLink, exportExcel, importExcel, monEquipe, updateMesInfos };
+module.exports = { me, getOne, updatePhoto, create, update, list, listWithoutAccount, sendRegistrationLink, exportExcel, modeleImportExcel, importExcel, monEquipe, updateMesInfos };

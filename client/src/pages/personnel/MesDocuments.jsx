@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { demanderDocument, getMesDemandesDocuments } from '../../services/documentApi';
 import { SkeletonText } from '../../components/ui';
+import SelectMenu from '../../components/ui/SelectMenu';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe from '../../hooks/useVueListe';
 
 const TYPES_DOCUMENT = [
   { value: 'certificat_administratif', label: 'Certificat administratif' },
@@ -17,6 +20,7 @@ const STATUT_LABELS = {
 };
 
 export default function MesDocuments() {
+  const [vue, setVue] = useVueListe('mes-documents');
   const [demandes, setDemandes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [typeDocument, setTypeDocument] = useState(TYPES_DOCUMENT[0].value);
@@ -58,19 +62,22 @@ export default function MesDocuments() {
         title="Mes documents"
         subtitle="Demandez un document administratif et suivez son traitement"
       />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 className="font-semibold text-navy dark:text-gold mb-4">Demander un document</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type de document</label>
-            <select
+            <SelectMenu
               value={typeDocument}
               onChange={(e) => setTypeDocument(e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
             >
               {TYPES_DOCUMENT.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-            </select>
+            </SelectMenu>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Motif (optionnel)</label>
@@ -99,7 +106,7 @@ export default function MesDocuments() {
         <h3 className="font-semibold text-navy dark:text-gold mb-4">Mes demandes</h3>
         {loading && <SkeletonText lines={3} />}
         {!loading && demandes.length === 0 && <p className="text-sm text-gray-400">Aucune demande pour l'instant.</p>}
-        <div className="space-y-3">
+        <div className={vue === 'liste' ? 'space-y-3' : 'grid grid-cols-1 lg:grid-cols-2 gap-3'}>
           {demandes.map((d) => (
             <div key={d.id} className="border-b last:border-0 dark:border-gray-700 pb-3">
               <div className="flex items-center justify-between">

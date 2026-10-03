@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { School, Plus, Search, LayoutGrid, List as ListIcon } from 'lucide-react';
+import { School, Plus, Search, LayoutGrid, List as ListIcon, Check, Pencil, X } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import { toast } from '../../utils/toast';
 import { SkeletonCard } from '../../components/ui';
-import { fetchEtablissements, createEtablissement, desactiverEtablissement, reactiverEtablissement } from '../../services/etablissementApi';
+import { fetchEtablissements, createEtablissement, desactiverEtablissement, reactiverEtablissement, renommerEtablissement } from '../../services/etablissementApi';
+import SelectMenu from '../../components/ui/SelectMenu';
 
 const inputClass = 'flex-1 border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy';
 
@@ -30,6 +31,8 @@ export default function Etablissements() {
   const [nouveauNom, setNouveauNom] = useState('');
   const [creating, setCreating] = useState(false);
   const [togglingId, setTogglingId] = useState(null);
+  const [edition, setEdition] = useState(null);
+  const [enregistrementNom, setEnregistrementNom] = useState(false);
   const [vue, setVue] = useState('liste');
   const [recherche, setRecherche] = useState('');
   const [categorie, setCategorie] = useState('TOUS');
@@ -54,6 +57,20 @@ export default function Etablissements() {
       toast.error(err.message);
     } finally {
       setCreating(false);
+    }
+  }
+
+  async function enregistrerNom() {
+    if (!edition || enregistrementNom) return;
+    setEnregistrementNom(true);
+    try {
+      await renommerEtablissement(edition.id, edition.valeur);
+      setEdition(null);
+      await load();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setEnregistrementNom(false);
     }
   }
 
@@ -92,6 +109,37 @@ export default function Etablissements() {
     <span className="text-xs px-2 py-0.5 rounded-full shrink-0 bg-navy/10 text-navy dark:bg-gold/10 dark:text-gold">
       {CATEGORIE_LABELS[categoriser(etablissement.nom)]}
     </span>
+  );
+
+  const nomOuEdition = (etablissement, classes) => (
+    edition?.id === etablissement.id ? (
+      <span className="flex items-center gap-2 min-w-0 flex-1">
+        <input
+          autoFocus value={edition.valeur} maxLength={200}
+          onChange={(e) => setEdition({ ...edition, valeur: e.target.value })}
+          onKeyDown={(e) => { if (e.key === 'Enter') enregistrerNom(); if (e.key === 'Escape') setEdition(null); }}
+          aria-label="Nouveau nom de l'établissement"
+          className="flex-1 min-w-0 border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
+        />
+        <button type="button" onClick={enregistrerNom} disabled={enregistrementNom} aria-label="Enregistrer" className="text-status-approved"><Check size={16} /></button>
+        <button type="button" onClick={() => setEdition(null)} aria-label="Annuler" className="text-gray-400"><X size={16} /></button>
+      </span>
+    ) : (
+      <span className={`font-medium truncate ${classes}`}>{etablissement.nom}</span>
+    )
+  );
+
+  const boutonEditer = (etablissement) => (
+    edition?.id === etablissement.id ? null : (
+      <button
+        type="button"
+        onClick={() => setEdition({ id: etablissement.id, valeur: etablissement.nom })}
+        aria-label={`Renommer ${etablissement.nom}`}
+        className="text-gray-400 hover:text-navy dark:hover:text-gold shrink-0"
+      >
+        <Pencil size={15} aria-hidden="true" />
+      </button>
+    )
   );
 
   const boutonToggle = (etablissement, className = '') => (
@@ -137,13 +185,13 @@ export default function Etablissements() {
             className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md pl-9 pr-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
           />
         </div>
-        <select
+        <SelectMenu
           value={categorie}
           onChange={(e) => setCategorie(e.target.value)}
           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy shrink-0"
         >
           {CATEGORIES.map((c) => <option key={c} value={c}>{CATEGORIE_LABELS[c]}</option>)}
-        </select>
+        </SelectMenu>
         <div className="flex items-center rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden shrink-0" role="group" aria-label="Mode d'affichage">
           <button
             type="button"
@@ -176,15 +224,16 @@ export default function Etablissements() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow divide-y divide-gray-100 dark:divide-gray-700">
           {filtres.map((etablissement) => (
             <div key={etablissement.id} className="flex items-center justify-between gap-3 px-4 py-3">
-              <span className="flex items-center gap-2 min-w-0">
+              <span className="flex items-center gap-2 min-w-0 flex-1">
                 <School size={18} className="text-navy dark:text-gold shrink-0" aria-hidden="true" />
-                <span className={`font-medium truncate ${etablissement.statut === 'ACTIF' ? 'text-navy dark:text-gray-100' : 'text-gray-400 dark:text-gray-500 line-through'}`}>
-                  {etablissement.nom}
-                </span>
-                {badgeCategorie(etablissement)}
-                {badgeStatut(etablissement)}
+                {nomOuEdition(etablissement, etablissement.statut === 'ACTIF' ? 'text-navy dark:text-gray-100' : 'text-gray-400 dark:text-gray-500 line-through')}
+                {edition?.id !== etablissement.id && badgeCategorie(etablissement)}
+                {edition?.id !== etablissement.id && badgeStatut(etablissement)}
               </span>
-              {boutonToggle(etablissement)}
+              <span className="flex items-center gap-3 shrink-0">
+                {boutonEditer(etablissement)}
+                {boutonToggle(etablissement)}
+              </span>
             </div>
           ))}
         </div>
@@ -196,9 +245,8 @@ export default function Etablissements() {
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-navy/10 dark:bg-gold/10">
                   <School size={18} className="text-navy dark:text-gold" aria-hidden="true" />
                 </span>
-                <span className={`font-medium leading-snug ${etablissement.statut === 'ACTIF' ? 'text-navy dark:text-gray-100' : 'text-gray-400 dark:text-gray-500 line-through'}`}>
-                  {etablissement.nom}
-                </span>
+                {nomOuEdition(etablissement, `font-medium leading-snug ${etablissement.statut === 'ACTIF' ? 'text-navy dark:text-gray-100' : 'text-gray-400 dark:text-gray-500 line-through'}`)}
+                {boutonEditer(etablissement)}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {badgeCategorie(etablissement)}

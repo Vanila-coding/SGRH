@@ -710,6 +710,20 @@ Incident maîtrisé : un script de test a cliqué le bouton « Générer la déc
 - **Tests** : 72/72 backend.
 - **Non commité avant cette publication** : aucun commit n'a été fait pendant la session ; ce bilan accompagne le push. Les fichiers `client/docs/*memoire*` non suivis n'en font pas partie.
 
+# 📦 Import/export Excel, gestion des directions, services et établissements, listes liste/carte — bilan (2026-10-03, suite)
+
+- **Import / export du personnel (PE et PAT)** : composant partagé `ImportExportPersonnel` (modèle d'import, export filtré par rôle, import avec rapport de lignes ignorées). Le modèle contient une feuille « Personnel » avec listes déroulantes (rôle, corps, type de contrat, fonction) et une feuille « Instructions ». Route `GET /personnel/import/modele?role=`, export `?role=PE|PAT`.
+- **Directions et services** : migration `021` (`actif` sur `directions` et `services`, appliquée après accord). Renommage avec répercussion transactionnelle sur `personnel.direction` / `personnel.service`, désactivation sans suppression (listes par défaut filtrées sur les entrées actives, `?tous=1` pour la gestion), import Excel idempotent et modèle (`/organisation/import/modele`, `/organisation/import`). Routes `PATCH /organisation/directions/:id` et `/services/:id`.
+- **Établissements** : renommage (`PATCH /etablissements/:id`), sans cascade (les fiches PE référencent l'identifiant).
+- **Contrats** : les champs date affichent « Début » et « Fin » à la place de « jj/mm/aaaa » (superposition dans le champ vide, sans bloquer le sélecteur).
+- **Grilles indiciaires** : `GET /indiciaire/grilles`, `/grilles/:id` et `/recherche` acceptent `view_profil` **ou** `view_personnel` (`requireAnyPermission`) : les RH ne recevaient plus de 403 en consultant les paramètres de carrière.
+- **Logo et favicon** : un SVG est accepté pour les logos du site (validation sans script ni attribut exécutable, CSP `default-src 'none'` sur `/uploads/site`). Les URLs des fichiers téléversés sont résolues vers l'API (`utils/siteAssets.js`) : elles pointaient auparavant vers le serveur Vite. Le favicon est un fichier transparent versionné (`?v=2`) pour contourner le cache du navigateur. Titre de l'onglet : « UM-HR ».
+- **Barre latérale** : libellés « Université de Mahajanga » et « Gestion des Ressources Humaines » éditables dans Personnalisation → Contenu. Logo SVG affiché en blanc sans pastille.
+- **Listes liste / carte** : composant `ViewToggle` et hook `useVueListe` (préférence mémorisée par écran). Appliqué à une vingtaine de listes ; sur les pages PAT et PE, le bouton est sur la ligne des filtres et la vue carte affiche les mêmes données que le tableau.
+- **Lien « Gérer les établissements »** sur la page PE, comme « Gérer les directions & services » sur la page PAT.
+- **Vérifié** : API (export filtré, modèle, rename et cascade, désactivation, import deux fois, renommage d'établissement restauré), navigateur (boutons et pages des personnels, page Organisation, vue carte PAT, libellés des dates, lien PE, logo SVG). Données de test supprimées.
+- **Non traité** : toggle liste/carte sur Invitations, Contrats (liste admin), Gestion des fonctions, tableaux de grilles indiciaires et de soldes d'ouverture, matrice des permissions. Export Excel des directions et services non prévu.
+
 ---
 
 ## 🎯 Les 10 prochaines tâches prioritaires

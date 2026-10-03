@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import { getMesContrats, telechargerDocumentContrat } from '../../services/contratApi';
 import { SkeletonCard } from '../../components/ui';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe from '../../hooks/useVueListe';
 
 const STATUT_CONTRAT_LABELS = {
   actif: 'Actif', expire: 'Expiré', renouvele: 'Renouvelé', non_renouvele: 'Non renouvelé', resilie: 'Résilié',
 };
 
 export default function MesContrats() {
+  const [vue, setVue] = useVueListe('mes-contrats');
   const [contrats, setContrats] = useState(null);
   const [error, setError] = useState('');
 
@@ -40,10 +43,13 @@ export default function MesContrats() {
         title="Mes contrats"
         subtitle="Historique de vos contrats et documents associés"
       />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         {error && <p className="text-sm text-status-rejected mb-2">{error}</p>}
         {!contrats.contrats?.length && <p className="text-sm text-gray-400">Aucun contrat enregistré pour l'instant.</p>}
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <div className={vue === 'liste' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 lg:grid-cols-2'}>
           {contrats.contrats?.map((c) => (
             <div key={c.id} className="border border-gray-100 dark:border-gray-700 rounded-md p-3">
               <div className="flex items-start justify-between gap-2 flex-wrap">

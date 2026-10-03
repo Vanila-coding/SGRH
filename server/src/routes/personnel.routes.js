@@ -23,6 +23,7 @@ router.patch('/me/photo', requireAuth, requirePermission('view_profil'), uploadP
 router.get('/mon-equipe', requireAuth, personnelController.monEquipe);
 router.post('/', requireAuth, requirePermission('create_personnel'), personnelController.create);
 router.get('/export', requireAuth, requirePermission('view_personnel'), personnelController.exportExcel);
+router.get('/import/modele', requireAuth, requirePermission('create_personnel'), personnelController.modeleImportExcel);
 router.post('/import', requireAuth, requirePermission('create_personnel'), upload.single('file'), personnelController.importExcel);
 router.get('/', requireAuth, requirePermission('view_personnel'), personnelController.list);
 router.get('/sans-compte', requireAuth, requirePermission('send_registration_link'), personnelController.listWithoutAccount);

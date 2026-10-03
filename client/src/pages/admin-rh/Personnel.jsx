@@ -1,13 +1,17 @@
-import { Fragment, useEffect, useMemo, useState, useRef } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search, UserPlus, Wrench, Download, Upload } from 'lucide-react';
-import { listPersonnel, exportPersonnelExcel, importPersonnelExcel } from '../../services/personnelApi';
+import { Building2, ChevronDown, ChevronUp, Info, Pencil, Search, UserPlus, Wrench } from 'lucide-react';
+import { listPersonnel } from '../../services/personnelApi';
+import ImportExportPersonnel from '../../components/personnel/ImportExportPersonnel';
 import { getFonctionHistory } from '../../services/userApi';
 import AjouterEmployeModal from '../../components/AjouterEmployeModal';
 import PageHeader from '../../components/PageHeader';
 import { usePermissions } from '../../context/PermissionContext';
-import { toast } from '../../utils/toast';
 import { SkeletonTable } from '../../components/ui';
+import SelectMenu from '../../components/ui/SelectMenu';
+import { PersonnelAvatar, StatusPill, TableFooter } from '../../components/personnel/PersonnelTableParts';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe from '../../hooks/useVueListe';
 
 const COLUMNS = [
   { key: 'nom', label: 'Nom' },
@@ -21,22 +25,23 @@ const COLUMNS = [
 
 const PAGE_SIZE = 10;
 
+function FilterSelect({ value, onChange, options, placeholder }) {
+  return <SelectMenu value={value} onChange={(e) => onChange(e.target.value)} options={options} placeholder={placeholder} className="w-44 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" ariaLabel={placeholder} />;
+}
+
 // Page PAT (Personnel Administratif et Technique) — le tableau lui-même est inchangé
 // depuis avant la séparation PE/PAT, seul le rôle « Personnel » de la sidebar est
 // devenu un sous-menu avec un lien dédié PE (voir menuConfig.js) ; cette page ne montre
 // donc plus que les fiches ayant le rôle PAT (`roles.includes('PAT')`, pas seulement
 // l'ancien champ `role` unique, pour rester correct si une personne est aussi PE).
 export default function Personnel() {
+  const [vue, setVue] = useVueListe('personnel-pat', 'liste');
   const { can } = usePermissions();
   const [personnelBrut, setPersonnelBrut] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
   const [history, setHistory] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [importResult, setImportResult] = useState(null);
-  const [importing, setImporting] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const fileInputRef = useRef(null);
 
   const [search, setSearch] = useState('');
   const [filterFonction, setFilterFonction] = useState('');
@@ -71,40 +76,14 @@ export default function Personnel() {
     setHistory(await getFonctionHistory(person.id).catch(() => []));
   }
 
-  async function handleExport() {
-    setExporting(true);
-    try {
-      await exportPersonnelExcel();
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setExporting(false);
-    }
-  }
-
-  async function handleImportFile(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    setImporting(true);
-    setImportResult(null);
-    try {
-      const result = await importPersonnelExcel(file);
-      setImportResult(result);
-      load();
-    } catch (err) {
-      setImportResult({ inserted: 0, errors: [{ line: '-', reason: err.message }] });
-    } finally {
-      setImporting(false);
-      e.target.value = '';
-    }
-  }
-
   const uniqueValues = (key) => [...new Set(personnel.map((p) => p[key]).filter(Boolean))].sort();
 
   // Résumé du personnel PAT (toujours sur la liste PAT complète, indépendant des
   // filtres ci-dessous : c'est un effectif, pas un résultat de recherche).
   const effectifs = useMemo(() => ({
     pat: personnel.length,
+    actifs: personnel.filter((p) => p.statut_compte === 'active').length,
+    enAttente: personnel.filter((p) => p.statut_compte === 'pending').length,
   }), [personnel]);
 
   const filtered = useMemo(() => {
@@ -150,18 +129,6 @@ export default function Personnel() {
     else { setSortKey(key); setSortAsc(true); }
   }
 
-  function FilterSelect({ value, onChange, options, placeholder }) {
-    return (
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="max-w-[9.5rem] border border-gray-300 rounded-md px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-navy"
-      >
-        <option value="">{placeholder}</option>
-        {options.map((o) => <option key={o} value={o}>{o}</option>)}
-      </select>
-    );
-  }
 
   return (
     <div>
@@ -175,6 +142,7 @@ export default function Personnel() {
           <div>
             <p className="text-xs text-gray-400">Administratif et technique (PAT)</p>
             <p className="text-2xl font-bold text-navy dark:text-gray-100">{effectifs.pat}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{effectifs.actifs} personnel ayant un compte activé · {effectifs.enAttente} en attente</p>
           </div>
         </div>
       </div>
@@ -191,31 +159,6 @@ export default function Personnel() {
         ) : <span />}
         <div className="flex gap-2">
         <button
-          onClick={handleExport}
-          disabled={exporting}
-          className="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-navy dark:text-gray-100 rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-        >
-          <Download size={16} />
-          {exporting ? 'Export en cours...' : 'Exporter en Excel'}
-        </button>
-
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={importing}
-          className="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-navy dark:text-gray-100 rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-        >
-          <Upload size={16} />
-          {importing ? 'Import en cours...' : 'Importer un fichier Excel'}
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".xlsx"
-          onChange={handleImportFile}
-          className="hidden"
-        />
-
-        <button
           onClick={() => setShowAddModal(true)}
           className="flex items-center gap-2 bg-navy text-white rounded-md px-4 py-2 text-sm font-medium hover:opacity-90"
         >
@@ -225,26 +168,9 @@ export default function Personnel() {
         </div>
       </div>
 
-      {importResult && (
-        <div className="mb-4 bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-          <p className="text-sm font-medium text-status-approved">
-            {importResult.inserted} fiche(s) importée(s) avec succès.
-          </p>
-          {importResult.errors.length > 0 && (
-            <div className="mt-2">
-              <p className="text-sm text-status-rejected font-medium">{importResult.errors.length} ligne(s) ignorée(s) :</p>
-              <ul className="text-xs text-gray-500 list-disc list-inside mt-1">
-                {importResult.errors.map((e, i) => (
-                  <li key={i}>Ligne {e.line} : {e.reason}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <button onClick={() => setImportResult(null)} className="text-xs text-navy underline mt-2">
-            Fermer
-          </button>
-        </div>
-      )}
+      <div className="mb-4">
+        <ImportExportPersonnel role="PAT" onImported={load} />
+      </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-4 space-y-3">
         <div className="relative">
@@ -273,6 +199,7 @@ export default function Personnel() {
               Réinitialiser
             </button>
           )}
+          <ViewToggle value={vue} onChange={setVue} className="ml-auto" />
         </div>
 
         <p className="text-xs text-gray-400">{filtered.length} résultat(s) sur {personnel.length}</p>
@@ -284,16 +211,59 @@ export default function Personnel() {
         </div>
       )}
 
-      {!loading && (
+      {!loading && vue === 'carte' && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            {paginated.map((p) => (
+              <Link
+                key={p.id}
+                to={`/admin/personnel/${p.id}/fiche`}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col gap-3 hover:shadow-md"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <PersonnelAvatar personnel={p} />
+                  <div className="min-w-0">
+                    <p className="font-medium text-navy dark:text-gray-100 truncate">
+                      {p.nom ? [p.prenom, p.nom].filter(Boolean).join(' ') : p.email}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{p.email}</p>
+                  </div>
+                </div>
+                <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                  <dt className="text-gray-400">Fonction</dt>
+                  <dd className="text-gray-700 dark:text-gray-200 truncate">{p.fonction || '—'}</dd>
+                  <dt className="text-gray-400">Corps</dt>
+                  <dd className="text-gray-700 dark:text-gray-200 truncate">{p.corps || '—'}</dd>
+                  <dt className="text-gray-400">Service</dt>
+                  <dd className="text-gray-700 dark:text-gray-200 truncate">{p.service || '—'}</dd>
+                  <dt className="text-gray-400">Direction</dt>
+                  <dd className="text-gray-700 dark:text-gray-200 truncate">{p.direction || '—'}</dd>
+                </dl>
+                <div className="mt-auto flex items-center justify-between gap-2">
+                  {p.en_conge ? <StatusPill tone="pending">En congé</StatusPill> : <StatusPill tone="approved">Présent</StatusPill>}
+                  <span className="text-xs font-medium text-navy dark:text-gold">Voir la fiche →</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {filtered.length === 0 && <p className="text-sm text-gray-400 text-center py-8">Aucun résultat pour ces critères.</p>}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow mt-3">
+            <TableFooter page={page} totalPages={totalPages} total={filtered.length} pageSize={PAGE_SIZE} onPage={setPage} />
+          </div>
+        </>
+      )}
+
+      {!loading && vue === 'liste' && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+                <th className="w-12 px-4 py-3" aria-label="Détails" />
                 {COLUMNS.map((col) => (
                   <th
                     key={col.key}
                     onClick={() => handleSort(col.key)}
-                    className="text-left px-4 py-2 font-medium text-gray-500 cursor-pointer select-none whitespace-nowrap"
+                    className="text-left px-4 py-3 font-semibold text-navy dark:text-gray-100 cursor-pointer select-none whitespace-nowrap"
                   >
                     <span className="flex items-center gap-1">
                       {col.label}
@@ -301,6 +271,7 @@ export default function Personnel() {
                     </span>
                   </th>
                 ))}
+                <th className="px-4 py-3" aria-label="Actions" />
               </tr>
             </thead>
             <tbody>
@@ -310,25 +281,48 @@ export default function Personnel() {
                     onClick={() => toggleExpand(p)}
                     className="border-b last:border-0 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
                   >
-                    <td className="px-4 py-2 text-navy dark:text-gray-100 font-medium whitespace-nowrap">
-                      {p.nom ? [p.prenom, p.nom].filter(Boolean).join(' ') : p.email}
+                    <td className="px-4 py-3">
+                      <span
+                        className={`flex h-8 w-8 items-center justify-center rounded-md border transition-colors ${expandedId === p.id ? 'border-navy bg-navy text-white' : 'border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400'}`}
+                        aria-hidden="true"
+                      >
+                        <Info size={15} />
+                      </span>
                     </td>
-                    <td className="px-4 py-2 text-gray-600 dark:text-gray-300 whitespace-nowrap">{p.fonction || '—'}</td>
-                    <td className="px-4 py-2 text-gray-600 dark:text-gray-300">{p.corps || '—'}</td>
-                    <td className="px-4 py-2 text-gray-600 dark:text-gray-300 whitespace-nowrap">{p.service || '—'}</td>
-                    <td className="px-4 py-2 text-gray-600 dark:text-gray-300 whitespace-nowrap">{p.direction || '—'}</td>
-                    <td className="px-4 py-2 text-gray-600 dark:text-gray-300">{p.type_contrat || '—'}</td>
-                    <td className="px-4 py-2">
-                      {p.en_conge ? (
-                        <span className="text-xs px-2 py-0.5 rounded bg-amber-50 text-status-pending font-medium">En congé</span>
-                      ) : (
-                        <span className="text-xs px-2 py-0.5 rounded bg-green-50 text-status-approved font-medium">Présent</span>
-                      )}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <PersonnelAvatar personnel={p} />
+                        <div className="min-w-0">
+                          <p className="font-medium text-navy dark:text-gray-100 whitespace-nowrap">
+                            {p.nom ? [p.prenom, p.nom].filter(Boolean).join(' ') : p.email}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{p.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300 whitespace-nowrap">{p.fonction || '—'}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{p.corps || '—'}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300 whitespace-nowrap">{p.service || '—'}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300 whitespace-nowrap">{p.direction || '—'}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{p.type_contrat || '—'}</td>
+                    <td className="px-4 py-3">
+                      {p.en_conge ? <StatusPill tone="pending">En congé</StatusPill> : <StatusPill tone="approved">Présent</StatusPill>}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Link
+                        to={`/admin/personnel/${p.id}/fiche`}
+                        onClick={(e) => e.stopPropagation()}
+                        aria-label="Voir la fiche"
+                        title="Voir la fiche"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 dark:border-gray-600 text-navy dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        <Pencil size={14} aria-hidden="true" />
+                      </Link>
                     </td>
                   </tr>
                   {expandedId === p.id && (
                     <tr className="bg-gray-50 dark:bg-gray-700">
-                      <td colSpan={COLUMNS.length} className="px-4 py-4">
+                      <td colSpan={COLUMNS.length + 2} className="px-4 py-4">
                         <div className="flex items-start justify-between">
                           <div className="grid grid-cols-3 gap-4 flex-1">
                             <div>
@@ -344,13 +338,6 @@ export default function Personnel() {
                               <p className="text-sm text-navy dark:text-gray-100">{p.grade || '—'}</p>
                             </div>
                           </div>
-                          <Link
-                            to={`/admin/personnel/${p.id}/fiche`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="text-xs text-navy underline shrink-0 ml-4"
-                          >
-                            Voir la fiche
-                          </Link>
                         </div>
 
                         {history.length > 0 && (
@@ -370,7 +357,7 @@ export default function Personnel() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={COLUMNS.length} className="px-4 py-8 text-center text-gray-400">
+                  <td colSpan={COLUMNS.length + 2} className="px-4 py-8 text-center text-gray-400">
                     Aucun résultat pour ces critères.
                   </td>
                 </tr>
@@ -378,27 +365,7 @@ export default function Personnel() {
             </tbody>
           </table>
 
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between gap-2 px-4 py-3 border-t dark:border-gray-700">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft size={14} /> Précédent
-              </button>
-              <p className="text-xs text-gray-400">Page {page} sur {totalPages}</p>
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Suivant <ChevronRight size={14} />
-              </button>
-            </div>
-          )}
+          <TableFooter page={page} totalPages={totalPages} total={filtered.length} pageSize={PAGE_SIZE} onPage={setPage} />
         </div>
       )}
 

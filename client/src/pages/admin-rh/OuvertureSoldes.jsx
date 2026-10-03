@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { listPersonnel } from '../../services/personnelApi';
 import { getSuiviConges, saisirOuvertureConges } from '../../services/congeApi';
 import { generateDocument } from '../../services/documentApi';
+import PersonnelSearchSelect from '../../components/PersonnelSearchSelect';
 
 const nouvelleLigne = () => ({ annee: '', libellePeriode: '', droit: '', reference: '', conges: [] });
 const nouveauConge = () => ({ dateDebut: '', dateFin: '', jours: '', lieuJouissance: '' });
@@ -84,10 +85,14 @@ export default function OuvertureSoldes() {
         Saisissez, année par année, les droits et les congés déjà pris d'après l'état de congé officiel. Les années déjà enregistrées ne peuvent pas être remplacées.
       </p>
 
-      <select value={selectedId} onChange={(e) => choisir(e.target.value)} className={`${champ} w-full sm:max-w-md`} aria-label="Personnel">
-        <option value="">-- Choisir un employé --</option>
-        {personnelList.map((p) => <option key={p.id} value={p.id}>{p.matricule} — {p.prenom} {p.nom}</option>)}
-      </select>
+      <PersonnelSearchSelect
+        id="ouverture-soldes-personnel"
+        items={personnelList}
+        value={selectedId}
+        onChange={choisir}
+        formatOption={(p) => `${p.matricule} — ${[p.prenom, p.nom].filter(Boolean).join(' ')}`}
+        className="max-w-md"
+      />
 
       {suivi && (
         <div className="mt-4 text-sm">

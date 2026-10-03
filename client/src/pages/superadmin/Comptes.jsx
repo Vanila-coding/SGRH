@@ -4,6 +4,8 @@ import { listAccounts, deactivateAccount, reactivateAccount, changeAccountRole, 
 import PageHeader from '../../components/PageHeader';
 import { SkeletonCard } from '../../components/ui/Skeleton';
 import ContacterCompteModal from '../../components/ContacterCompteModal';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe, { classeConteneur } from '../../hooks/useVueListe';
 
 // Textes par défaut proposés dans la fenêtre de contact obligatoire, modifiables par
 // le Superadmin avant l'envoi — jamais envoyés tels quels sans relecture.
@@ -33,6 +35,7 @@ const ROLE_LABELS = {
 const ROLES_PROTEGES = ['ADMIN_RH', 'SUPERADMIN'];
 
 export default function Comptes() {
+  const [vue, setVue] = useVueListe('comptes-superadmin');
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterRole, setFilterRole] = useState('');
@@ -96,6 +99,9 @@ export default function Comptes() {
   return (
     <div className="max-w-[1600px] mx-auto">
       <PageHeader crumbs={[{ label: 'Administration' }, { label: 'Gestion des comptes' }]} title="Gestion des comptes" subtitle="Activer, désactiver ou supprimer un compte utilisateur" />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
 
       <div className="relative mb-4 max-w-md">
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
@@ -140,7 +146,7 @@ export default function Comptes() {
           {accounts.length === 0 ? 'Aucun compte enregistré.' : 'Aucun compte ne correspond à cette recherche.'}
         </p>
       ) : (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <div className={classeConteneur(vue, 3)}>
         {filtered.map((a) => (
           <div key={a.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col sm:flex-row sm:items-start justify-between gap-3">
             <div className="min-w-0">

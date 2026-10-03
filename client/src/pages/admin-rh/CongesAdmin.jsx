@@ -6,10 +6,13 @@ import OuvertureSoldes from './OuvertureSoldes';
 import PageHeader from '../../components/PageHeader';
 import { JUSTIFICATIF_OBLIGATOIRE } from '../../constants/conges';
 import { SkeletonCard, EmptyState } from '../../components/ui';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe, { classeConteneur } from '../../hooks/useVueListe';
 
 const JUSTIFICATIF_REQUIS_VALIDATION = ['Congé de maladie', 'Congé de maternité'];
 
 export default function CongesAdmin() {
+  const [vue, setVue] = useVueListe('conges-admin');
   const [demandes, setDemandes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState('');
@@ -65,17 +68,20 @@ export default function CongesAdmin() {
   return (
     <div>
       <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Congés & absences' }]} title="Congés & absences" subtitle="Demandes en attente de décision" />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
 
       {actionError && <p className="text-sm text-status-rejected mb-4">{actionError}</p>}
       {loading && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className={classeConteneur(vue, 4)}>
           <SkeletonCard lines={2} />
           <SkeletonCard lines={2} />
         </div>
       )}
       {!loading && demandes.length === 0 && <EmptyState title="Aucune demande en attente." />}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className={classeConteneur(vue, 4)}>
         {demandes.map((d) => {
           const justificatifManquant = JUSTIFICATIF_REQUIS_VALIDATION.includes(d.type_conge) && !d.justificatif_path;
 

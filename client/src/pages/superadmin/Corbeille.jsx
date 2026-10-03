@@ -3,10 +3,13 @@ import { Trash2, Search } from 'lucide-react';
 import { listCorbeille, restoreFromCorbeille, deletePermanently, emptyCorbeille } from '../../services/corbeilleApi';
 import PageHeader from '../../components/PageHeader';
 import { SkeletonCard } from '../../components/ui/Skeleton';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe, { classeConteneur } from '../../hooks/useVueListe';
 
 const TYPE_LABELS = { compte: 'Compte utilisateur' };
 
 export default function Corbeille() {
+  const [vue, setVue] = useVueListe('corbeille');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -80,6 +83,9 @@ export default function Corbeille() {
         title="Corbeille"
         subtitle="Les éléments supprimés restent ici jusqu'à restauration ou suppression définitive"
       />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
 
       {!loading && items.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
@@ -129,12 +135,12 @@ export default function Corbeille() {
       )}
 
       {loading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className={classeConteneur(vue, 3)}>
           <SkeletonCard lines={1} />
           <SkeletonCard lines={1} />
         </div>
       ) : (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <div className={classeConteneur(vue, 3)}>
         {filtered.map((item) => {
           // Un compte utilisateur (`archiveAndDeleteCompte`) est archivé avec ses données
           // liées (congés, notifications...) : l'utilisateur lui-même est imbriqué sous

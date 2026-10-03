@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { usePermissions } from '../../context/PermissionContext';
 import { useText } from '../../context/TextContext';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
+import { urlFichierSite } from '../../utils/siteAssets';
 
 const estActif = (pathname, path) => pathname === path || pathname.startsWith(`${path}/`);
 
@@ -19,6 +20,10 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
   const { can, loading } = usePermissions();
   const { pathname } = useLocation();
   const { settings } = useSiteSettings();
+  const logoPrincipal = urlFichierSite(settings.logo_principal_url) || '/logo-univ-mahajanga.png';
+  const logoEstSvg = /\.svg$/i.test(logoPrincipal);
+  const titreLigne2 = useText('sidebar.titre_ligne_2', 'UNIVERSITÉ', 'Barre latérale');
+  const titreLigne3 = useText('sidebar.titre_ligne_3', 'DE MAHAJANGA', 'Barre latérale');
   // Choix explicite de l'utilisateur, valable pour la page courante seulement : dès
   // qu'on navigue, la catégorie de la page active se rouvre (les autres se replient).
   const [choix, setChoix] = useState({ chemin: null, cle: null });
@@ -91,21 +96,25 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
         }`}
       >
         <div className="flex items-start justify-between gap-2 p-6 border-b border-white/10">
-          <div className="flex min-w-0 items-center gap-3">
-            {/* Logo sur pastille blanche : le fichier a un fond blanc et le bleu du logo
-                se lirait mal directement sur le fond navy. Décoratif (le nom est juste à côté). */}
-            <img
-              src={settings.logo_principal_url || '/logo-univ-mahajanga.png'}
-              alt=""
-              aria-hidden="true"
-              width="44"
-              height="44"
-              className="h-11 w-11 shrink-0 rounded-lg bg-white object-contain p-0.5"
-            />
+          <div className="flex min-w-0 flex-col gap-2">
+            <div className="flex items-center gap-3">
+              {/* Un SVG monochrome prend la couleur de la barre latérale (blanc) ; un fichier
+                  raster garde sa pastille blanche, sinon ses couleurs seraient perdues. */}
+              <img
+                src={logoPrincipal}
+                alt=""
+                aria-hidden="true"
+                width="44"
+                height="44"
+                className={logoEstSvg ? 'h-11 w-11 shrink-0 object-contain brightness-0 invert' : 'h-11 w-11 shrink-0 rounded-lg bg-white object-contain p-0.5'}
+              />
+              <span className="font-display text-2xl font-bold leading-none tracking-wide bg-gradient-to-r from-[#5b74ff] to-[#9db0ff] bg-clip-text text-transparent">
+                UM-HR
+              </span>
+            </div>
             <div className="min-w-0">
-              <p className="font-bold leading-tight">UNIVERSITÉ</p>
-              <p className="font-bold leading-tight">DE MAHAJANGA</p>
-              <p className="text-xs text-white/60 mt-1">Gestion des Ressources Humaines</p>
+              <p className="text-xs text-white/60 leading-tight">{titreLigne2} {titreLigne3}</p>
+              <p className="text-xs text-white/60 leading-tight">Gestion des Ressources Humaines</p>
             </div>
           </div>
           <button

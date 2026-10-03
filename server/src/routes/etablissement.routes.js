@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.get('/', requireAuth, etablissementController.list);
 router.post('/', requireAuth, requirePermission('manage_etablissements'), etablissementController.create);
+router.patch('/:id', requireAuth, requirePermission('manage_etablissements'), etablissementController.renommer);
 router.patch('/:id/desactiver', requireAuth, requirePermission('manage_etablissements'), etablissementController.desactiver);
 router.patch('/:id/reactiver', requireAuth, requirePermission('manage_etablissements'), etablissementController.reactiver);
 

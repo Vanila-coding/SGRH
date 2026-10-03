@@ -274,7 +274,8 @@ CREATE INDEX idx_password_reset_user ON password_reset_tokens (user_id);
 CREATE TABLE directions (
   id                       SERIAL PRIMARY KEY,
   nom                      VARCHAR(150) NOT NULL UNIQUE,
-  responsable_personnel_id INTEGER UNIQUE REFERENCES personnel(id)
+  responsable_personnel_id INTEGER UNIQUE REFERENCES personnel(id),
+  actif                    BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE services (
@@ -282,6 +283,7 @@ CREATE TABLE services (
   nom                      VARCHAR(150) NOT NULL,
   direction_id             INTEGER NOT NULL REFERENCES directions(id),
   responsable_personnel_id INTEGER UNIQUE REFERENCES personnel(id),
+  actif                    BOOLEAN NOT NULL DEFAULT TRUE,
   CONSTRAINT services_nom_direction_id_key UNIQUE (nom, direction_id)
 );
 

@@ -4,6 +4,7 @@ import { fetchDirections, fetchServices } from '../services/organisationApi';
 import { fetchCategories } from '../services/categorieApi';
 import { fetchEtablissements } from '../services/etablissementApi';
 import Modal from './ui/Modal';
+import SelectMenu from './ui/SelectMenu';
 
 const FONCTIONS_PAR_ROLE = {
   PE: ['Enseignant', 'Enseignant Chercheur', 'Maître de Conférences', 'Professeur'],
@@ -161,7 +162,7 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
           {form.roles.includes('PAT') && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Secrétariat</label>
-              <select
+              <SelectMenu
                 value={form.secretariatRole}
                 onChange={(e) => update('secretariatRole', e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
@@ -169,30 +170,30 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
                 <option value="">Aucun</option>
                 <option value="SECRETAIRE_PE">Secrétaire PE</option>
                 <option value="SECRETAIRE_PAT">Secrétaire PAT</option>
-              </select>
+              </SelectMenu>
             </div>
           )}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fonction</label>
-            <select
+            <SelectMenu
               value={form.fonction}
               onChange={(e) => update('fonction', e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
             >
               <option value="">--</option>
               {fonctionOptions.map((f) => <option key={f} value={f}>{f}</option>)}
-            </select>
+            </SelectMenu>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Corps</label>
-            <select
+            <SelectMenu
               value={form.corps}
               onChange={(e) => update('corps', e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
             >
               <option value="">--</option>
               {CORPS_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
+            </SelectMenu>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Grade</label>
@@ -212,27 +213,27 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catégorie professionnelle</label>
-            <select
+            <SelectMenu
               value={form.categorieId}
               onChange={(e) => update('categorieId', e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
             >
               <option value="">--</option>
               {categories.map((c) => <option key={c.id} value={c.id}>{c.code} — {c.appellation}</option>)}
-            </select>
+            </SelectMenu>
           </div>
           {form.roles.includes('PE') && (
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Établissement (PE)</label>
-                <select
+                <SelectMenu
                   value={form.etablissementId}
                   onChange={(e) => update('etablissementId', e.target.value)}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
                 >
                   <option value="">--</option>
                   {etablissements.map((e) => <option key={e.id} value={e.id}>{e.nom}</option>)}
-                </select>
+                </SelectMenu>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Corps académique (PE)</label>
@@ -264,18 +265,18 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Direction</label>
-            <select
+            <SelectMenu
               value={selectedDirectionId}
               onChange={handleDirectionChange}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
             >
               <option value="">--</option>
               {directions.map((d) => <option key={d.id} value={d.id}>{d.nom}</option>)}
-            </select>
+            </SelectMenu>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service</label>
-            <select
+            <SelectMenu
               value={services.find((s) => s.nom === form.service)?.id || ''}
               onChange={handleServiceChange}
               disabled={!selectedDirectionId}
@@ -283,7 +284,7 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
             >
               <option value="">--</option>
               {services.map((s) => <option key={s.id} value={s.id}>{s.nom}</option>)}
-            </select>
+            </SelectMenu>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Téléphone</label>
@@ -295,14 +296,14 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type de contrat</label>
-            <select
+            <SelectMenu
               value={form.typeContrat}
               onChange={(e) => update('typeContrat', e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
             >
               <option value="">--</option>
               {TYPES_CONTRAT.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
+            </SelectMenu>
           </div>
 
           <div>

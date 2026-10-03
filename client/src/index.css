@@ -8,6 +8,7 @@
   --color-status-approved: #2F6F4E;
   --color-status-rejected: #B23A3A;
   --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Exo 2', ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {

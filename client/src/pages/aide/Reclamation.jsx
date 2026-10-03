@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import PageHeader from '../../components/PageHeader';
 import { signalerProbleme, getMesReclamations } from '../../services/reclamationApi';
 import { SkeletonText } from '../../components/ui';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe from '../../hooks/useVueListe';
 
 const STATUT_LABELS = {
   ouverte: { label: 'En attente', color: 'text-status-pending' },
@@ -9,6 +11,7 @@ const STATUT_LABELS = {
 };
 
 export default function Reclamation() {
+  const [vue, setVue] = useVueListe('mes-reclamations');
   const [sujet, setSujet] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState(null);
@@ -53,6 +56,9 @@ export default function Reclamation() {
         title="Signaler un problème"
         subtitle="Décrivez le problème rencontré : le Superadmin est notifié dès l'envoi"
       />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h3 className="font-semibold text-navy dark:text-gold mb-4">Nouvelle réclamation</h3>
@@ -99,7 +105,7 @@ export default function Reclamation() {
           {!loading && mesReclamations.length === 0 && (
             <p className="text-gray-400 dark:text-gray-500 text-sm">Aucune réclamation pour l'instant.</p>
           )}
-          <div className="space-y-3">
+          <div className={vue === 'liste' ? 'space-y-3' : 'grid grid-cols-1 lg:grid-cols-2 gap-3'}>
             {mesReclamations.map((r) => (
               <div key={r.id} className="border-b border-gray-100 dark:border-gray-700 last:border-0 pb-3">
                 <div className="flex items-center justify-between gap-2">

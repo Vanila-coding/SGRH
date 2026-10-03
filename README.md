@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="docs/images/logo-um-hr.png" alt="UM-HR" width="600">
+</p>
+
+<p align="center"><strong>Système de Gestion des Ressources Humaines</strong><br>Université de Mahajanga</p>
+
 # SGRH — Système de Gestion des Ressources Humaines
 
 Application web de gestion des ressources humaines de l'Université de Mahajanga. SGRH réunit une interface React et une API Express connectée à PostgreSQL.
@@ -310,12 +316,13 @@ Les réponses sont JSON, sauf l'export Excel et le téléchargement de documents
 | Méthode | URL | Accès | Objectif |
 | --- | --- | --- | --- |
 | GET / POST | `/api/personnel` | `view_personnel` / `create_personnel` | Liste ou crée une fiche ; chaque fiche renvoie `roles` (tableau `PE`/`PAT`, une personne peut avoir les deux) et, si PE, `etablissement_id`/`etablissement_nom`/`corps_pe`/`diplome`/`specialite`. Création/modification acceptent `roles: []` (au moins un requis) et `peInfos: {}` (établissement, corps, diplôme, spécialité). La création accepte aussi `secretariatRole` (`SECRETAIRE_PE` ou `SECRETAIRE_PAT`), refusé si la fiche n'est pas PAT. |
-| GET / POST / PATCH | `/api/etablissements`, `/:id/desactiver`, `/:id/reactiver` | `view_personnel` (lecture) / `manage_etablissements` (écriture) | Établissements auxquels rattacher un PE ; désactivation seulement, jamais de suppression physique. |
+| GET / POST / PATCH | `/api/etablissements`, `/:id` (renommage), `/:id/desactiver`, `/:id/reactiver` | `view_personnel` (lecture) / `manage_etablissements` (écriture) | Établissements auxquels rattacher un PE ; désactivation seulement, jamais de suppression physique. |
 | GET | `/api/personnel/me` | `view_profil` | Fiche de l'utilisateur courant. |
 | PATCH | `/api/personnel/me/photo` | `view_profil` | Enregistre la photo personnelle multipart `photo` (JPG/PNG/WebP, 3 Mo maximum). |
 | GET | `/api/personnel/sans-compte` | `send_registration_link` | Personnel sans compte. |
 | POST | `/api/personnel/:id/envoyer-lien` | `send_registration_link` | Lien d'inscription par e-mail. |
-| GET / POST | `/api/personnel/export`, `/api/personnel/import` | `view_personnel` / `create_personnel` | Export Excel / import multipart `file` (5 Mo maximum). |
+| GET / POST | `/api/personnel/export?role=PE\|PAT`, `/api/personnel/import` | `view_personnel` / `create_personnel` | Export Excel (filtrable par rôle) / import multipart `file` (5 Mo maximum). |
+| GET | `/api/personnel/import/modele?role=PE\|PAT` | `create_personnel` | Modèle d'import Excel : feuille « Personnel » avec listes déroulantes et feuille « Instructions ». |
 | GET / POST | `/api/pending-accounts`, `/:id/approve`, `/:id/reject` | `view_pending_accounts` | Liste et traite les comptes en attente. |
 | GET / POST / DELETE | `/api/account-admin`, `/:id/deactivate`, `/:id/reactivate`, `/:id` | `manage_accounts` | Gestion des comptes ; la suppression est transactionnelle et réversible (voir Backend et sécurité). |
 | PATCH | `/api/account-admin/:id/role` | `manage_accounts` | Promeut/rétrograde un compte en secrétaire de sa catégorie — transitions strictement limitées à `PE⇄SECRETAIRE_PE`/`PAT⇄SECRETAIRE_PAT`, jamais `ADMIN_RH`/`SUPERADMIN`. |
@@ -398,12 +405,15 @@ Les réponses sont JSON, sauf l'export Excel et le téléchargement de documents
 
 | Méthode | URL | Accès | Objectif |
 | --- | --- | --- | --- |
-| GET | `/api/organisation/directions` | Authentifié | Catalogue des directions (nom, responsable). |
-| GET | `/api/organisation/services?directionId=` | Authentifié | Catalogue des services, filtrable par direction. |
+| GET | `/api/organisation/directions` | Authentifié | Catalogue des directions actives (nom, responsable) ; `?tous=1` inclut les désactivées (page de gestion). |
+| GET | `/api/organisation/services?directionId=&tous=1` | Authentifié | Catalogue des services actifs, filtrable par direction (`tous=1` pour la gestion). |
 | POST | `/api/organisation/directions` | `manage_organisation` | Crée une direction (`nom`, unique, ≤150 caractères). |
+| PATCH | `/api/organisation/directions/:id` | `manage_organisation` | Renomme (`nom`) et/ou désactive/réactive (`actif`). Un renommage est répercuté sur `personnel.direction` dans la même transaction. |
 | DELETE | `/api/organisation/directions/:id` | `manage_organisation` | Supprime une direction ; refusée (409) si des services ou des fiches personnel la référencent encore. |
 | POST | `/api/organisation/services` | `manage_organisation` | Crée un service (`nom`, `directionId`). |
+| PATCH | `/api/organisation/services/:id` | `manage_organisation` | Renomme et/ou désactive un service ; le renommage est répercuté sur `personnel.service`. |
 | DELETE | `/api/organisation/services/:id` | `manage_organisation` | Supprime un service ; refusée (409) si des fiches personnel le référencent encore. |
+| GET / POST | `/api/organisation/import/modele`, `/api/organisation/import` | `manage_organisation` | Modèle Excel (Direction / Service) et import : les entrées existantes sont réutilisées, jamais dupliquées. |
 | GET | `/api/categories` | Authentifié | Catalogue des catégories professionnelles (numéro 1 à 8, sans 7 ; code, appellation, niveau de diplôme requis). |
 | GET | `/api/parametres-carriere` | `manage_parametres_carriere` | Liste les paramètres de progression de carrière. |
 | PATCH | `/api/parametres-carriere/:cle` | `manage_parametres_carriere` | Modifie un paramètre ; consigné dans `activity_log`. |
@@ -413,7 +423,7 @@ Les réponses sont JSON, sauf l'export Excel et le téléchargement de documents
 | Méthode | URL | Accès | Objectif |
 | --- | --- | --- | --- |
 | GET | `/api/indiciaire/grilles` | `view_profil` | Liste les grilles (filtrable par `?regime=`). |
-| GET | `/api/indiciaire/grilles/:id` | `view_profil` | Détail d'une grille. |
+| GET | `/api/indiciaire/grilles/:id` | `view_profil` ou `view_personnel` | Détail d'une grille (les agents voient leur indice, les RH consultent les grilles). |
 | GET | `/api/indiciaire/recherche` | `view_profil` | Parcourt les lignes de grille (filtres `regime`, `classe`, `echelon`, `cadre`, `echelle`, `categorie`). |
 | GET | `/api/indiciaire/resolve` | `manage_fonctions` | Résout un indice réglementaire (`regime`, `classe`, `echelon`, `categorie`/`cadre`/`echelle`, `dateEffet`) ; 422 explicite si aucune ligne ou plusieurs grilles concurrentes. |
 | POST | `/api/indiciaire/grilles/:id/lignes` | `manage_parametres_carriere` | Ajoute une ligne de grille ; `sourceTexte` et `dateDebutValidite` obligatoires, aucune insertion sans référence. |
@@ -425,7 +435,7 @@ Les réponses sont JSON, sauf l'export Excel et le téléchargement de documents
 
 Le responsable d'une direction ou d'un service n'est jamais modifié par une route dédiée : `organisationRepository.syncResponsable` est appelée en interne lors d'un changement de fonction/service/direction d'une fiche personnel, et retire automatiquement la personne de tout ancien poste de responsable avant, le cas échéant, de l'assigner au nouveau.
 
-**Gestion des directions et services** (page `/admin/organisation`, lien « Gérer les directions & services » depuis `/admin/personnel`, permission `manage_organisation`) : la RH crée et supprime des directions et des services (pas de renommage). `personnel.direction`/`personnel.service` étant du texte libre relié par le nom (sans clé étrangère), une suppression est refusée avec un message explicite tant que des services (pour une direction) ou des fiches personnel (pour une direction ou un service) la référencent encore — chaque création et suppression est tracée dans `activity_log`.
+**Gestion des directions et services** (page `/admin/organisation`, lien « Gérer les directions & services » depuis `/admin/personnel`, permission `manage_organisation`) : la RH crée, renomme, désactive (`actif`) et supprime des directions et des services, et peut les importer depuis Excel. Une entrée désactivée n'est plus proposée dans les formulaires, mais les fiches qui la référencent restent intactes. `personnel.direction`/`personnel.service` étant du texte libre relié par le nom (sans clé étrangère), un renommage est répercuté sur ces fiches, et une suppression est refusée avec un message explicite tant que des services (pour une direction) ou des fiches personnel (pour une direction ou un service) la référencent encore — chaque création et suppression est tracée dans `activity_log`.
 
 ## Structure de la base de données
 
@@ -528,6 +538,7 @@ Toutes les clés étrangères vers `users.id` ont un comportement `ON DELETE` ex
 | `018_create_pe_pat_multi_role.sql` | Crée `personnel_roles`, `etablissements`, `personnel_pe_infos` ; rétro-remplit `personnel_roles` depuis `personnel.role`. `personnel.role` conservé, non supprimé. | Non |
 | `019_add_secretariat_roles.sql` | Élargit `users_role_check` à `SECRETAIRE_PE`/`SECRETAIRE_PAT` ; ajoute `decision_secretariat`/`decision_secretariat_le`/`avis_secretariat` sur `conges` et `demandes_documents` ; rétro-approuve les lignes déjà existantes (jamais bloquées rétroactivement par la nouvelle étape). | Non |
 | `020_add_personnel_secretariat_role.sql` | Ajoute la colonne nullable `personnel.secretariat_role` (`SECRETAIRE_PE`/`SECRETAIRE_PAT`, `CHECK`) désignée par l'Admin RH à la création de la fiche. | Non |
+| `021_directions_services_actif_et_etablissements.sql` | Ajoute `directions.actif` et `services.actif` (`BOOLEAN NOT NULL DEFAULT TRUE`) pour désactiver sans supprimer. | Non |
 
 Elles sont réexécutables sans risque (`IF NOT EXISTS` / `DROP CONSTRAINT IF EXISTS` avant chaque `ADD`) et n'altèrent jamais de données existantes. Les migrations `012` (type de colonne et `DEFAULT`) et `011` (contrainte) modifient la définition d'une colonne ou d'une contrainte, sans toucher aux lignes.
 

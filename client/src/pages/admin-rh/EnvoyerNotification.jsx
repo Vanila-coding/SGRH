@@ -3,6 +3,7 @@ import { sendNotification } from '../../services/notificationApi';
 import { listUsers } from '../../services/userApi';
 import PageHeader from '../../components/PageHeader';
 import { Skeleton } from '../../components/ui/Skeleton';
+import SelectMenu from '../../components/ui/SelectMenu';
 
 const FONCTIONS = [
   'Enseignant', 'Enseignant Chercheur', 'Maître de Conférences', 'Professeur',
@@ -74,7 +75,7 @@ export default function EnvoyerNotification() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Destinataires</label>
-            <select
+            <SelectMenu
               value={ciblage}
               onChange={(e) => setCiblage(e.target.value)}
               className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
@@ -82,7 +83,7 @@ export default function EnvoyerNotification() {
               <option value="role">Tout un groupe (PE ou PAT)</option>
               <option value="fonction">Une fonction précise (ex: chefs de service)</option>
               <option value="individual">Une personne précise</option>
-            </select>
+            </SelectMenu>
           </div>
 
           <div>
@@ -90,31 +91,31 @@ export default function EnvoyerNotification() {
               {ciblage === 'role' ? 'Groupe' : ciblage === 'fonction' ? 'Fonction' : 'Personne'}
             </label>
             {ciblage === 'role' && (
-              <select
+              <SelectMenu
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
               >
                 <option value="PE">Tous les PE</option>
                 <option value="PAT">Tous les PAT</option>
-              </select>
+              </SelectMenu>
             )}
 
             {ciblage === 'fonction' && (
-              <select
+              <SelectMenu
                 value={fonction}
                 onChange={(e) => setFonction(e.target.value)}
                 className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
               >
                 {FONCTIONS.map((f) => <option key={f} value={f}>{f}</option>)}
-              </select>
+              </SelectMenu>
             )}
 
             {ciblage === 'individual' && (
               individualsLoading ? (
                 <Skeleton className="h-9 w-full rounded-md" />
               ) : (
-              <select
+              <SelectMenu
                 required
                 value={selectedIndividual}
                 onChange={(e) => setSelectedIndividual(e.target.value)}
@@ -124,7 +125,7 @@ export default function EnvoyerNotification() {
                 {individuals.map((u) => (
                   <option key={u.id} value={u.id}>{u.email} ({u.role}{u.fonction ? ` - ${u.fonction}` : ''})</option>
                 ))}
-              </select>
+              </SelectMenu>
               )
             )}
           </div>
@@ -133,7 +134,7 @@ export default function EnvoyerNotification() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
-            <select
+            <SelectMenu
               value={type}
               onChange={(e) => setType(e.target.value)}
               className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
@@ -141,7 +142,7 @@ export default function EnvoyerNotification() {
               <option value="info">Information</option>
               <option value="reunion">Réunion</option>
               <option value="echeance">Échéance de contrat</option>
-            </select>
+            </SelectMenu>
           </div>
 
           <div>
@@ -159,14 +160,14 @@ export default function EnvoyerNotification() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Destination (facultatif)</label>
-          <select
+          <SelectMenu
             value={lien}
             onChange={(e) => setLien(e.target.value)}
             className="w-full sm:w-1/2 border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
           >
             <option value="">Aucune</option>
             {DESTINATIONS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
-          </select>
+          </SelectMenu>
           <p className="text-xs text-gray-400 mt-1">Si une destination est choisie, la notification sera cliquable et renverra vers cette page.</p>
         </div>
 

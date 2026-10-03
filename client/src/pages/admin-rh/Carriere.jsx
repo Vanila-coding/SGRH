@@ -16,6 +16,9 @@ import {
 import GrilleIndiciaireSelector from '../../components/GrilleIndiciaireSelector';
 import PersonnelSearchSelect from '../../components/PersonnelSearchSelect';
 import { SkeletonPage } from '../../components/ui';
+import SelectMenu from '../../components/ui/SelectMenu';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe from '../../hooks/useVueListe';
 
 const TYPES_EVENEMENT = [
   'Recrutement', 'Stage', 'Titularisation', 'Prolongation de stage', "Avancement d'échelon",
@@ -34,6 +37,7 @@ const emptyForm = {
 };
 
 export default function Carriere() {
+  const [vue, setVue] = useVueListe('carriere-situations');
   const { can } = usePermissions();
   const [personnelList, setPersonnelList] = useState([]);
   const [selectedId, setSelectedId] = useState('');
@@ -283,6 +287,9 @@ export default function Carriere() {
   return (
     <div className="space-y-6">
       <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Carrière' }]} title="Carrière" subtitle="Situation administrative, événements de carrière et diplômes" />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <label htmlFor="carriere-personnel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Choisir un employé</label>
         <PersonnelSearchSelect
@@ -319,7 +326,7 @@ export default function Carriere() {
             )}
 
             <form onSubmit={handleAddSituation} className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
-              <select
+              <SelectMenu
                 required value={situationForm.typeSituationId}
                 onChange={(e) => setSituationForm((p) => ({ ...p, typeSituationId: e.target.value }))}
                 className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm sm:col-span-2"
@@ -328,7 +335,7 @@ export default function Carriere() {
                 {typesSituation.map((t) => (
                   <option key={t.id} value={t.id}>{t.libelle}{t.categories_concernees ? ` (${t.categories_concernees})` : ''}</option>
                 ))}
-              </select>
+              </SelectMenu>
               <input
                 type="date" required value={situationForm.dateDebut}
                 onChange={(e) => setSituationForm((p) => ({ ...p, dateDebut: e.target.value }))}
@@ -364,7 +371,7 @@ export default function Carriere() {
             </form>
 
             {situations?.historique?.length > 0 && (
-              <div className="space-y-2">
+              <div className={vue === 'liste' ? 'space-y-2' : 'grid grid-cols-1 lg:grid-cols-2 gap-2'}>
                 <p className="text-xs text-gray-400 font-medium">Historique des situations</p>
                 {situations.historique.map((s) => (
                   <div key={s.id} className="border-b border-gray-100 dark:border-gray-700 pb-2">
@@ -438,14 +445,14 @@ export default function Carriere() {
                     </p>
                     {traiterAlerteId === a.id ? (
                       <form onSubmit={handleTraiterAlerte} className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
-                        <select
+                        <SelectMenu
                           required value={traiterForm.categorie}
                           onChange={(e) => setTraiterForm((p) => ({ ...p, categorie: e.target.value }))}
                           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                         >
                           <option value="">-- Catégorie --</option>
                           {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'].map((c) => <option key={c} value={c}>{c}</option>)}
-                        </select>
+                        </SelectMenu>
                         <input
                           type="date" required value={traiterForm.dateEffet}
                           onChange={(e) => setTraiterForm((p) => ({ ...p, dateEffet: e.target.value }))}
@@ -483,13 +490,13 @@ export default function Carriere() {
               {editingId ? "Modifier l'événement" : 'Ajouter un événement'}
             </h3>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <select
+              <SelectMenu
                 value={form.typeEvenement}
                 onChange={(e) => updateForm('typeEvenement', e.target.value)}
                 className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy sm:col-span-3"
               >
                 {TYPES_EVENEMENT.map((t) => <option key={t} value={t}>{t}</option>)}
-              </select>
+              </SelectMenu>
 
               <div>
                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Date de l'événement *</label>
@@ -753,7 +760,7 @@ export default function Carriere() {
                 </button>
               </form>
               {data.diplomes.length === 0 && <p className="text-sm text-gray-400">Aucun diplôme enregistré.</p>}
-              <div className="space-y-2">
+              <div className={vue === 'liste' ? 'space-y-2' : 'grid grid-cols-1 lg:grid-cols-2 gap-2'}>
                 {data.diplomes.map((d) => (
                   <div key={d.id} className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
                     <div>

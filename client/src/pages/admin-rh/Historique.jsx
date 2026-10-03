@@ -4,8 +4,12 @@ import { getActivityLog } from '../../services/activityLogApi';
 import PageHeader from '../../components/PageHeader';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ACTION_LABELS } from '../../constants/activityLabels';
+import SelectMenu from '../../components/ui/SelectMenu';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe from '../../hooks/useVueListe';
 
 export default function Historique() {
+  const [vue, setVue] = useVueListe('journal');
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('');
@@ -28,6 +32,9 @@ export default function Historique() {
   return (
     <div className="max-w-[1600px] mx-auto">
       <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Audit & journal' }]} title="Audit & journal" subtitle="Historique des actions effectuées dans le SGRH" />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
       <div className="mb-6 flex flex-wrap items-center gap-2">
         <div className="relative flex-1 min-w-[220px]">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
@@ -39,7 +46,7 @@ export default function Historique() {
             className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
           />
         </div>
-        <select
+        <SelectMenu
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy shrink-0"
@@ -48,7 +55,7 @@ export default function Historique() {
           {Object.entries(ACTION_LABELS).map(([type, { label }]) => (
             <option key={type} value={type}>{label}</option>
           ))}
-        </select>
+        </SelectMenu>
       </div>
 
       {!loading && filtered.length === 0 && (
@@ -58,7 +65,7 @@ export default function Historique() {
       )}
 
       {loading && (
-        <div className="space-y-2" role="status" aria-label="Chargement du journal d'activité">
+        <div className={vue === 'liste' ? 'space-y-2' : 'grid grid-cols-1 lg:grid-cols-2 gap-2'} role="status" aria-label="Chargement du journal d'activité">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-start gap-3">
               <Skeleton className="h-5 w-28 rounded shrink-0" />
@@ -71,7 +78,7 @@ export default function Historique() {
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className={vue === 'liste' ? 'space-y-2' : 'grid grid-cols-1 lg:grid-cols-2 gap-2'}>
         {!loading && filtered.map((log) => {
           const meta = ACTION_LABELS[log.action_type] || { label: log.action_type, color: 'bg-gray-100 text-gray-600' };
           return (

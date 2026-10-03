@@ -8,6 +8,7 @@ import { toast } from '../../utils/toast';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ConfirmDialog } from '../../components/ui';
 import { Moon, RotateCcw } from 'lucide-react';
+import { urlFichierSite } from '../../utils/siteAssets';
 
 const COLOR_LABELS = {
   color_navy: 'Couleur principale (boutons, accents, sidebar)',
@@ -26,6 +27,10 @@ const CHAMPS_CONNEXION = [
   { key: 'login.titre_bienvenue', label: 'Titre', defaut: "Bienvenue sur l'espace RH" },
   { key: 'login.slogan', label: 'Sous-titre', defaut: 'Excellence • Intégrité • Innovation' },
   { key: 'login.description_bienvenue', label: "Message d'accueil", defaut: "Université de Mahajanga — Plateforme de gestion des ressources humaines. Consultez votre dossier, vos congés et vos notifications en un seul endroit.", multiligne: true },
+];
+const CHAMPS_BARRE_LATERALE = [
+  { key: 'sidebar.titre_ligne_2', label: "Nom de l'université — 1re partie", defaut: 'UNIVERSITÉ' },
+  { key: 'sidebar.titre_ligne_3', label: "Nom de l'université — 2e partie", defaut: 'DE MAHAJANGA' },
 ];
 const CHAMPS_FOOTER = [
   { key: 'footer.nom_application', label: "Nom de l'application", defaut: 'Université de Mahajanga' },
@@ -87,7 +92,7 @@ Chaque demande dispose d'un lien "Voir / télécharger la fiche", reprenant le f
   },
 ];
 const TOUTES_LES_CLES_CURATED = new Set([
-  ...CHAMPS_CONNEXION, ...CHAMPS_FOOTER, ...CHAMPS_SYSTEME, ...CHAMPS_MENU, ...CHAMPS_INSTITUTION, ...CHAMPS_AIDE,
+  ...CHAMPS_CONNEXION, ...CHAMPS_BARRE_LATERALE, ...CHAMPS_FOOTER, ...CHAMPS_SYSTEME, ...CHAMPS_MENU, ...CHAMPS_INSTITUTION, ...CHAMPS_AIDE,
 ].map((c) => c.key));
 
 function Section({ title, description, children }) {
@@ -182,8 +187,7 @@ function ChampImage({ label, hint, valeurActuelle, onUpload }) {
     }
   }
 
-  const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000/api').replace(/\/api$/, '');
-  const src = preview || (valeurActuelle ? `${API_URL}${valeurActuelle}` : null);
+  const src = preview || urlFichierSite(valeurActuelle);
 
   return (
     <div className="flex items-center gap-4">
@@ -195,7 +199,7 @@ function ChampImage({ label, hint, valeurActuelle, onUpload }) {
         {hint && <p className="text-xs text-gray-400 mb-2">{hint}</p>}
         <label className="inline-block px-3 py-1.5 rounded-md text-xs font-medium bg-navy text-white hover:opacity-90 cursor-pointer">
           {uploading ? 'Envoi...' : 'Choisir une image'}
-          <input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" disabled={uploading} onChange={handleFile} />
+          <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="hidden" disabled={uploading} onChange={handleFile} />
         </label>
       </div>
     </div>
@@ -377,6 +381,9 @@ export default function ApparenceSite() {
         <>
           <Section title="Page de connexion">
             {CHAMPS_CONNEXION.map((c) => <ChampTexte key={c.key} champ={c} />)}
+          </Section>
+          <Section title="Barre latérale">
+            {CHAMPS_BARRE_LATERALE.map((c) => <ChampTexte key={c.key} champ={c} />)}
           </Section>
           <Section title="Pied de page">
             {CHAMPS_FOOTER.map((c) => <ChampTexte key={c.key} champ={c} />)}

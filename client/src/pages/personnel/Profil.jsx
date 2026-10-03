@@ -12,6 +12,7 @@ import { getMesContrats } from '../../services/contratApi';
 import { getSoldeConges } from '../../services/congeApi';
 import { present, toInputDate } from '../../utils/dossier';
 import { Skeleton, SkeletonAvatar, SkeletonText } from '../../components/ui';
+import SelectMenu from '../../components/ui/SelectMenu';
 
 const SITUATIONS_FAMILIALES = ['Célibataire', 'Marié(e)', 'Divorcé(e)', 'Veuf/Veuve'];
 const SEXES = ['Masculin', 'Féminin'];
@@ -275,12 +276,12 @@ export default function Profil() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">Sexe</label>
-                <select
+                <SelectMenu
                   value={formSexe} onChange={(e) => setFormSexe(e.target.value)}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                 >
                   {SEXES.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
+                </SelectMenu>
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">Date de naissance</label>
@@ -312,12 +313,12 @@ export default function Profil() {
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">Situation familiale</label>
-                <select
+                <SelectMenu
                   value={formSituation} onChange={(e) => setFormSituation(e.target.value)}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                 >
                   {SITUATIONS_FAMILIALES.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
+                </SelectMenu>
               </div>
             </div>
             <div>

@@ -1,6 +1,5 @@
-// Gestion des directions et services par la RH (ajout/suppression). Créer/supprimer
-// est volontairement tout ce qui est proposé : pas de renommage, pour rester strictement
-// dans le périmètre demandé.
+// Gestion des directions et services par la RH : création, renommage, désactivation
+// (sans suppression tant qu'une fiche les référence), et import Excel.
 const organisationRepository = require('../repositories/organisationRepository');
 const activityLogRepository = require('../repositories/activityLogRepository');
 
@@ -99,4 +98,101 @@ async function supprimerService(idRaw, supprimePar) {
   await activityLogRepository.create(supprimePar, 'organisation_service_supprime', `Service supprimé : ${service.nom}`);
 }
 
-module.exports = { OrganisationError, creerDirection, supprimerDirection, creerService, supprimerService };
+function lireActif(valeur, actifActuel) {
+  if (valeur === undefined) return actifActuel;
+  if (typeof valeur !== 'boolean') throw new OrganisationError('Le statut doit être actif ou inactif.');
+  return valeur;
+}
+
+async function modifierDirection(idRaw, corps, modifiePar) {
+  const id = Number(idRaw);
+  if (!Number.isInteger(id) || id < 1) throw new OrganisationError('Identifiant de direction invalide.');
+  const existante = await organisationRepository.findDirectionById(id);
+  if (!existante) throw new OrganisationError('Direction introuvable.', 404);
+
+  const nom = corps.nom === undefined ? existante.nom : nettoyerNom(corps.nom, 'Le nom de la direction');
+  const actif = lireActif(corps.actif, existante.actif);
+  let modifiee;
+  try {
+    modifiee = await organisationRepository.updateDirection(id, { nom, actif });
+  } catch (err) {
+    if (err.code === '23505') throw new OrganisationError('Une direction porte déjà ce nom.', 409);
+    throw err;
+  }
+  const changements = [];
+  if (nom !== existante.nom) changements.push(`nom : ${existante.nom} → ${nom}`);
+  if (actif !== existante.actif) changements.push(actif ? 'réactivée' : 'désactivée');
+  if (changements.length) {
+    await activityLogRepository.create(modifiePar, 'organisation_direction_modifiee', `Direction ${existante.nom} modifiée (${changements.join(', ')})`);
+  }
+  return modifiee;
+}
+
+async function modifierService(idRaw, corps, modifiePar) {
+  const id = Number(idRaw);
+  if (!Number.isInteger(id) || id < 1) throw new OrganisationError('Identifiant de service invalide.');
+  const existant = await organisationRepository.findServiceById(id);
+  if (!existant) throw new OrganisationError('Service introuvable.', 404);
+
+  const nom = corps.nom === undefined ? existant.nom : nettoyerNom(corps.nom, 'Le nom du service');
+  const actif = lireActif(corps.actif, existant.actif);
+  let modifie;
+  try {
+    modifie = await organisationRepository.updateService(id, { nom, actif });
+  } catch (err) {
+    if (err.code === '23505') throw new OrganisationError('Un service porte déjà ce nom dans cette direction.', 409);
+    throw err;
+  }
+  const changements = [];
+  if (nom !== existant.nom) changements.push(`nom : ${existant.nom} → ${nom}`);
+  if (actif !== existant.actif) changements.push(actif ? 'réactivé' : 'désactivé');
+  if (changements.length) {
+    await activityLogRepository.create(modifiePar, 'organisation_service_modifie', `Service ${existant.nom} modifié (${changements.join(', ')})`);
+  }
+  return modifie;
+}
+
+// Chaque ligne = une direction, et optionnellement un service qui en dépend. Une
+// direction ou un service déjà existant est réutilisé (jamais dupliqué ni écrasé).
+async function importerDirectionsServices(rows, importePar) {
+  const resultat = { directionsCreees: 0, servicesCrees: 0, erreurs: [] };
+
+  for (let i = 0; i < rows.length; i++) {
+    const ligne = i + 2;
+    const row = rows[i];
+    let nomDirection;
+    let nomService;
+    try {
+      nomDirection = nettoyerNom(row.direction, 'La direction');
+      nomService = row.service ? nettoyerNom(row.service, 'Le service') : null;
+    } catch (err) {
+      resultat.erreurs.push({ line: ligne, reason: err.message });
+      continue;
+    }
+
+    try {
+      let direction = await organisationRepository.findDirectionByNom(nomDirection);
+      if (!direction) {
+        direction = await organisationRepository.createDirection(nomDirection);
+        resultat.directionsCreees += 1;
+        await activityLogRepository.create(importePar, 'organisation_direction_creee', `Direction créée (import) : ${nomDirection}`);
+      }
+      if (nomService) {
+        const service = await organisationRepository.findServiceByNomEtDirection(nomService, direction.id);
+        if (!service) {
+          await organisationRepository.createService(nomService, direction.id);
+          resultat.servicesCrees += 1;
+          await activityLogRepository.create(importePar, 'organisation_service_cree', `Service créé (import) : ${nomService} (${nomDirection})`);
+        }
+      }
+    } catch (err) {
+      resultat.erreurs.push({ line: ligne, reason: `Erreur sur « ${nomDirection} » : ${err.message}` });
+    }
+  }
+  return resultat;
+}
+
+module.exports = {
+  OrganisationError, creerDirection, supprimerDirection, creerService, supprimerService,
+  modifierDirection, modifierService, importerDirectionsServices,
+};

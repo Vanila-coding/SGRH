@@ -4,6 +4,7 @@ import { fetchGrilles, rechercherLignes, ajouterLigneGrille, CLASSES_GRILLE } fr
 import PageHeader from '../../components/PageHeader';
 import { toast } from '../../utils/toast';
 import { SkeletonCard, SkeletonTable } from '../../components/ui/Skeleton';
+import SelectMenu from '../../components/ui/SelectMenu';
 
 const inputClass = 'border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-1.5 text-sm';
 
@@ -17,10 +18,10 @@ function OngletParametres({ params, setEdits, status, handleSave }) {
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1">
               <p className="text-sm font-medium text-navy dark:text-gray-100">
-                {p.cle}
+                {p.description}
                 {p.a_valider && <span className="ml-2 text-xs px-2 py-0.5 rounded bg-amber-50 text-status-pending font-medium">À valider</span>}
               </p>
-              <p className="text-xs text-gray-400 mt-0.5">{p.description}</p>
+              <p className="text-xs text-gray-400 mt-0.5 font-mono">{p.cle}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 mt-3">
@@ -128,18 +129,18 @@ function OngletGrilles() {
 
         {showForm && (
           <form onSubmit={handleAjouterLigne} className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 p-3 bg-navy/5 rounded-md">
-            <select required value={ligneForm.grilleId} onChange={(e) => updateLigneForm('grilleId', e.target.value)} className={inputClass}>
+            <SelectMenu required value={ligneForm.grilleId} onChange={(e) => updateLigneForm('grilleId', e.target.value)} className={inputClass}>
               <option value="">-- Grille --</option>
               {grilles.map((g) => <option key={g.id} value={g.id}>{g.nom}</option>)}
-            </select>
-            <select required value={ligneForm.classe} onChange={(e) => updateLigneForm('classe', e.target.value)} className={inputClass}>
+            </SelectMenu>
+            <SelectMenu required value={ligneForm.classe} onChange={(e) => updateLigneForm('classe', e.target.value)} className={inputClass}>
               <option value="">-- Classe --</option>
               {CLASSES_GRILLE.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-            </select>
-            <select required value={ligneForm.echelon} onChange={(e) => updateLigneForm('echelon', e.target.value)} className={inputClass} disabled={!classeInfo}>
+            </SelectMenu>
+            <SelectMenu required value={ligneForm.echelon} onChange={(e) => updateLigneForm('echelon', e.target.value)} className={inputClass} disabled={!classeInfo}>
               <option value="">-- Échelon --</option>
               {echelons.map((e) => <option key={e} value={e}>{e}</option>)}
-            </select>
+            </SelectMenu>
             <input required type="number" placeholder="Indice" value={ligneForm.indice} onChange={(e) => updateLigneForm('indice', e.target.value)} className={inputClass} />
             <input type="text" placeholder="Catégorie (I-X, si applicable)" value={ligneForm.categorie} onChange={(e) => updateLigneForm('categorie', e.target.value)} className={inputClass} />
             <input type="text" placeholder="Cadre (A-D, si applicable)" value={ligneForm.cadre} onChange={(e) => updateLigneForm('cadre', e.target.value)} className={inputClass} />

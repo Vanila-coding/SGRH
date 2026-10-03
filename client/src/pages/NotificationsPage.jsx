@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { getMyNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../services/notificationApi';
 import PageHeader from '../components/PageHeader';
 import { SkeletonCard } from '../components/ui/Skeleton';
+import ViewToggle from '../components/ui/ViewToggle';
+import useVueListe, { classeConteneur } from '../hooks/useVueListe';
 
 const TYPE_LABELS = {
   info: 'Information', reunion: 'Réunion', echeance: 'Échéance',
@@ -10,6 +12,7 @@ const TYPE_LABELS = {
 };
 
 export default function NotificationsPage() {
+  const [vue, setVue] = useVueListe('notifications');
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('toutes'); // 'toutes' | 'non_lues' | 'lues'
@@ -52,6 +55,9 @@ export default function NotificationsPage() {
   return (
     <div className="max-w-[1600px] mx-auto">
       <PageHeader crumbs={[{ label: 'Notifications' }]} title="Notifications" />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
       <div className="flex items-center justify-between gap-2 mb-6 flex-wrap">
         <div className="flex gap-2">
           {['toutes', 'non_lues', 'lues'].map((f) => (
@@ -78,14 +84,14 @@ export default function NotificationsPage() {
       )}
 
       {loading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className={classeConteneur(vue, 3)}>
           <SkeletonCard lines={2} />
           <SkeletonCard lines={2} />
           <SkeletonCard lines={2} />
           <SkeletonCard lines={2} />
         </div>
       ) : (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <div className={classeConteneur(vue, 3)}>
         {filtered.map((n) => (
           <div
             key={n.id}

@@ -88,22 +88,31 @@ export async function getMonEquipe() {
   return data;
 }
 
-export async function exportPersonnelExcel() {
+async function telechargerFichier(chemin, nomFichier, messageErreur) {
   const token = localStorage.getItem('rh_token');
-  const res = await fetch(`${API_URL}/personnel/export`, {
+  const res = await fetch(`${API_URL}${chemin}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw makeApiError(res, null, "Échec de l'export");
+  if (!res.ok) throw makeApiError(res, null, messageErreur);
 
   const blob = await res.blob();
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'personnel.xlsx';
+  a.download = nomFichier;
   document.body.appendChild(a);
   a.click();
   a.remove();
   window.URL.revokeObjectURL(url);
+}
+
+export function exportPersonnelExcel(role) {
+  const query = role ? `?role=${role}` : '';
+  return telechargerFichier(`/personnel/export${query}`, role ? `personnel-${role}.xlsx` : 'personnel.xlsx', "Échec de l'export");
+}
+
+export function telechargerModeleImport(role) {
+  return telechargerFichier(`/personnel/import/modele?role=${role}`, `modele-import-personnel-${role}.xlsx`, 'Échec du téléchargement du modèle');
 }
 
 export async function importPersonnelExcel(file) {

@@ -8,4 +8,18 @@ function imageExtension(buffer) {
   return null;
 }
 
-module.exports = { imageExtension };
+const SVG_DANGEREUX = /<script|<foreignObject|<iframe|<embed|<object|<!ENTITY|\son[a-z]+\s*=|javascript:|(href|src)\s*=\s*["']\s*(https?:|\/\/)/i;
+
+function svgSur(buffer) {
+  const texte = buffer.toString('utf8');
+  if (!/^\s*(<\?xml[^>]*>\s*)?(<!--[\s\S]*?-->\s*)*(<!DOCTYPE[^>]*>\s*)?<svg[\s>]/i.test(texte)) return false;
+  return !SVG_DANGEREUX.test(texte);
+}
+
+// Logos et favicon du site uniquement : un SVG est accepté s'il ne contient ni script
+// ni attribut exécutable. Ne jamais l'utiliser pour les photos de profil.
+function logoExtension(buffer) {
+  return imageExtension(buffer) || (svgSur(buffer) ? 'svg' : null);
+}
+
+module.exports = { imageExtension, logoExtension };

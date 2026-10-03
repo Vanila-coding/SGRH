@@ -4,7 +4,7 @@ const path = require('path');
 const siteSettingsService = require('../services/siteSettingsService');
 const siteSettingsRepository = require('../repositories/siteSettingsRepository');
 const activityLogRepository = require('../repositories/activityLogRepository');
-const { imageExtension } = require('../utils/imageType');
+const { logoExtension } = require('../utils/imageType');
 
 async function get(req, res) {
   const settings = await siteSettingsService.getSettings();
@@ -39,9 +39,9 @@ function makeImageUploadHandler(slot) {
   return async function uploadImage(req, res) {
     if (!req.file) return res.status(400).json({ message: 'Une image est requise' });
 
-    const extension = imageExtension(req.file.buffer);
+    const extension = logoExtension(req.file.buffer);
     if (!extension) {
-      return res.status(400).json({ message: 'Format invalide. Utilisez une image JPG, PNG ou WebP.' });
+      return res.status(400).json({ message: 'Format invalide. Utilisez une image JPG, PNG, WebP ou SVG (sans script).' });
     }
 
     const filename = `${crypto.randomUUID()}.${extension}`;

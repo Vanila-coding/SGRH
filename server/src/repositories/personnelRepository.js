@@ -98,7 +98,7 @@ async function findLinkedUserId(personnelId) {
 
 async function listAll() {
   const result = await pool.query(
-    `SELECT p.*, (u.id IS NOT NULL) AS a_un_compte, cp.code AS categorie_code, cp.appellation AS categorie_appellation,
+    `SELECT p.*, (u.id IS NOT NULL) AS a_un_compte, u.status AS statut_compte, cp.code AS categorie_code, cp.appellation AS categorie_appellation,
        (SELECT array_agg(pr.role ORDER BY pr.role) FROM personnel_roles pr WHERE pr.personnel_id = p.id) AS roles,
        pe.etablissement_id, pe.corps_pe, pe.categorie_libelle, pe.diplome, pe.specialite,
        et.nom AS etablissement_nom

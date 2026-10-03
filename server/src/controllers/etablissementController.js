@@ -41,4 +41,13 @@ async function reactiver(req, res) {
   }
 }
 
-module.exports = { list, create, desactiver, reactiver };
+async function renommer(req, res) {
+  try {
+    const etablissement = await etablissementService.renommer(req.params.id, req.body.nom, req.user.id);
+    return res.status(200).json({ message: 'Établissement renommé', etablissement });
+  } catch (err) {
+    return sendError(res, err);
+  }
+}
+
+module.exports = { list, create, renommer, desactiver, reactiver };

@@ -48,4 +48,15 @@ function requirePermission(key) {
   };
 }
 
-module.exports = { requireAuth, requireRole, requirePermission };
+function requireAnyPermission(keys) {
+  return async (req, res, next) => {
+    if (!req.user) return res.status(401).json({ message: 'Authentification requise' });
+
+    for (const key of keys) {
+      if (await permissionRepository.isRoleAllowed(req.user.role, key)) return next();
+    }
+    return res.status(403).json({ message: 'Accès refusé (permission manquante)' });
+  };
+}
+
+module.exports = { requireAuth, requireRole, requirePermission, requireAnyPermission };

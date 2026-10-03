@@ -37,3 +37,15 @@ export async function reactiverEtablissement(id) {
   const res = await fetch(`${API_URL}/etablissements/${id}/reactiver`, { method: 'PATCH', headers: authHeaders() });
   return lireOuErreur(res, "Échec de la réactivation de l'établissement");
 }
+
+export async function renommerEtablissement(id, nom) {
+  const token = localStorage.getItem('rh_token');
+  const res = await fetch(`${API_URL}/etablissements/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ nom }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || 'Échec du renommage');
+  return data.etablissement;
+}

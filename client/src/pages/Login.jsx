@@ -5,11 +5,14 @@ import { useAuth } from '../context/AuthContext';
 import { useText } from '../context/TextContext';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import Footer from '../components/layout/Footer';
+import { urlFichierSite } from '../utils/siteAssets';
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const { settings } = useSiteSettings();
+  const logoConnexion = urlFichierSite(settings.logo_connexion_url || settings.logo_principal_url) || '/logo-univ-mahajanga.png';
+  const logoConnexionEstSvg = /\.svg$/i.test(logoConnexion);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -60,9 +63,9 @@ export default function Login() {
           <div className="relative overflow-hidden flex flex-col justify-between p-8 sm:p-10 min-h-[220px] md:min-h-[520px] bg-navy">
             <div className="relative z-10 flex items-center gap-2">
               <img
-                src={settings.logo_connexion_url || settings.logo_principal_url || '/logo-univ-mahajanga.png'}
+                src={logoConnexion}
                 alt="Université de Mahajanga"
-                className="h-8 w-8 rounded-md bg-white object-contain p-0.5"
+                className={logoConnexionEstSvg ? 'h-8 w-8 object-contain brightness-0 invert' : 'h-8 w-8 rounded-md bg-white object-contain p-0.5'}
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
             </div>

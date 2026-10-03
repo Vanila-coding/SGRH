@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { getSiteSettings } from '../services/siteSettingsAdminApi';
+import { urlFichierSite } from '../utils/siteAssets';
 
 const SiteSettingsContext = createContext(null);
 
@@ -25,7 +26,7 @@ function applyColors(settings) {
 function applyFavicon(settings) {
   if (!settings.favicon_url) return;
   const link = document.querySelector("link[rel~='icon']");
-  if (link) link.href = settings.favicon_url;
+  if (link) link.href = urlFichierSite(settings.favicon_url);
 }
 
 // Applique les couleurs et le favicon personnalisés à chaque démarrage de l'application

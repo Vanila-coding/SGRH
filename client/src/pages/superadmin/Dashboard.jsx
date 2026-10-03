@@ -13,6 +13,7 @@ import { getAdminDashboardStats } from '../../services/statsApi';
 import { Card, Badge, Skeleton, SkeletonText } from '../../components/ui';
 import PageHeader from '../../components/PageHeader';
 import { ACTION_LABELS } from '../../constants/activityLabels';
+import SelectMenu from '../../components/ui/SelectMenu';
 
 // Les 6 rôles réels de l'app (Secrétaire PE/PAT ajoutés cette session) — une liste
 // restée à 4 aurait sous-compté "Rôles" et caché deux lignes dans la répartition.
@@ -210,7 +211,7 @@ export default function SuperadminDashboard() {
         <Card className="lg:col-span-2">
           <div className="flex items-start justify-between gap-3 mb-1">
             <SectionTitle icon={History}>Activité récente</SectionTitle>
-            <select
+            <SelectMenu
               value={activityLimit}
               onChange={(e) => setActivityLimit(Number(e.target.value))}
               className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md pl-2 pr-6 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-navy shrink-0"
@@ -218,7 +219,7 @@ export default function SuperadminDashboard() {
               <option value={5}>5 dernières</option>
               <option value={10}>10 dernières</option>
               <option value={20}>20 dernières</option>
-            </select>
+            </SelectMenu>
           </div>
           <p className="text-xs text-gray-400 mb-3">Activité du personnel (congés, documents, carrière...), hors connexions.</p>
           {activity === null ? (

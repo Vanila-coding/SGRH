@@ -5,6 +5,7 @@ import { createDemande, getMyDemandes, getSoldeConges, uploadJustificatif, telec
 import { getMyPersonnel } from '../../services/personnelApi';
 import { TYPES_CONGE, JUSTIFICATIF_OBLIGATOIRE, STATUS_LABELS } from '../../constants/conges';
 import { SkeletonText } from '../../components/ui';
+import SelectMenu from '../../components/ui/SelectMenu';
 
 function formatJours(n) {
   if (n === null || n === undefined) return '—';
@@ -149,13 +150,13 @@ export default function Conges() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type de demande</label>
-              <select
+              <SelectMenu
                 value={typeConge}
                 onChange={(e) => setTypeConge(e.target.value)}
                 className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
               >
                 {TYPES_CONGE.map((t) => <option key={t} value={t}>{t}</option>)}
-              </select>
+              </SelectMenu>
               {typeConge === 'Congé annuel' && (
                 <p className="text-xs text-gray-400 mt-1">
                   Minimum 15 jours pour votre première demande de congé annuel de l'année (ou votre solde disponible s'il est inférieur).

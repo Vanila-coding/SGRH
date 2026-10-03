@@ -3,8 +3,11 @@ import { Link } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import { getPendingEquipe, reviewIntermediaire } from '../../services/congeApi';
 import { SkeletonCard, EmptyState } from '../../components/ui';
+import ViewToggle from '../../components/ui/ViewToggle';
+import useVueListe from '../../hooks/useVueListe';
 
 export default function ValidationEquipe() {
+  const [vue, setVue] = useVueListe('validation-equipe');
   const [demandes, setDemandes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -45,6 +48,9 @@ export default function ValidationEquipe() {
         title="Validation équipe"
         subtitle="Demandes de votre équipe en attente de votre avis, avant transmission à l'Admin RH"
       />
+      <div className="flex justify-end mb-3">
+        <ViewToggle value={vue} onChange={setVue} />
+      </div>
 
       {error && <p className="text-sm text-status-rejected mb-4">{error}</p>}
       {loading && (
@@ -55,7 +61,7 @@ export default function ValidationEquipe() {
       )}
       {!loading && demandes.length === 0 && <EmptyState title="Aucune demande en attente." />}
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className={vue === 'liste' ? 'flex flex-col gap-4' : 'grid grid-cols-1 gap-4 lg:grid-cols-2'}>
         {demandes.map((d) => (
           <div key={d.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
             <div className="flex items-center justify-between mb-2">

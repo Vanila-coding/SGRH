@@ -26,6 +26,14 @@ async function setStatut(id, statut) {
   return result.rows[0] || null;
 }
 
+async function setNom(id, nom) {
+  const result = await pool.query(
+    `UPDATE etablissements SET nom = $2 WHERE id = $1 RETURNING id, nom, statut`,
+    [id, nom]
+  );
+  return result.rows[0] || null;
+}
+
 async function countPersonnelByEtablissement(id) {
   const result = await pool.query(
     `SELECT COUNT(*)::int AS count FROM personnel_pe_infos WHERE etablissement_id = $1`,
@@ -34,4 +42,4 @@ async function countPersonnelByEtablissement(id) {
   return result.rows[0].count;
 }
 
-module.exports = { list, findById, create, setStatut, countPersonnelByEtablissement };
+module.exports = { list, findById, create, setStatut, setNom, countPersonnelByEtablissement };

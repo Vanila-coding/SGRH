@@ -4,6 +4,7 @@ import { FONCTIONS_PAR_ROLE } from '../../constants/fonctions';
 import PageHeader from '../../components/PageHeader';
 import PersonnelSearchSelect from '../../components/PersonnelSearchSelect';
 import { Skeleton } from '../../components/ui/Skeleton';
+import SelectMenu from '../../components/ui/SelectMenu';
 
 export default function GestionFonctions() {
   const [users, setUsers] = useState([]);
@@ -75,7 +76,7 @@ export default function GestionFonctions() {
           {selectedUser && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nouvelle fonction</label>
-              <select
+              <SelectMenu
                 required
                 value={newFonction}
                 onChange={(e) => setNewFonction(e.target.value)}
@@ -85,7 +86,7 @@ export default function GestionFonctions() {
                 {FONCTIONS_PAR_ROLE[selectedUser.role].map((f) => (
                   <option key={f} value={f}>{f}</option>
                 ))}
-              </select>
+              </SelectMenu>
             </div>
           )}
 

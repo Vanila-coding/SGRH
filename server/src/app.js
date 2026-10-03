@@ -76,6 +76,10 @@ app.use(express.json({ limit: '2mb' }));
 app.use('/uploads/profile-photos', express.static(path.join(__dirname, '../uploads/profile-photos')));
 // Logo, favicon, logo de connexion : mêmes raisons (utilisés publiquement, y compris sur
 // la page de connexion avant authentification ; noms de fichiers UUID).
+app.use('/uploads/site', (req, res, next) => {
+  res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:");
+  next();
+});
 app.use('/uploads/site', express.static(path.join(__dirname, '../uploads/site')));
 
 app.use('/api/invitations', invitationRoutes);

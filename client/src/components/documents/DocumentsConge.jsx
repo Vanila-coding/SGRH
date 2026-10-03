@@ -1,3 +1,4 @@
+import { traduire } from '../../i18n';
 // Décision d'octroi d'une fraction de congé et état de congé (mise en page des fiches
 // du Service du Personnel). Les données viennent du snapshot figé du document.
 
@@ -19,12 +20,12 @@ function Position({ titre, p }) {
   return (
     <div className="p-3 space-y-1">
       <p className="font-bold text-center border-b border-black pb-1 mb-2">{titre}</p>
-      <p><strong>IM :</strong> {p.iM || '—'}</p>
-      <p><strong>Budget :</strong> {p.budget ? `Chapitre ${p.budget}` : '—'}</p>
-      <p><strong>Corps :</strong> {p.corps || '—'}</p>
-      <p><strong>Grade :</strong> {p.grade || '—'}</p>
-      <p><strong>Fonction :</strong> {p.fonction || '—'}</p>
-      <p><strong>Indice :</strong> {p.indice || '—'}</p>
+      <p><strong>{traduire('IM :')}</strong> {p.iM || '—'}</p>
+      <p><strong>{traduire('Budget :')}</strong> {p.budget ? `Chapitre ${p.budget}` : '—'}</p>
+      <p><strong>{traduire('Corps :')}</strong> {p.corps || '—'}</p>
+      <p><strong>{traduire('Grade :')}</strong> {p.grade || '—'}</p>
+      <p><strong>{traduire('Fonction :')}</strong> {p.fonction || '—'}</p>
+      <p><strong>{traduire('Indice :')}</strong> {p.indice || '—'}</p>
     </div>
   );
 }
@@ -34,11 +35,11 @@ export function DecisionConge({ doc }) {
   const annees = [...(d.anneesService || []), ...(d.soldeAnterieur ? ["solde d'ouverture antérieur"] : [])];
   return (
     <div className="text-sm" data-testid="decision-conge">
-      <p className="mb-1"><span className="font-bold underline">Décision N°</span> {d.numero}</p>
+      <p className="mb-1"><span className="font-bold underline">{traduire('Décision N°')}</span> {d.numero}</p>
       <p className="font-bold mb-5">Portant octroi d'une fraction de congé de {d.jours} jours.</p>
 
-      <p className="mb-1"><span className="font-bold underline">Nom :</span> {d.nom}</p>
-      <p className="mb-4"><span className="font-bold underline">Prénoms :</span> {d.prenom}</p>
+      <p className="mb-1"><span className="font-bold underline">{traduire('Nom :')}</span> {d.nom}</p>
+      <p className="mb-4"><span className="font-bold underline">{traduire('Prénoms :')}</span> {d.prenom}</p>
 
       <div className="border border-black">
         <div className="grid grid-cols-2 divide-x divide-black border-b border-black">
@@ -47,7 +48,7 @@ export function DecisionConge({ doc }) {
         </div>
         <div className="grid grid-cols-2 divide-x divide-black">
           <div className="p-3 text-xs space-y-1">
-            <p className="font-bold underline text-sm">AMPLIATION</p>
+            <p className="font-bold underline text-sm">{traduire('AMPLIATION')}</p>
             {d.ampliation.map((a) => (
               <p key={a.destinataire}>
                 {a.destinataire}
@@ -75,15 +76,15 @@ export function EtatConge({ doc }) {
   const e = doc.donnees;
   return (
     <div className="text-sm" data-testid="etat-conge">
-      <h1 className="text-center text-xl font-bold underline mb-5">ETAT DE CONGE</h1>
+      <h1 className="text-center text-xl font-bold underline mb-5">{traduire('ETAT DE CONGE')}</h1>
 
       <div className="space-y-1 mb-4">
-        <p><strong className="underline">Service :</strong> {e.service || '—'}</p>
-        <p><strong className="underline">Fonction :</strong> {e.fonction || '—'}</p>
-        <p><strong className="underline">Nom :</strong> {e.nom}</p>
-        <p><strong className="underline">Prénoms :</strong> {e.prenom}</p>
-        <p><strong className="underline">LM :</strong> {e.matricule}</p>
-        <p><strong className="underline">Statut :</strong> {e.statut || '—'}</p>
+        <p><strong className="underline">{traduire('Service :')}</strong> {e.service || '—'}</p>
+        <p><strong className="underline">{traduire('Fonction :')}</strong> {e.fonction || '—'}</p>
+        <p><strong className="underline">{traduire('Nom :')}</strong> {e.nom}</p>
+        <p><strong className="underline">{traduire('Prénoms :')}</strong> {e.prenom}</p>
+        <p><strong className="underline">{traduire('LM :')}</strong> {e.matricule}</p>
+        <p><strong className="underline">{traduire('Statut :')}</strong> {e.statut || '—'}</p>
       </div>
 
       <div className="overflow-x-auto print:overflow-visible">
@@ -111,7 +112,7 @@ export function EtatConge({ doc }) {
           })}
           {e.ouverture && (
             <tr>
-              <td className="border border-black p-1.5 font-bold">Solde d'ouverture antérieur (non ventilé par année)</td>
+              <td className="border border-black p-1.5 font-bold">{traduire('Solde d\'ouverture antérieur (non ventilé par année)')}</td>
               <td className="border border-black p-1.5">—</td>
               <td className="border border-black p-1.5" />
               <td className="border border-black p-1.5" />
@@ -120,13 +121,13 @@ export function EtatConge({ doc }) {
             </tr>
           )}
           {e.lignes.length === 0 && !e.ouverture && (
-            <tr><td colSpan={6} className="border border-black p-3 text-gray-500">Aucun droit à congé enregistré.</td></tr>
+            <tr><td colSpan={6} className="border border-black p-3 text-gray-500">{traduire('Aucun droit à congé enregistré.')}</td></tr>
           )}
         </tbody>
       </table>
       </div>
 
-      <p className="text-right font-bold mt-3">Total de congé : <span className="inline-block border border-black px-3 py-1 ml-2">{Number(e.total).toLocaleString('fr-FR', { minimumFractionDigits: 1 })} Jrs</span></p>
+      <p className="text-right font-bold mt-3">{traduire('Total de congé :')}<span className="inline-block border border-black px-3 py-1 ml-2">{Number(e.total).toLocaleString('fr-FR', { minimumFractionDigits: 1 })} Jrs</span></p>
       <p className="italic mt-2">L'état de congé est arrêté au nombre de : {e.totalEnLettres} ({Number(e.total).toLocaleString('fr-FR')} jours.)</p>
     </div>
   );

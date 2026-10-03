@@ -544,6 +544,10 @@ Elles sont réexécutables sans risque (`IF NOT EXISTS` / `DROP CONSTRAINT IF EX
 
 **Installation depuis zéro** : `server/database/schema.sql` décrit la structure complète (33 tables : les 32 tables de la base `rh_mahajanga` plus la table de référence `roles`, avec clés primaires, types, `NOT NULL`, clés étrangères, index, `CHECK` et la vue `user_details`), `seed_reference.sql` les données de référence et `seed_dev.sql` des données fictives de développement (comptes `@example.test`, mot de passe `Demo1234!`). Le modèle conceptuel (diagramme Mermaid, cardinalités, écarts connus) est dans `server/database/MCD.md`. Le schéma a été comparé colonne par colonne, contrainte par contrainte et index par index avec la base réelle : seuls diffèrent la table `roles` et ses clés étrangères (à la place du `CHECK` sur les rôles), les `CHECK` sur les types de document et des index supplémentaires. Il ne doit jamais être exécuté sur une base existante (utiliser les migrations).
 
+## Langue de l'interface
+
+L'interface est disponible en français (par défaut) et en anglais : Paramètres > Langue & région, ou FR / EN sur la page de connexion. Les textes passent par `traduire('Texte français')` (`client/src/i18n/`), avec le dictionnaire `dictionnaires.js` ; un texte absent reste en français. Les documents officiels imprimables restent en français.
+
 ## Qualité et CI
 
 GitHub Actions s'exécute sur chaque push et pull request vers `main` : `npm ci` dans les deux applications, build du frontend et vérification syntaxique de tous les fichiers backend avec `node --check`.

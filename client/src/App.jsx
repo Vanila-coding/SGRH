@@ -54,6 +54,7 @@ import Conges from './pages/personnel/Conges';
 import MonEquipe from './pages/personnel/MonEquipe';
 import ValidationEquipe from './pages/personnel/ValidationEquipe';
 import MesDocuments from './pages/personnel/MesDocuments';
+import { traduire } from './i18n';
 
 const ALL_ROLES = ['ADMIN_RH', 'SUPERADMIN', 'PE', 'PAT', 'SECRETAIRE_PE', 'SECRETAIRE_PAT'];
 // Les routes en libre-service (mon dossier, mes congés, aide...) n'ont pas de prop
@@ -93,202 +94,202 @@ function App() {
 
                 <Route path="/notifications" element={
                   <ProtectedRoute allowedRoles={ALL_ROLES} permission="view_notifications">
-                    <AppShell title="Notifications" subtitle="Gestion des Ressources Humaines"><NotificationsPage /></AppShell>
+                    <AppShell title={traduire('Notifications')} subtitle={traduire('Gestion des Ressources Humaines')}><NotificationsPage /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/parametres" element={
                   <ProtectedRoute allowedRoles={ALL_ROLES}>
-                    <AppShell title="Paramètres" subtitle="Gestion des Ressources Humaines"><Parametres /></AppShell>
+                    <AppShell title={traduire('Paramètres')} subtitle={traduire('Gestion des Ressources Humaines')}><Parametres /></AppShell>
                   </ProtectedRoute>
                 } />
 
                 <Route path="/aide/commencer" element={
                   <ProtectedRoute allowedRoles={PE_PAT}>
-                    <AppShell title="Par où commencer" subtitle="Documentation"><ParOuCommencer /></AppShell>
+                    <AppShell title={traduire('Par où commencer')} subtitle={traduire('Documentation')}><ParOuCommencer /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/aide/droits" element={
                   <ProtectedRoute allowedRoles={PE_PAT}>
-                    <AppShell title="Vos droits" subtitle="Documentation"><VosDroits /></AppShell>
+                    <AppShell title={traduire('Vos droits')} subtitle={traduire('Documentation')}><VosDroits /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/aide/procedures" element={
                   <ProtectedRoute allowedRoles={PE_PAT}>
-                    <AppShell title="Les procédures" subtitle="Documentation"><Procedures /></AppShell>
+                    <AppShell title={traduire('Les procédures')} subtitle={traduire('Documentation')}><Procedures /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/aide/signaler" element={
                   <ProtectedRoute allowedRoles={PE_PAT} permission="signaler_probleme">
-                    <AppShell title="Signaler un problème" subtitle="Documentation"><Reclamation /></AppShell>
+                    <AppShell title={traduire('Signaler un problème')} subtitle={traduire('Documentation')}><Reclamation /></AppShell>
                   </ProtectedRoute>
                 } />
 
                 <Route path="/mon-equipe" element={
                   <ProtectedRoute allowedRoles={PE_PAT}>
-                    <AppShell title="Mon équipe" subtitle="Gestion des Ressources Humaines"><MonEquipe /></AppShell>
+                    <AppShell title={traduire('Mon équipe')} subtitle={traduire('Gestion des Ressources Humaines')}><MonEquipe /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/validation-equipe" element={
                   <ProtectedRoute allowedRoles={PE_PAT}>
-                    <AppShell title="Validation équipe" subtitle="Gestion des Ressources Humaines"><ValidationEquipe /></AppShell>
+                    <AppShell title={traduire('Validation équipe')} subtitle={traduire('Gestion des Ressources Humaines')}><ValidationEquipe /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/mes-documents" element={
                   <ProtectedRoute allowedRoles={PE_PAT} permission="demander_document">
-                    <AppShell title="Mes documents" subtitle="Gestion des Ressources Humaines"><MesDocuments /></AppShell>
+                    <AppShell title={traduire('Mes documents')} subtitle={traduire('Gestion des Ressources Humaines')}><MesDocuments /></AppShell>
                   </ProtectedRoute>
                 } />
 
                 <Route path="/admin/dashboard" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="view_dashboard_admin">
-                    <AppShell title="Tableau de bord" subtitle="Gestion des Ressources Humaines"><Dashboard /></AppShell>
+                    <AppShell title={traduire('Tableau de bord')} subtitle={traduire('Gestion des Ressources Humaines')}><Dashboard /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/personnel/:id/fiche" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="view_personnel">
-                    <AppShell title="Personnel" subtitle="Gestion des Ressources Humaines"><PersonnelFiche /></AppShell>
+                    <AppShell title={traduire('Personnel')} subtitle={traduire('Gestion des Ressources Humaines')}><PersonnelFiche /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/personnel/pe" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="view_personnel">
-                    <AppShell title="Personnel enseignant" subtitle="Gestion des Ressources Humaines"><PersonnelPE /></AppShell>
+                    <AppShell title={traduire('Personnel enseignant')} subtitle={traduire('Gestion des Ressources Humaines')}><PersonnelPE /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/personnel/etablissements" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="manage_etablissements">
-                    <AppShell title="Établissements" subtitle="Gestion des Ressources Humaines"><Etablissements /></AppShell>
+                    <AppShell title={traduire('Établissements')} subtitle={traduire('Gestion des Ressources Humaines')}><Etablissements /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/personnel" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="view_personnel">
-                    <AppShell title="Personnel" subtitle="Gestion des Ressources Humaines"><Personnel /></AppShell>
+                    <AppShell title={traduire('Personnel')} subtitle={traduire('Gestion des Ressources Humaines')}><Personnel /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/organisation" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="manage_organisation">
-                    <AppShell title="Directions & services" subtitle="Gestion des Ressources Humaines"><OrganisationRH /></AppShell>
+                    <AppShell title={traduire('Directions & services')} subtitle={traduire('Gestion des Ressources Humaines')}><OrganisationRH /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/invitations" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="send_registration_link">
-                    <AppShell title="Inviter un personnel" subtitle="Gestion des Ressources Humaines"><Invitations /></AppShell>
+                    <AppShell title={traduire('Inviter un personnel')} subtitle={traduire('Gestion des Ressources Humaines')}><Invitations /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/comptes-attente" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="view_pending_accounts">
-                    <AppShell title="Comptes en attente" subtitle="Gestion des Ressources Humaines"><ComptesEnAttente /></AppShell>
+                    <AppShell title={traduire('Comptes en attente')} subtitle={traduire('Gestion des Ressources Humaines')}><ComptesEnAttente /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/notifications" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="send_notification">
-                    <AppShell title="Envoyer une notification" subtitle="Gestion des Ressources Humaines"><EnvoyerNotification /></AppShell>
+                    <AppShell title={traduire('Envoyer une notification')} subtitle={traduire('Gestion des Ressources Humaines')}><EnvoyerNotification /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/fonctions" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="manage_fonctions">
-                    <AppShell title="Gestion des fonctions" subtitle="Gestion des Ressources Humaines"><GestionFonctions /></AppShell>
+                    <AppShell title={traduire('Gestion des fonctions')} subtitle={traduire('Gestion des Ressources Humaines')}><GestionFonctions /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/carriere" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="manage_fonctions">
-                    <AppShell title="Carrière" subtitle="Gestion des Ressources Humaines"><Carriere /></AppShell>
+                    <AppShell title={traduire('Carrière')} subtitle={traduire('Gestion des Ressources Humaines')}><Carriere /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/contrats" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="manage_fonctions">
-                    <AppShell title="Contrats" subtitle="Gestion des Ressources Humaines"><ContratsAdmin /></AppShell>
+                    <AppShell title={traduire('Contrats')} subtitle={traduire('Gestion des Ressources Humaines')}><ContratsAdmin /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/parametres-carriere" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="manage_parametres_carriere">
-                    <AppShell title="Paramètres de carrière" subtitle="Gestion des Ressources Humaines"><ParametresCarriere /></AppShell>
+                    <AppShell title={traduire('Paramètres de carrière')} subtitle={traduire('Gestion des Ressources Humaines')}><ParametresCarriere /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/conges" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="view_conges_admin">
-                    <AppShell title="Congés & absences" subtitle="Gestion des Ressources Humaines"><CongesAdmin /></AppShell>
+                    <AppShell title={traduire('Congés & absences')} subtitle={traduire('Gestion des Ressources Humaines')}><CongesAdmin /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/documents" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="manage_documents">
-                    <AppShell title="Documents administratifs" subtitle="Gestion des Ressources Humaines"><DocumentsAdmin /></AppShell>
+                    <AppShell title={traduire('Documents administratifs')} subtitle={traduire('Gestion des Ressources Humaines')}><DocumentsAdmin /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/demandes-documents" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="manage_documents">
-                    <AppShell title="Demandes de documents" subtitle="Gestion des Ressources Humaines"><DemandesDocuments /></AppShell>
+                    <AppShell title={traduire('Demandes de documents')} subtitle={traduire('Gestion des Ressources Humaines')}><DemandesDocuments /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/historique" element={
                   <ProtectedRoute allowedRoles={ADMIN_OR_SUPERADMIN} permission="view_historique">
-                    <AppShell title="Audit & journal" subtitle="Gestion des Ressources Humaines"><Historique /></AppShell>
+                    <AppShell title={traduire('Audit & journal')} subtitle={traduire('Gestion des Ressources Humaines')}><Historique /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/secretariat/conges" element={
                   <ProtectedRoute allowedRoles={[...ADMIN_OR_SUPERADMIN, 'SECRETAIRE_PE', 'SECRETAIRE_PAT']} permission="review_conges_secretariat">
-                    <AppShell title="Congés à vérifier" subtitle="Secrétariat"><CongesSecretariat /></AppShell>
+                    <AppShell title={traduire('Congés à vérifier')} subtitle={traduire('Secrétariat')}><CongesSecretariat /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/secretariat/documents" element={
                   <ProtectedRoute allowedRoles={[...ADMIN_OR_SUPERADMIN, 'SECRETAIRE_PE', 'SECRETAIRE_PAT']} permission="review_documents_secretariat">
-                    <AppShell title="Demandes de documents" subtitle="Secrétariat"><DemandesDocumentsSecretariat /></AppShell>
+                    <AppShell title={traduire('Demandes de documents')} subtitle={traduire('Secrétariat')}><DemandesDocumentsSecretariat /></AppShell>
                   </ProtectedRoute>
                 } />
 
                 <Route path="/superadmin/dashboard" element={
                   <ProtectedRoute allowedRoles={['SUPERADMIN']} permission="view_dashboard_admin">
-                    <AppShell title="Tableau de bord" subtitle="Administration système"><SuperadminDashboard /></AppShell>
+                    <AppShell title={traduire('Tableau de bord')} subtitle={traduire('Administration système')}><SuperadminDashboard /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/superadmin/comptes" element={
                   <ProtectedRoute allowedRoles={['SUPERADMIN']} permission="manage_accounts">
-                    <AppShell title="Gestion des comptes" subtitle="Administration système"><ComptesSuperadmin /></AppShell>
+                    <AppShell title={traduire('Gestion des comptes')} subtitle={traduire('Administration système')}><ComptesSuperadmin /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/superadmin/corbeille" element={
                   <ProtectedRoute allowedRoles={['SUPERADMIN']} permission="manage_corbeille">
-                    <AppShell title="Corbeille" subtitle="Administration système"><CorbeilleSuperadmin /></AppShell>
+                    <AppShell title={traduire('Corbeille')} subtitle={traduire('Administration système')}><CorbeilleSuperadmin /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/superadmin/permissions" element={
                   <ProtectedRoute allowedRoles={['SUPERADMIN']} permission="manage_permissions">
-                    <AppShell title="Gestion des permissions" subtitle="Administration système"><PermissionsSuperadmin /></AppShell>
+                    <AppShell title={traduire('Gestion des permissions')} subtitle={traduire('Administration système')}><PermissionsSuperadmin /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/superadmin/reclamations" element={
                   <ProtectedRoute allowedRoles={['SUPERADMIN']} permission="manage_reclamations">
-                    <AppShell title="Réclamations" subtitle="Administration système"><ReclamationsSuperadmin /></AppShell>
+                    <AppShell title={traduire('Réclamations')} subtitle={traduire('Administration système')}><ReclamationsSuperadmin /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/superadmin/apparence" element={
                   <ProtectedRoute allowedRoles={['SUPERADMIN']} permission="manage_site_texts">
-                    <AppShell title="Personnalisation" subtitle="Administration système"><ApparenceSite /></AppShell>
+                    <AppShell title={traduire('Personnalisation')} subtitle={traduire('Administration système')}><ApparenceSite /></AppShell>
                   </ProtectedRoute>
                 } />
 
                 <Route path="/dashboard" element={
                   <ProtectedRoute allowedRoles={PE_PAT}>
-                    <AppShell title="Espace personnel" subtitle="Gestion des Ressources Humaines"><PersonnelDashboard /></AppShell>
+                    <AppShell title={traduire('Espace personnel')} subtitle={traduire('Gestion des Ressources Humaines')}><PersonnelDashboard /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/profil" element={
                   <ProtectedRoute allowedRoles={PE_PAT} permission="view_profil">
-                    <AppShell title="Mon dossier" subtitle="Gestion des Ressources Humaines"><Profil /></AppShell>
+                    <AppShell title={traduire('Mon dossier')} subtitle={traduire('Gestion des Ressources Humaines')}><Profil /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/carriere" element={
                   <ProtectedRoute allowedRoles={PE_PAT} permission="view_profil">
-                    <AppShell title="Ma carrière" subtitle="Gestion des Ressources Humaines"><MaCarriere /></AppShell>
+                    <AppShell title={traduire('Ma carrière')} subtitle={traduire('Gestion des Ressources Humaines')}><MaCarriere /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/mes-contrats" element={
                   <ProtectedRoute allowedRoles={PE_PAT} permission="view_profil">
-                    <AppShell title="Mes contrats" subtitle="Gestion des Ressources Humaines"><MesContrats /></AppShell>
+                    <AppShell title={traduire('Mes contrats')} subtitle={traduire('Gestion des Ressources Humaines')}><MesContrats /></AppShell>
                   </ProtectedRoute>
                 } />
                 <Route path="/conges" element={
                   <ProtectedRoute allowedRoles={PE_PAT} permission="view_mes_conges">
-                    <AppShell title="Mes congés & absences" subtitle="Gestion des Ressources Humaines"><Conges /></AppShell>
+                    <AppShell title={traduire('Mes congés & absences')} subtitle={traduire('Gestion des Ressources Humaines')}><Conges /></AppShell>
                   </ProtectedRoute>
                 } />
 

@@ -5,6 +5,7 @@ import PageHeader from '../components/PageHeader';
 import { SkeletonCard } from '../components/ui/Skeleton';
 import ViewToggle from '../components/ui/ViewToggle';
 import useVueListe, { classeConteneur } from '../hooks/useVueListe';
+import { traduire } from '../i18n';
 
 const TYPE_LABELS = {
   info: 'Information', reunion: 'Réunion', echeance: 'Échéance',
@@ -54,7 +55,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="max-w-[1600px] mx-auto">
-      <PageHeader crumbs={[{ label: 'Notifications' }]} title="Notifications" />
+      <PageHeader crumbs={[{ label: traduire('Notifications') }]} title={traduire('Notifications')} />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
       </div>
@@ -68,19 +69,19 @@ export default function NotificationsPage() {
                 filter === f ? 'bg-navy text-white' : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
               }`}
             >
-              {f === 'toutes' ? 'Toutes' : f === 'non_lues' ? 'Non lues' : 'Lues'}
+              {f === 'toutes' ? 'Toutes' : f === 'non_lues' ? traduire('Non lues') : traduire('Lues')}
             </button>
           ))}
         </div>
         {unreadCount > 0 && (
           <button onClick={handleMarkAllRead} className="text-sm text-navy dark:text-gold font-medium underline">
-            Tout marquer comme lu
+            {traduire('Tout marquer comme lu')}
           </button>
         )}
       </div>
 
       {!loading && filtered.length === 0 && (
-        <p className="text-gray-400 text-sm">Aucune notification ici.</p>
+        <p className="text-gray-400 text-sm">{traduire('Aucune notification ici.')}</p>
       )}
 
       {loading ? (
@@ -118,7 +119,7 @@ export default function NotificationsPage() {
                   onClick={() => handleGoTo(n)}
                   className="text-xs text-navy dark:text-gold underline whitespace-nowrap"
                 >
-                  Voir
+                  {traduire('Voir')}
                 </button>
               )}
               {!n.is_read && (
@@ -126,7 +127,7 @@ export default function NotificationsPage() {
                   onClick={() => handleRead(n.id)}
                   className="text-xs text-gray-400 underline whitespace-nowrap"
                 >
-                  Marquer lue
+                  {traduire('Marquer lue')}
                 </button>
               )}
             </div>

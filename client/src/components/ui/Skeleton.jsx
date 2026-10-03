@@ -1,3 +1,4 @@
+import { traduire } from '../../i18n';
 // Brique de base : un rectangle qui pulse. Les composants composés ci-dessous
 // portent le rôle d'accessibilité (role="status") ; les briques ne le portent pas
 // pour éviter d'empiler plusieurs annonces "chargement" identiques au lecteur d'écran.
@@ -21,7 +22,7 @@ export function SkeletonAvatar({ size = 48, className = '' }) {
 
 export function SkeletonCard({ lines = 3, className = '' }) {
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 ${className}`} role="status" aria-label="Chargement en cours">
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 ${className}`} role="status" aria-label={traduire('Chargement en cours')}>
       <Skeleton className="h-4 w-1/3 rounded mb-4" />
       <SkeletonText lines={lines} />
     </div>
@@ -30,7 +31,7 @@ export function SkeletonCard({ lines = 3, className = '' }) {
 
 export function SkeletonTable({ rows = 5, columns = 4, className = '' }) {
   return (
-    <div className={`space-y-3 ${className}`} role="status" aria-label="Chargement du tableau">
+    <div className={`space-y-3 ${className}`} role="status" aria-label={traduire('Chargement du tableau')}>
       {Array.from({ length: rows }).map((_, r) => (
         <div key={r} className="flex gap-4">
           {Array.from({ length: columns }).map((_, c) => (
@@ -44,7 +45,7 @@ export function SkeletonTable({ rows = 5, columns = 4, className = '' }) {
 
 export function SkeletonPage({ cards = 2, className = '' }) {
   return (
-    <div className={`space-y-6 ${className}`} role="status" aria-label="Chargement de la page">
+    <div className={`space-y-6 ${className}`} role="status" aria-label={traduire('Chargement de la page')}>
       <Skeleton className="h-7 w-1/4 rounded" />
       {Array.from({ length: cards }).map((_, i) => (
         <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">

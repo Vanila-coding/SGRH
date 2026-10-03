@@ -1,3 +1,4 @@
+import { traduire } from '../i18n';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
 export async function loginRequest(email, password) {
@@ -7,7 +8,7 @@ export async function loginRequest(email, password) {
     body: JSON.stringify({ email, password }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Échec de la connexion');
+  if (!res.ok) throw new Error(traduire(data.message || 'Échec de la connexion'));
   return data; // { token, user }
 }
 
@@ -28,6 +29,6 @@ export async function changePassword(currentPassword, newPassword) {
     body: JSON.stringify({ currentPassword, newPassword }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Échec de la mise à jour');
+  if (!res.ok) throw new Error(traduire(data.message || 'Échec de la mise à jour'));
   return data;
 }

@@ -1,13 +1,14 @@
 import { LayoutGrid, List } from 'lucide-react';
+import { traduire } from '../../i18n';
 
 const OPTIONS = [
-  { value: 'liste', label: 'Affichage en liste', Icone: List },
-  { value: 'carte', label: 'Affichage en cartes', Icone: LayoutGrid },
+  { value: 'liste', label: traduire('Affichage en liste'), Icone: List },
+  { value: 'carte', label: traduire('Affichage en cartes'), Icone: LayoutGrid },
 ];
 
 export default function ViewToggle({ value, onChange, className = '' }) {
   return (
-    <div role="group" aria-label="Mode d'affichage" className={`inline-flex rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden ${className}`}>
+    <div role="group" aria-label={traduire("Mode d'affichage")} className={`inline-flex rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden ${className}`}>
       {OPTIONS.map(({ value: v, label, Icone }) => (
         <button
           key={v}

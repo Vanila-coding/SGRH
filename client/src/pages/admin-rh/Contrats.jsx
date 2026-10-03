@@ -12,6 +12,7 @@ import Modal from '../../components/ui/Modal';
 import PersonnelSearchSelect from '../../components/PersonnelSearchSelect';
 import { toast } from '../../utils/toast';
 import SelectMenu from '../../components/ui/SelectMenu';
+import { traduire } from '../../i18n';
 
 const STATUT_CONTRAT_LABELS = {
   actif: 'Actif', expire: 'Expiré', renouvele: 'Renouvelé', non_renouvele: 'Non renouvelé', resilie: 'Résilié',
@@ -89,7 +90,7 @@ export default function Contrats() {
     try {
       await importerContrat(selectedId, contratForm, contratFile);
       setContratStatus('success');
-      setContratFeedback('Contrat importé.');
+      setContratFeedback(traduire('Contrat importé.'));
       setContratForm(emptyContratForm);
       setContratFile(null);
       loadContrats(selectedId);
@@ -106,7 +107,7 @@ export default function Contrats() {
     try {
       await finaliserRenouvellement(selectedId, contratPrecedentId, renouvelForm, renouvelFile);
       setContratStatus('success');
-      setContratFeedback('Nouveau contrat enregistré.');
+      setContratFeedback(traduire('Nouveau contrat enregistré.'));
       setRenouvelForm(emptyContratForm);
       setRenouvelFile(null);
       loadContrats(selectedId);
@@ -128,7 +129,7 @@ export default function Contrats() {
 
   async function handleConfirmerNonRenouvellement() {
     if (!nonRenouvelMotif.trim() || confirmingNonRenouvellement) {
-      if (!nonRenouvelMotif.trim()) setContratFeedback('Le motif est obligatoire.');
+      if (!nonRenouvelMotif.trim()) setContratFeedback(traduire('Le motif est obligatoire.'));
       return;
     }
     setConfirmingNonRenouvellement(true);
@@ -152,7 +153,7 @@ export default function Contrats() {
     try {
       await ajouterDocumentContrat(contratId, file, 'avenant');
       setAvenantFile((prev) => ({ ...prev, [contratId]: null }));
-      toast.success('Avenant ajouté.');
+      toast.success(traduire('Avenant ajouté.'));
       loadContrats(selectedId);
     } catch (err) {
       toast.error(err.message);
@@ -171,9 +172,9 @@ export default function Contrats() {
 
   return (
     <div className="space-y-6">
-      <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Contrats' }]} title="Contrats" subtitle="Historique, renouvellement et documents contractuels" />
+      <PageHeader crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Contrats') }]} title={traduire('Contrats')} subtitle={traduire('Historique, renouvellement et documents contractuels')} />
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <label htmlFor="contrats-personnel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Choisir un employé</label>
+        <label htmlFor="contrats-personnel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Choisir un employé')}</label>
         <PersonnelSearchSelect
           id="contrats-personnel"
           items={personnelList}
@@ -205,23 +206,23 @@ export default function Contrats() {
             >
               {TYPES_CONTRAT.map((t) => <option key={t} value={t}>{t}</option>)}
             </SelectMenu>
-            <ChampDate libelle="Début"
+            <ChampDate libelle={traduire('Début')}
               type="date" required value={contratForm.dateDebut}
               onChange={(e) => setContratForm((p) => ({ ...p, dateDebut: e.target.value }))}
               className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
               />
-            <ChampDate libelle="Fin"
+            <ChampDate libelle={traduire('Fin')}
               type="date" value={contratForm.dateFin}
               onChange={(e) => setContratForm((p) => ({ ...p, dateFin: e.target.value }))}
               className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
               />
             <input
-              type="text" placeholder="Référence décision" value={contratForm.referenceDecision}
+              type="text" placeholder={traduire('Référence décision')} value={contratForm.referenceDecision}
               onChange={(e) => setContratForm((p) => ({ ...p, referenceDecision: e.target.value }))}
               className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
             />
             <input
-              type="text" placeholder="Observations" value={contratForm.observations}
+              type="text" placeholder={traduire('Observations')} value={contratForm.observations}
               onChange={(e) => setContratForm((p) => ({ ...p, observations: e.target.value }))}
               className="sm:col-span-2 border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
             />
@@ -235,7 +236,7 @@ export default function Contrats() {
               disabled={contratStatus === 'loading'}
               className="bg-navy text-white rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
             >
-              Importer un contrat (PDF)
+              {traduire('Importer un contrat (PDF)')}
             </button>
           </form>
           {contratFeedback && (
@@ -244,7 +245,7 @@ export default function Contrats() {
             </p>
           )}
 
-          {!contrats.contrats?.length && <p className="text-sm text-gray-400">Aucun contrat enregistré pour l'instant.</p>}
+          {!contrats.contrats?.length && <p className="text-sm text-gray-400">{traduire("Aucun contrat enregistré pour l\'instant.")}</p>}
 
           <div className="space-y-3">
             {contrats.contrats?.map((c) => (
@@ -259,10 +260,10 @@ export default function Contrats() {
                       du {new Date(c.date_debut).toLocaleDateString('fr-FR')}
                       {c.date_fin ? ` au ${new Date(c.date_fin).toLocaleDateString('fr-FR')}` : ' (sans date de fin)'}
                     </p>
-                    {c.reference_decision && <p className="text-xs text-gray-400">Réf. {c.reference_decision}</p>}
+                    {c.reference_decision && <p className="text-xs text-gray-400">{traduire('Réf.')} {c.reference_decision}</p>}
                     {c.observations && <p className="text-xs text-gray-400">{c.observations}</p>}
                     {c.decision === 'non_renouvele' && (
-                      <p className="text-xs text-status-rejected mt-1">Motif de non-renouvellement : {c.motif_non_renouvellement}</p>
+                      <p className="text-xs text-status-rejected mt-1">{traduire('Motif de non-renouvellement :')} {c.motif_non_renouvellement}</p>
                     )}
                   </div>
                   <span className="text-xs px-2 py-1 rounded-full bg-navy/10 text-navy dark:bg-gold/10 dark:text-gold shrink-0">
@@ -277,7 +278,7 @@ export default function Contrats() {
                         key={doc.id} type="button" onClick={() => handleTelecharger(doc)}
                         className="text-xs text-navy dark:text-gold underline"
                       >
-                        {doc.type_document === 'avenant' ? 'Avenant' : doc.type_document === 'autre' ? 'Document' : 'Contrat'} — {doc.filename}
+                        {doc.type_document === 'avenant' ? 'Avenant' : doc.type_document === 'autre' ? traduire('Document') : traduire('Contrat')} — {doc.filename}
                       </button>
                     ))}
                   </div>
@@ -291,13 +292,13 @@ export default function Contrats() {
                           type="button" onClick={() => handleDeciderRenouvellement(c.id)}
                           className="text-xs px-3 py-1.5 rounded-md bg-status-approved text-white font-medium hover:opacity-90"
                         >
-                          Renouveler (renégociation)
+                          {traduire('Renouveler (renégociation)')}
                         </button>
                         <button
                           type="button" onClick={() => { setNonRenouvelModal(c.id); setNonRenouvelMotif(''); }}
                           className="text-xs px-3 py-1.5 rounded-md border border-status-rejected text-status-rejected font-medium hover:bg-red-50"
                         >
-                          Ne pas renouveler
+                          {traduire('Ne pas renouveler')}
                         </button>
                       </div>
                     )}
@@ -305,7 +306,7 @@ export default function Contrats() {
                     {c.decision === 'renouvele_renegociation' && (
                       <form onSubmit={(e) => handleFinaliserRenouvellement(e, c.id)} className="grid grid-cols-1 sm:grid-cols-4 gap-2">
                         <p className="sm:col-span-4 text-xs text-gray-400">
-                          Renégociation en cours — renseignez le nouveau contrat une fois signé.
+                          {traduire('Renégociation en cours — renseignez le nouveau contrat une fois signé.')}
                         </p>
                         <SelectMenu
                           required value={renouvelForm.typeContrat}
@@ -314,12 +315,12 @@ export default function Contrats() {
                         >
                           {TYPES_CONTRAT.map((t) => <option key={t} value={t}>{t}</option>)}
                         </SelectMenu>
-                        <ChampDate libelle="Début"
+                        <ChampDate libelle={traduire('Début')}
                             type="date" required value={renouvelForm.dateDebut}
                             onChange={(e) => setRenouvelForm((p) => ({ ...p, dateDebut: e.target.value }))}
                             className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                           />
-                        <ChampDate libelle="Fin"
+                        <ChampDate libelle={traduire('Fin')}
                             type="date" value={renouvelForm.dateFin}
                             onChange={(e) => setRenouvelForm((p) => ({ ...p, dateFin: e.target.value }))}
                             className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
@@ -333,7 +334,7 @@ export default function Contrats() {
                           type="submit" disabled={contratStatus === 'loading'}
                           className="sm:col-span-4 text-xs px-3 py-1.5 rounded-md bg-navy text-white font-medium hover:opacity-90 disabled:opacity-50 w-fit"
                         >
-                          Finaliser le renouvellement
+                          {traduire('Finaliser le renouvellement')}
                         </button>
                       </form>
                     )}
@@ -345,7 +346,7 @@ export default function Contrats() {
                         className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                       />
                       <button type="submit" className="text-xs px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300">
-                        Ajouter un avenant
+                        {traduire('Ajouter un avenant')}
                       </button>
                     </form>
                   </div>
@@ -355,8 +356,8 @@ export default function Contrats() {
           </div>
 
           {nonRenouvelModal && (
-            <Modal onClose={() => setNonRenouvelModal(null)} title="Non-renouvellement du contrat" maxWidth="max-w-md">
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Motif (obligatoire)</label>
+            <Modal onClose={() => setNonRenouvelModal(null)} title={traduire('Non-renouvellement du contrat')} maxWidth="max-w-md">
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Motif (obligatoire)')}</label>
                 <textarea
                   rows={3} value={nonRenouvelMotif}
                   onChange={(e) => setNonRenouvelMotif(e.target.value)}
@@ -368,14 +369,14 @@ export default function Contrats() {
                     disabled={confirmingNonRenouvellement}
                     className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm text-gray-600 dark:text-gray-300 disabled:opacity-50"
                   >
-                    Annuler
+                    {traduire('Annuler')}
                   </button>
                   <button
                     type="button" onClick={handleConfirmerNonRenouvellement}
                     disabled={!nonRenouvelMotif.trim() || confirmingNonRenouvellement}
                     className="px-4 py-2 rounded-md bg-status-rejected text-white text-sm font-medium hover:opacity-90 disabled:opacity-50"
                   >
-                    {confirmingNonRenouvellement ? 'Confirmation...' : 'Confirmer le non-renouvellement'}
+                    {confirmingNonRenouvellement ? 'Confirmation...' : traduire('Confirmer le non-renouvellement')}
                   </button>
                 </div>
             </Modal>

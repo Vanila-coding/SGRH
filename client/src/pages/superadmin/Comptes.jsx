@@ -6,19 +6,20 @@ import { SkeletonCard } from '../../components/ui/Skeleton';
 import ContacterCompteModal from '../../components/ContacterCompteModal';
 import ViewToggle from '../../components/ui/ViewToggle';
 import useVueListe, { classeConteneur } from '../../hooks/useVueListe';
+import { traduire } from '../../i18n';
 
 // Textes par défaut proposés dans la fenêtre de contact obligatoire, modifiables par
 // le Superadmin avant l'envoi — jamais envoyés tels quels sans relecture.
 const TEXTES_ACTION = {
   desactiver: {
-    libelleBouton: 'Envoyer et désactiver',
-    sujetDefaut: 'Votre compte va être désactivé',
-    messageDefaut: "Bonjour,\n\nNous vous informons que votre compte sur la plateforme de gestion RH de l'Université de Mahajanga va être désactivé.\n\nPour toute question, contactez l'administration RH.",
+    libelleBouton: traduire('Envoyer et désactiver'),
+    sujetDefaut: traduire('Votre compte va être désactivé'),
+    messageDefaut: traduire('Bonjour,\n\nNous vous informons que votre compte sur la plateforme de gestion RH de l\'Université de Mahajanga va être désactivé.\n\nPour toute question, contactez l\'administration RH.'),
   },
   supprimer: {
-    libelleBouton: 'Envoyer et supprimer',
-    sujetDefaut: 'Votre compte va être supprimé',
-    messageDefaut: "Bonjour,\n\nNous vous informons que votre compte sur la plateforme de gestion RH de l'Université de Mahajanga va être supprimé.\n\nPour toute question, contactez l'administration RH.",
+    libelleBouton: traduire('Envoyer et supprimer'),
+    sujetDefaut: traduire('Votre compte va être supprimé'),
+    messageDefaut: traduire('Bonjour,\n\nNous vous informons que votre compte sur la plateforme de gestion RH de l\'Université de Mahajanga va être supprimé.\n\nPour toute question, contactez l\'administration RH.'),
   },
 };
 
@@ -98,7 +99,7 @@ export default function Comptes() {
 
   return (
     <div className="max-w-[1600px] mx-auto">
-      <PageHeader crumbs={[{ label: 'Administration' }, { label: 'Gestion des comptes' }]} title="Gestion des comptes" subtitle="Activer, désactiver ou supprimer un compte utilisateur" />
+      <PageHeader crumbs={[{ label: traduire('Administration') }, { label: traduire('Gestion des comptes') }]} title={traduire('Gestion des comptes')} subtitle={traduire('Activer, désactiver ou supprimer un compte utilisateur')} />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
       </div>
@@ -109,7 +110,7 @@ export default function Comptes() {
           type="text"
           value={recherche}
           onChange={(e) => setRecherche(e.target.value)}
-          placeholder="Rechercher par nom, email ou matricule..."
+          placeholder={traduire('Rechercher par nom, email ou matricule...')}
           className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
         />
       </div>
@@ -143,7 +144,7 @@ export default function Comptes() {
         </div>
       ) : filtered.length === 0 ? (
         <p className="text-sm text-gray-400 px-1">
-          {accounts.length === 0 ? 'Aucun compte enregistré.' : 'Aucun compte ne correspond à cette recherche.'}
+          {accounts.length === 0 ? 'Aucun compte enregistré.' : traduire('Aucun compte ne correspond à cette recherche.')}
         </p>
       ) : (
       <div className={classeConteneur(vue, 3)}>
@@ -159,11 +160,11 @@ export default function Comptes() {
                   a.status === 'active' ? 'bg-green-50 text-status-approved' :
                   a.status === 'pending' ? 'bg-amber-50 text-status-pending' : 'bg-red-50 text-status-rejected'
                 }`}>
-                  {a.status === 'active' ? 'Actif' : a.status === 'pending' ? 'En attente' : 'Désactivé'}
+                  {a.status === 'active' ? 'Actif' : a.status === 'pending' ? traduire('En attente') : traduire('Désactivé')}
                 </span>
               </div>
               <p className="text-xs text-gray-400 mt-1 truncate">
-                {a.email} {a.matricule && `— Matricule ${a.matricule}`}
+                {a.email} {a.matricule && `${traduire('— Matricule')} ${a.matricule}`}
               </p>
             </div>
 
@@ -174,13 +175,13 @@ export default function Comptes() {
                     onClick={() => handleChangeRole(a, 'SECRETAIRE_PE')}
                     className="px-3 py-1.5 rounded-md text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
-                    Désigner secrétaire PE
+                    {traduire('Désigner secrétaire PE')}
                   </button>
                   <button
                     onClick={() => handleChangeRole(a, 'SECRETAIRE_PAT')}
                     className="px-3 py-1.5 rounded-md text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
-                    Désigner secrétaire PAT
+                    {traduire('Désigner secrétaire PAT')}
                   </button>
                 </>
               )}
@@ -189,12 +190,12 @@ export default function Comptes() {
                   onClick={() => handleChangeRole(a, 'PAT')}
                   className="px-3 py-1.5 rounded-md text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  Retirer le secrétariat
+                  {traduire('Retirer le secrétariat')}
                 </button>
               )}
               {ROLES_PROTEGES.includes(a.role) ? (
-                <span className="px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 dark:text-gray-500" title="Les comptes Admin RH et Superadmin ne peuvent pas être désactivés ou supprimés.">
-                  Protégé
+                <span className="px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 dark:text-gray-500" title={traduire('Les comptes Admin RH et Superadmin ne peuvent pas être désactivés ou supprimés.')}>
+                  {traduire('Protégé')}
                 </span>
               ) : (
                 <>
@@ -203,14 +204,14 @@ export default function Comptes() {
                       onClick={() => handleReactivate(a)}
                       className="px-3 py-1.5 rounded-md text-xs font-medium border border-status-approved text-status-approved hover:bg-green-50"
                     >
-                      Activer
+                      {traduire('Activer')}
                     </button>
                   ) : (
                     <button
                       onClick={() => setActionEnCours({ compte: a, type: 'desactiver' })}
                       className="px-3 py-1.5 rounded-md text-xs font-medium border border-status-rejected text-status-rejected hover:bg-red-50"
                     >
-                      Désactiver
+                      {traduire('Désactiver')}
                     </button>
                   )}
 
@@ -218,7 +219,7 @@ export default function Comptes() {
                     onClick={() => setActionEnCours({ compte: a, type: 'supprimer' })}
                     className="px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 hover:text-status-rejected"
                   >
-                    Supprimer
+                    {traduire('Supprimer')}
                   </button>
                 </>
               )}

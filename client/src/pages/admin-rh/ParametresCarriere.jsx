@@ -5,6 +5,7 @@ import PageHeader from '../../components/PageHeader';
 import { toast } from '../../utils/toast';
 import { SkeletonCard, SkeletonTable } from '../../components/ui/Skeleton';
 import SelectMenu from '../../components/ui/SelectMenu';
+import { traduire } from '../../i18n';
 
 const inputClass = 'border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-1.5 text-sm';
 
@@ -19,7 +20,7 @@ function OngletParametres({ params, setEdits, status, handleSave }) {
             <div className="flex-1">
               <p className="text-sm font-medium text-navy dark:text-gray-100">
                 {p.description}
-                {p.a_valider && <span className="ml-2 text-xs px-2 py-0.5 rounded bg-amber-50 text-status-pending font-medium">À valider</span>}
+                {p.a_valider && <span className="ml-2 text-xs px-2 py-0.5 rounded bg-amber-50 text-status-pending font-medium">{traduire('À valider')}</span>}
               </p>
               <p className="text-xs text-gray-400 mt-0.5 font-mono">{p.cle}</p>
             </div>
@@ -36,10 +37,10 @@ function OngletParametres({ params, setEdits, status, handleSave }) {
               disabled={status[p.cle] === 'loading'}
               className="bg-navy text-white rounded-md px-3 py-1.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
             >
-              Enregistrer
+              {traduire('Enregistrer')}
             </button>
           </div>
-          {status[p.cle] === 'success' && <p className="text-xs text-status-approved mt-1">Enregistré.</p>}
+          {status[p.cle] === 'success' && <p className="text-xs text-status-approved mt-1">{traduire('Enregistré.')}</p>}
         </div>
       ))}
     </div>
@@ -106,14 +107,14 @@ function OngletGrilles() {
   return (
     <div className="space-y-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="font-semibold text-navy dark:text-gold mb-2">Grilles indiciaires réglementaires</h3>
-        {grilles.length === 0 && <p className="text-sm text-gray-400">Aucune grille enregistrée.</p>}
+        <h3 className="font-semibold text-navy dark:text-gold mb-2">{traduire('Grilles indiciaires réglementaires')}</h3>
+        {grilles.length === 0 && <p className="text-sm text-gray-400">{traduire('Aucune grille enregistrée.')}</p>}
         <div className="space-y-3">
           {grilles.map((g) => (
             <div key={g.id} className="border-b border-gray-100 dark:border-gray-700 pb-3 last:border-0">
               <p className="text-sm font-medium text-navy dark:text-gray-100">{g.nom} <span className="text-xs text-gray-400">({g.regime})</span></p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{g.description}</p>
-              <p className="text-xs text-gray-400 mt-0.5">Source : {g.texte_source_principal}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{traduire('Source :')} {g.texte_source_principal}</p>
             </div>
           ))}
         </div>
@@ -121,35 +122,35 @@ function OngletGrilles() {
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-navy dark:text-gold">Lignes de grille ({lignes.length})</h3>
+          <h3 className="font-semibold text-navy dark:text-gold">{traduire('Lignes de grille (')}{lignes.length})</h3>
           <button onClick={() => setShowForm((s) => !s)} className="text-sm text-navy dark:text-gold underline">
-            {showForm ? 'Fermer' : 'Ajouter une ligne'}
+            {showForm ? 'Fermer' : traduire('Ajouter une ligne')}
           </button>
         </div>
 
         {showForm && (
           <form onSubmit={handleAjouterLigne} className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 p-3 bg-navy/5 rounded-md">
             <SelectMenu required value={ligneForm.grilleId} onChange={(e) => updateLigneForm('grilleId', e.target.value)} className={inputClass}>
-              <option value="">-- Grille --</option>
+              <option value="">{traduire('-- Grille --')}</option>
               {grilles.map((g) => <option key={g.id} value={g.id}>{g.nom}</option>)}
             </SelectMenu>
             <SelectMenu required value={ligneForm.classe} onChange={(e) => updateLigneForm('classe', e.target.value)} className={inputClass}>
-              <option value="">-- Classe --</option>
+              <option value="">{traduire('-- Classe --')}</option>
               {CLASSES_GRILLE.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
             </SelectMenu>
             <SelectMenu required value={ligneForm.echelon} onChange={(e) => updateLigneForm('echelon', e.target.value)} className={inputClass} disabled={!classeInfo}>
-              <option value="">-- Échelon --</option>
+              <option value="">{traduire('-- Échelon --')}</option>
               {echelons.map((e) => <option key={e} value={e}>{e}</option>)}
             </SelectMenu>
-            <input required type="number" placeholder="Indice" value={ligneForm.indice} onChange={(e) => updateLigneForm('indice', e.target.value)} className={inputClass} />
-            <input type="text" placeholder="Catégorie (I-X, si applicable)" value={ligneForm.categorie} onChange={(e) => updateLigneForm('categorie', e.target.value)} className={inputClass} />
-            <input type="text" placeholder="Cadre (A-D, si applicable)" value={ligneForm.cadre} onChange={(e) => updateLigneForm('cadre', e.target.value)} className={inputClass} />
-            <input type="text" placeholder="Échelle (si applicable)" value={ligneForm.echelle} onChange={(e) => updateLigneForm('echelle', e.target.value)} className={inputClass} />
+            <input required type="number" placeholder={traduire('Indice')} value={ligneForm.indice} onChange={(e) => updateLigneForm('indice', e.target.value)} className={inputClass} />
+            <input type="text" placeholder={traduire('Catégorie (I-X, si applicable)')} value={ligneForm.categorie} onChange={(e) => updateLigneForm('categorie', e.target.value)} className={inputClass} />
+            <input type="text" placeholder={traduire('Cadre (A-D, si applicable)')} value={ligneForm.cadre} onChange={(e) => updateLigneForm('cadre', e.target.value)} className={inputClass} />
+            <input type="text" placeholder={traduire('Échelle (si applicable)')} value={ligneForm.echelle} onChange={(e) => updateLigneForm('echelle', e.target.value)} className={inputClass} />
             <input required type="date" value={ligneForm.dateDebutValidite} onChange={(e) => updateLigneForm('dateDebutValidite', e.target.value)} className={inputClass} />
-            <input required type="text" placeholder="Texte source (obligatoire)" value={ligneForm.sourceTexte} onChange={(e) => updateLigneForm('sourceTexte', e.target.value)} className={`${inputClass} sm:col-span-2`} />
-            <input type="text" placeholder="Article / référence" value={ligneForm.sourceArticle} onChange={(e) => updateLigneForm('sourceArticle', e.target.value)} className={`${inputClass} sm:col-span-2`} />
+            <input required type="text" placeholder={traduire('Texte source (obligatoire)')} value={ligneForm.sourceTexte} onChange={(e) => updateLigneForm('sourceTexte', e.target.value)} className={`${inputClass} sm:col-span-2`} />
+            <input type="text" placeholder={traduire('Article / référence')} value={ligneForm.sourceArticle} onChange={(e) => updateLigneForm('sourceArticle', e.target.value)} className={`${inputClass} sm:col-span-2`} />
             <div className="col-span-2 sm:col-span-4">
-              <button type="submit" disabled={formStatus === 'loading'} className="bg-navy text-white rounded-md px-4 py-1.5 text-sm font-medium disabled:opacity-50">Enregistrer</button>
+              <button type="submit" disabled={formStatus === 'loading'} className="bg-navy text-white rounded-md px-4 py-1.5 text-sm font-medium disabled:opacity-50">{traduire('Enregistrer')}</button>
               {formFeedback && <span className={`ml-3 text-xs ${formStatus === 'success' ? 'text-status-approved' : 'text-status-rejected'}`}>{formFeedback}</span>}
             </div>
           </form>
@@ -159,8 +160,8 @@ function OngletGrilles() {
           <table className="w-full text-xs">
             <thead>
               <tr className="text-left text-gray-400 border-b border-gray-100 dark:border-gray-700">
-                <th className="pb-2 pr-3">Classe</th><th className="pb-2 pr-3">Échelon</th><th className="pb-2 pr-3">Catégorie</th>
-                <th className="pb-2 pr-3">Cadre/Échelle</th><th className="pb-2 pr-3">Indice</th><th className="pb-2">Source</th>
+                <th className="pb-2 pr-3">{traduire('Classe')}</th><th className="pb-2 pr-3">{traduire('Échelon')}</th><th className="pb-2 pr-3">{traduire('Catégorie')}</th>
+                <th className="pb-2 pr-3">{traduire('Cadre/Échelle')}</th><th className="pb-2 pr-3">{traduire('Indice')}</th><th className="pb-2">{traduire('Source')}</th>
               </tr>
             </thead>
             <tbody>
@@ -215,13 +216,13 @@ export default function ParametresCarriere() {
   return (
     <div className="max-w-[1600px] mx-auto">
       <PageHeader
-        crumbs={[{ label: 'Admin RH' }, { label: 'Carrière' }, { label: 'Paramètres carrière' }]}
-        title="Paramètres carrière"
-        subtitle="Règles de progression de carrière et grilles indiciaires réglementaires"
+        crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Carrière') }, { label: traduire('Paramètres carrière') }]}
+        title={traduire('Paramètres carrière')}
+        subtitle={traduire('Règles de progression de carrière et grilles indiciaires réglementaires')}
       />
 
       <div className="flex gap-2 mb-4 border-b border-gray-200 dark:border-gray-700">
-        {[{ key: 'parametres', label: 'Paramètres' }, { key: 'grilles', label: 'Grilles indiciaires' }].map((t) => (
+        {[{ key: 'parametres', label: traduire('Paramètres') }, { key: 'grilles', label: traduire('Grilles indiciaires') }].map((t) => (
           <button
             key={t.key}
             onClick={() => setOnglet(t.key)}
@@ -235,7 +236,7 @@ export default function ParametresCarriere() {
       {onglet === 'parametres' && (
         <>
           <p className="text-sm text-gray-500 mb-4">
-            Les paramètres marqués <span className="text-status-pending font-medium">à valider</span> sont
+            Les paramètres marqués <span className="text-status-pending font-medium">{traduire('à valider')}</span> sont
             issus d'informations recueillies mais non encore confirmées officiellement par la RH — modifie-les dès que la règle définitive est connue.
           </p>
           {loading ? (

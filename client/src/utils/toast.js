@@ -1,3 +1,4 @@
+import { traduire } from '../i18n';
 // API impérative `toast.success("...")` utilisable depuis n'importe quel composant
 // sans passer par un hook. Le ToastProvider s'enregistre lui-même au montage ; tant
 // qu'aucun provider n'est monté (ne devrait jamais arriver en usage normal, l'app
@@ -9,6 +10,7 @@ export function registerToastHandlers(nextHandlers) {
 }
 
 function dispatch(type, message, options) {
+  if (typeof message === 'string') message = traduire(message);
   if (!handlers) {
     console.warn(`[toast:${type}] (ToastProvider non monté)`, message);
     return;

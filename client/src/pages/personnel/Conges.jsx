@@ -6,6 +6,7 @@ import { getMyPersonnel } from '../../services/personnelApi';
 import { TYPES_CONGE, JUSTIFICATIF_OBLIGATOIRE, STATUS_LABELS } from '../../constants/conges';
 import { SkeletonText } from '../../components/ui';
 import SelectMenu from '../../components/ui/SelectMenu';
+import { traduire } from '../../i18n';
 
 function formatJours(n) {
   if (n === null || n === undefined) return '—';
@@ -111,27 +112,27 @@ export default function Conges() {
   return (
     <div>
       <PageHeader
-        crumbs={[{ label: 'Mon espace', path: '/dashboard' }, { label: 'Mes congés & absences' }]}
-        title="Mes congés & absences"
-        subtitle="Déposez une demande et suivez son traitement"
+        crumbs={[{ label: traduire('Mon espace'), path: '/dashboard' }, { label: traduire('Mes congés & absences') }]}
+        title={traduire('Mes congés & absences')}
+        subtitle={traduire('Déposez une demande et suivez son traitement')}
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="font-semibold text-navy dark:text-gold mb-4">Nouvelle demande</h3>
+        <h3 className="font-semibold text-navy dark:text-gold mb-4">{traduire('Nouvelle demande')}</h3>
 
         {personnel && (
           <div className="grid grid-cols-2 gap-3 mb-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-            <ReadOnlyField label="Matricule" value={personnel.matricule} />
-            <ReadOnlyField label="Nom et prénom" value={[personnel.prenom, personnel.nom].filter(Boolean).join(' ')} />
-            <ReadOnlyField label="Fonction" value={personnel.fonction} />
-            <ReadOnlyField label="Corps / Grade" value={[personnel.corps, personnel.grade].filter(Boolean).join(' / ')} />
+            <ReadOnlyField label={traduire('Matricule')} value={personnel.matricule} />
+            <ReadOnlyField label={traduire('Nom et prénom')} value={[personnel.prenom, personnel.nom].filter(Boolean).join(' ')} />
+            <ReadOnlyField label={traduire('Fonction')} value={personnel.fonction} />
+            <ReadOnlyField label={traduire('Corps / Grade')} value={[personnel.corps, personnel.grade].filter(Boolean).join(' / ')} />
           </div>
         )}
 
         {solde && (
           <div className="mb-5 p-3 bg-navy/5 dark:bg-gold/10 rounded-md">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-navy dark:text-gray-100 font-medium">Solde de congé annuel disponible</span>
+              <span className="text-sm text-navy dark:text-gray-100 font-medium">{traduire('Solde de congé annuel disponible')}</span>
               <span className="text-xl font-bold text-navy dark:text-gold">{formatJours(solde.soldeDisponible)}</span>
             </div>
             {solde.dateRecrutementConnue ? (
@@ -140,7 +141,7 @@ export default function Conges() {
               </p>
             ) : (
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Date de recrutement non renseignée : les droits de l'année ne peuvent pas être calculés automatiquement. Votre solde actuel est conservé comme solde d'ouverture.
+                {traduire('Date de recrutement non renseignée : les droits de l\'année ne peuvent pas être calculés automatiquement. Votre solde actuel est conservé comme solde d\'ouverture.')}
               </p>
             )}
           </div>
@@ -149,7 +150,7 @@ export default function Conges() {
         {step === 'form' && (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type de demande</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Type de demande')}</label>
               <SelectMenu
                 value={typeConge}
                 onChange={(e) => setTypeConge(e.target.value)}
@@ -159,29 +160,29 @@ export default function Conges() {
               </SelectMenu>
               {typeConge === 'Congé annuel' && (
                 <p className="text-xs text-gray-400 mt-1">
-                  Minimum 15 jours pour votre première demande de congé annuel de l'année (ou votre solde disponible s'il est inférieur).
+                  {traduire('Minimum 15 jours pour votre première demande de congé annuel de l\'année (ou votre solde disponible s\'il est inférieur).')}
                 </p>
               )}
               {typeConge === 'Congé de paternité' && (
                 <p className="text-xs text-gray-400 mt-1">
-                  Le congé de paternité est limité à 15 jours maximum.
+                  {traduire('Le congé de paternité est limité à 15 jours maximum.')}
                 </p>
               )}
               {typeConge === 'Congé de maternité' && (
                 <p className="text-xs text-gray-400 mt-1">
-                  Durée indicative : environ 3 mois.
+                  {traduire('Durée indicative : environ 3 mois.')}
                 </p>
               )}
               {JUSTIFICATIF_OBLIGATOIRE.includes(typeConge) && (
                 <p className="text-xs text-status-pending mt-1">
-                  Un justificatif sera demandé à l'étape suivante pour ce type de congé.
+                  {traduire("Un justificatif sera demandé à l\'étape suivante pour ce type de congé.")}
                 </p>
               )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date de début</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Date de début')}</label>
                 <input
                   type="date" required value={dateDebut}
                   onChange={(e) => setDateDebut(e.target.value)}
@@ -189,7 +190,7 @@ export default function Conges() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date de fin</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Date de fin')}</label>
                 <input
                   type="date" required value={dateFin}
                   onChange={(e) => setDateFin(e.target.value)}
@@ -199,17 +200,17 @@ export default function Conges() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lieu de jouissance</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Lieu de jouissance')}</label>
               <input
                 type="text" value={lieuJouissance}
                 onChange={(e) => setLieuJouissance(e.target.value)}
-                placeholder="Ex : Mahajanga"
+                placeholder={traduire('Ex : Mahajanga')}
                 className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date de reprise de service</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Date de reprise de service')}</label>
               <input
                 type="date" value={dateRepriseService}
                 onChange={(e) => setDateRepriseService(e.target.value)}
@@ -218,7 +219,7 @@ export default function Conges() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Remplaçant(e) (optionnel)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Remplaçant(e) (optionnel)')}</label>
               <input
                 type="text" value={remplacant}
                 onChange={(e) => setRemplacant(e.target.value)}
@@ -227,7 +228,7 @@ export default function Conges() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Motif</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Motif')}</label>
               <textarea
                 rows={2} value={motif}
                 onChange={(e) => setMotif(e.target.value)}
@@ -240,7 +241,7 @@ export default function Conges() {
               disabled={status === 'loading'}
               className="w-full bg-navy text-white rounded-md py-2 font-medium hover:opacity-90 disabled:opacity-50"
             >
-              {status === 'loading' ? 'Envoi...' : 'Envoyer la demande'}
+              {status === 'loading' ? 'Envoi...' : traduire('Envoyer la demande')}
             </button>
 
             {feedback && (
@@ -259,7 +260,7 @@ export default function Conges() {
                 : 'Vous pouvez joindre un justificatif (optionnel).'}
             </p>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Justificatif (PDF, JPG ou PNG)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Justificatif (PDF, JPG ou PNG)')}</label>
               <input
                 type="file"
                 accept=".pdf,.jpg,.jpeg,.png"
@@ -273,14 +274,14 @@ export default function Conges() {
                 disabled={uploadStatus === 'loading' || (obligatoire && !file)}
                 className="flex-1 bg-navy text-white rounded-md py-2 font-medium hover:opacity-90 disabled:opacity-50"
               >
-                {uploadStatus === 'loading' ? 'Envoi...' : 'Envoyer le justificatif'}
+                {uploadStatus === 'loading' ? 'Envoi...' : traduire('Envoyer le justificatif')}
               </button>
               {!obligatoire && (
                 <button
                   onClick={() => finishFlow('Demande envoyée sans justificatif.')}
                   className="px-4 rounded-md border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  Passer
+                  {traduire('Passer')}
                 </button>
               )}
             </div>
@@ -290,10 +291,10 @@ export default function Conges() {
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="font-semibold text-navy dark:text-gold mb-4">Mes demandes</h3>
+        <h3 className="font-semibold text-navy dark:text-gold mb-4">{traduire('Mes demandes')}</h3>
         {loading && <SkeletonText lines={4} />}
         {!loading && demandes.length === 0 && (
-          <p className="text-gray-400 dark:text-gray-500 text-sm">Aucune demande pour l'instant.</p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm">{traduire("Aucune demande pour l\'instant.")}</p>
         )}
         <div className="space-y-3">
           {demandes.map((d) => (
@@ -308,11 +309,11 @@ export default function Conges() {
                 Du {new Date(d.date_debut).toLocaleDateString('fr-FR')} au {new Date(d.date_fin).toLocaleDateString('fr-FR')}
               </p>
               {d.decision_intermediaire === 'en_attente' && (
-                <p className="text-xs text-status-pending mt-1">En attente de l'avis du responsable direct</p>
+                <p className="text-xs text-status-pending mt-1">{traduire("En attente de l\'avis du responsable direct")}</p>
               )}
-              {d.lieu_jouissance && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Lieu : {d.lieu_jouissance}</p>}
+              {d.lieu_jouissance && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{traduire('Lieu :')} {d.lieu_jouissance}</p>}
               {d.avis_chef_service && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Avis : {d.avis_chef_service}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{traduire('Avis :')} {d.avis_chef_service}</p>
               )}
               {d.justificatif_path && (
                 <button
@@ -320,11 +321,11 @@ export default function Conges() {
                   onClick={() => telechargerJustificatifConge(d.id, d.justificatif_filename)}
                   className="text-xs text-navy dark:text-gold underline mt-1 inline-block mr-3"
                 >
-                  Voir le justificatif
+                  {traduire('Voir le justificatif')}
                 </button>
               )}
               <Link to={`/demandes/${d.id}/fiche`} className="text-xs text-navy dark:text-gold underline mt-1 inline-block">
-                Voir / télécharger la fiche
+                {traduire('Voir / télécharger la fiche')}
               </Link>
             </div>
           ))}

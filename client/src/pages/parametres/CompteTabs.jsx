@@ -4,6 +4,7 @@ import { UserRound, Mail, Phone, Briefcase, Hash, BadgeCheck, ShieldCheck, Eye, 
 import { useAuth } from '../../context/AuthContext';
 import { changePassword } from '../../services/authApi';
 import SettingsCard from '../../components/settings/SettingsCard';
+import { traduire } from '../../i18n';
 
 const STATUS_STYLES = {
   active: 'bg-status-approved/10 text-status-approved',
@@ -19,14 +20,14 @@ export function ProfilCompte() {
   const initial = (user?.prenom?.[0] || user?.email?.[0] || '?').toUpperCase();
 
   return (
-    <SettingsCard icon={UserRound} title="Profil et compte" description="Informations liées à votre compte SGRH.">
+    <SettingsCard icon={UserRound} title={traduire('Profil et compte')} description={traduire('Informations liées à votre compte SGRH.')}>
       <div className="flex items-center gap-4 py-4">
         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-navy text-xl font-semibold text-white dark:bg-gold dark:text-navy">
           {initial}
         </div>
         <div className="min-w-0">
           <p className="font-medium text-slate-800 dark:text-gray-100 truncate">{fullName}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user?.fonction || 'Fonction non renseignée'}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user?.fonction || traduire('Fonction non renseignée')}</p>
           {user?.status && (
             <span className={`inline-block mt-1 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[user.status] || ''}`}>
               {STATUS_LABELS[user.status] || user.status}
@@ -36,16 +37,16 @@ export function ProfilCompte() {
       </div>
 
       {[
-        { icon: Hash, label: 'Matricule', value: user?.matricule },
-        { icon: Mail, label: 'Email', value: user?.email },
-        { icon: Phone, label: 'Téléphone', value: user?.telephone },
-        { icon: Briefcase, label: 'Fonction', value: user?.fonction },
+        { icon: Hash, label: traduire('Matricule'), value: user?.matricule },
+        { icon: Mail, label: traduire('Email'), value: user?.email },
+        { icon: Phone, label: traduire('Téléphone'), value: user?.telephone },
+        { icon: Briefcase, label: traduire('Fonction'), value: user?.fonction },
       ].map(({ icon: Icon, label, value }) => (
         <div key={label} className="flex items-center gap-3 py-4">
           <Icon size={16} className="text-slate-400 shrink-0" />
           <div className="min-w-0">
             <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">{label}</p>
-            <p className="text-sm font-medium text-slate-800 dark:text-gray-100 truncate">{value || 'Non renseigné'}</p>
+            <p className="text-sm font-medium text-slate-800 dark:text-gray-100 truncate">{value || traduire('Non renseigné')}</p>
           </div>
         </div>
       ))}
@@ -86,14 +87,14 @@ export function Securite() {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
       setStatus('error');
-      setFeedback('Les nouveaux mots de passe ne correspondent pas.');
+      setFeedback(traduire('Les nouveaux mots de passe ne correspondent pas.'));
       return;
     }
     setStatus('loading');
     try {
       await changePassword(currentPassword, newPassword);
       setStatus('success');
-      setFeedback('Mot de passe mis à jour.');
+      setFeedback(traduire('Mot de passe mis à jour.'));
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -107,13 +108,13 @@ export function Securite() {
   const inputClass = 'w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-navy';
 
   return (
-    <SettingsCard icon={ShieldCheck} title="Sécurité" description="Changez votre mot de passe régulièrement pour protéger votre compte.">
+    <SettingsCard icon={ShieldCheck} title={traduire('Sécurité')} description={traduire('Changez votre mot de passe régulièrement pour protéger votre compte.')}>
       <form onSubmit={handleSubmit} className="space-y-4 py-4">
-        <input type={inputType} required placeholder="Mot de passe actuel" value={currentPassword}
+        <input type={inputType} required placeholder={traduire('Mot de passe actuel')} value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)} className={inputClass} />
 
         <div className="relative">
-          <input type={inputType} required minLength={8} placeholder="Nouveau mot de passe" value={newPassword}
+          <input type={inputType} required minLength={8} placeholder={traduire('Nouveau mot de passe')} value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)} className={inputClass} />
           <button type="button" onClick={() => setShowPwd((v) => !v)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -132,12 +133,12 @@ export function Securite() {
           </div>
         )}
 
-        <input type={inputType} required minLength={8} placeholder="Confirmer le nouveau mot de passe" value={confirmPassword}
+        <input type={inputType} required minLength={8} placeholder={traduire('Confirmer le nouveau mot de passe')} value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} />
 
         <button type="submit" disabled={status === 'loading'}
           className="w-full bg-navy text-white rounded-md py-2 font-medium hover:opacity-90 disabled:opacity-50 dark:bg-gold dark:text-navy">
-          {status === 'loading' ? 'Mise à jour...' : 'Mettre à jour le mot de passe'}
+          {status === 'loading' ? 'Mise à jour...' : traduire('Mettre à jour le mot de passe')}
         </button>
         {feedback && (
           <p className={`text-sm ${status === 'success' ? 'text-status-approved' : 'text-status-rejected'}`}>{feedback}</p>
@@ -149,26 +150,26 @@ export function Securite() {
 
 export function Sessions() {
   const ua = navigator.userAgent;
-  const browser = /Chrome/i.test(ua) ? 'Chrome' : /Firefox/i.test(ua) ? 'Firefox' : /Safari/i.test(ua) ? 'Safari' : 'Navigateur';
-  const device = /Mobile|Android|iPhone/i.test(ua) ? 'Mobile' : 'Ordinateur';
+  const browser = /Chrome/i.test(ua) ? 'Chrome' : /Firefox/i.test(ua) ? traduire('Firefox') : /Safari/i.test(ua) ? traduire('Safari') : traduire('Navigateur');
+  const device = /Mobile|Android|iPhone/i.test(ua) ? 'Mobile' : traduire('Ordinateur');
 
   return (
-    <SettingsCard icon={MonitorSmartphone} title="Sessions" description="Appareils actuellement connectés à votre compte.">
+    <SettingsCard icon={MonitorSmartphone} title={traduire('Sessions')} description={traduire('Appareils actuellement connectés à votre compte.')}>
       <div className="flex items-center justify-between gap-4 py-4">
         <div className="flex items-center gap-3">
           <Laptop size={20} className="text-slate-400" />
           <div>
             <p className="text-sm font-medium text-slate-800 dark:text-gray-100">{device} · {browser}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Dernière activité : à l'instant</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{traduire("Dernière activité : à l\'instant")}</p>
           </div>
         </div>
-        <span className="rounded-full bg-status-approved/10 px-2.5 py-1 text-xs font-medium text-status-approved">Session actuelle</span>
+        <span className="rounded-full bg-status-approved/10 px-2.5 py-1 text-xs font-medium text-status-approved">{traduire('Session actuelle')}</span>
       </div>
       <div className="py-4">
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Aucune autre session active détectée.</p>
-        <button type="button" disabled title="Nécessite une implémentation backend"
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{traduire('Aucune autre session active détectée.')}</p>
+        <button type="button" disabled title={traduire('Nécessite une implémentation backend')}
           className="text-sm font-medium text-status-rejected opacity-50 cursor-not-allowed">
-          Se déconnecter de toutes les autres sessions
+          {traduire('Se déconnecter de toutes les autres sessions')}
         </button>
       </div>
     </SettingsCard>

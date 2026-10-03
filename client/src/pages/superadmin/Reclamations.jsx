@@ -4,15 +4,16 @@ import PageHeader from '../../components/PageHeader';
 import { SkeletonCard } from '../../components/ui/Skeleton';
 import ViewToggle from '../../components/ui/ViewToggle';
 import useVueListe from '../../hooks/useVueListe';
+import { traduire } from '../../i18n';
 
 const STATUT_LABELS = {
-  ouverte: { label: 'En attente', color: 'bg-amber-50 text-status-pending' },
-  traitee: { label: 'Traitée', color: 'bg-green-50 text-status-approved' },
+  ouverte: { label: traduire('En attente'), color: 'bg-amber-50 text-status-pending' },
+  traitee: { label: traduire('Traitée'), color: 'bg-green-50 text-status-approved' },
 };
 
 function nomAuteur(r) {
   const nomComplet = `${r.auteur_prenom || ''} ${r.auteur_nom || ''}`.trim();
-  return nomComplet || r.auteur_email || 'Auteur supprimé';
+  return nomComplet || r.auteur_email || traduire('Auteur supprimé');
 }
 
 export default function Reclamations() {
@@ -56,7 +57,7 @@ export default function Reclamations() {
 
   return (
     <div className="max-w-[1600px] mx-auto">
-      <PageHeader crumbs={[{ label: 'Administration' }, { label: 'Réclamations' }]} title="Réclamations" subtitle="Problèmes signalés par le personnel" />
+      <PageHeader crumbs={[{ label: traduire('Administration') }, { label: traduire('Réclamations') }]} title={traduire('Réclamations')} subtitle={traduire('Problèmes signalés par le personnel')} />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
       </div>
@@ -70,11 +71,11 @@ export default function Reclamations() {
         </div>
       ) : (
         <>
-          {reclamations.length === 0 && <p className="text-gray-500 dark:text-gray-400">Aucune réclamation.</p>}
+          {reclamations.length === 0 && <p className="text-gray-500 dark:text-gray-400">{traduire('Aucune réclamation.')}</p>}
 
           {ouvertes.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-sm font-semibold text-navy dark:text-gold mb-3">En attente ({ouvertes.length})</h3>
+              <h3 className="text-sm font-semibold text-navy dark:text-gold mb-3">{traduire('En attente (')}{ouvertes.length})</h3>
               <div className={vue === 'liste' ? 'space-y-3' : 'grid grid-cols-1 lg:grid-cols-2 gap-3'}>
                 {ouvertes.map((r) => (
                   <div key={r.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
@@ -95,7 +96,7 @@ export default function Reclamations() {
                           rows={3}
                           value={reponses[r.id] || ''}
                           onChange={(e) => setReponses((prev) => ({ ...prev, [r.id]: e.target.value }))}
-                          placeholder="Votre réponse..."
+                          placeholder={traduire('Votre réponse...')}
                           className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
                         />
                         <div className="flex gap-2">
@@ -104,13 +105,13 @@ export default function Reclamations() {
                             disabled={saving === r.id || !(reponses[r.id] || '').trim()}
                             className="px-3 py-1.5 rounded-md text-xs font-medium bg-status-approved text-white disabled:opacity-50"
                           >
-                            {saving === r.id ? '...' : 'Marquer traitée'}
+                            {saving === r.id ? '...' : traduire('Marquer traitée')}
                           </button>
                           <button
                             onClick={() => setOuvertId(null)}
                             className="px-3 py-1.5 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
                           >
-                            Annuler
+                            {traduire('Annuler')}
                           </button>
                         </div>
                       </div>
@@ -119,7 +120,7 @@ export default function Reclamations() {
                         onClick={() => setOuvertId(r.id)}
                         className="mt-3 px-3 py-1.5 rounded-md text-xs font-medium border border-navy text-navy dark:border-gold dark:text-gold hover:bg-navy/5 dark:hover:bg-gold/10"
                       >
-                        Répondre
+                        {traduire('Répondre')}
                       </button>
                     )}
                   </div>
@@ -130,7 +131,7 @@ export default function Reclamations() {
 
           {traitees.length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold text-navy dark:text-gold mb-3">Traitées ({traitees.length})</h3>
+              <h3 className="text-sm font-semibold text-navy dark:text-gold mb-3">{traduire('Traitées (')}{traitees.length})</h3>
               <div className={vue === 'liste' ? 'space-y-3' : 'grid grid-cols-1 lg:grid-cols-2 gap-3'}>
                 {traitees.map((r) => (
                   <div key={r.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 opacity-75">
@@ -145,7 +146,7 @@ export default function Reclamations() {
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">{r.description}</p>
                     <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">Réponse</p>
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">{traduire('Réponse')}</p>
                       <p className="text-sm text-gray-700 dark:text-gray-200">{r.reponse}</p>
                     </div>
                   </div>

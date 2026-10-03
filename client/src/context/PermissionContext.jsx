@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { getMyPermissions } from '../services/permissionApi';
+import { traduire } from '../i18n';
 
 const PermissionContext = createContext(null);
 

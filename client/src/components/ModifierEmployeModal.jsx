@@ -7,6 +7,7 @@ import { fetchEtablissements } from '../services/etablissementApi';
 import GrilleIndiciaireSelector from './GrilleIndiciaireSelector';
 import Modal from './ui/Modal';
 import SelectMenu from './ui/SelectMenu';
+import { traduire } from '../i18n';
 
 const CORPS_OPTIONS = ['EFA', 'ELD', 'Fonctionnaire'];
 const TYPES_CONTRAT = ['CDI', 'CDD', 'Vacataire', 'Stagiaire'];
@@ -84,7 +85,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
     e.preventDefault();
     if (form.roles.length === 0) {
       setStatus('error');
-      setMessage('Sélectionne au moins un rôle (PE ou PAT).');
+      setMessage(traduire('Sélectionne au moins un rôle (PE ou PAT).'));
       return;
     }
     setStatus('loading');
@@ -104,7 +105,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
       delete payload.etablissementId; delete payload.corpsPe; delete payload.diplome; delete payload.specialite;
       await updatePersonnel(personnel.id, payload);
       setStatus('success');
-      setMessage('Fiche mise à jour.');
+      setMessage(traduire('Fiche mise à jour.'));
       setTimeout(() => onSuccess?.(), 800);
     } catch (err) {
       setStatus('error');
@@ -121,20 +122,20 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
 
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rôle(s) *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Rôle(s) *')}</label>
             <div className="flex items-center gap-4 h-[42px]">
               <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
                 <input type="checkbox" checked={form.roles.includes('PE')} onChange={() => toggleRole('PE')} className="w-4 h-4 accent-navy" />
-                PE
+                {traduire('PE')}
               </label>
               <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
                 <input type="checkbox" checked={form.roles.includes('PAT')} onChange={() => toggleRole('PAT')} className="w-4 h-4 accent-navy" />
-                PAT
+                {traduire('PAT')}
               </label>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Nom')}</label>
             <input
               type="text" value={form.nom}
               onChange={(e) => update('nom', e.target.value)}
@@ -142,7 +143,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prénom</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Prénom')}</label>
             <input
               type="text" value={form.prenom}
               onChange={(e) => update('prenom', e.target.value)}
@@ -150,7 +151,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Email')}</label>
             <input
               type="email" value={form.email}
               onChange={(e) => update('email', e.target.value)}
@@ -158,7 +159,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Corps</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Corps')}</label>
             <SelectMenu
               value={form.corps}
               onChange={(e) => update('corps', e.target.value)}
@@ -169,7 +170,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
             </SelectMenu>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Grade</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Grade')}</label>
             <input
               type="text" value={form.grade}
               onChange={(e) => update('grade', e.target.value)}
@@ -177,7 +178,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Poste</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Poste')}</label>
             <input
               type="text" value={form.poste}
               onChange={(e) => update('poste', e.target.value)}
@@ -185,7 +186,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catégorie professionnelle</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Catégorie professionnelle')}</label>
             <SelectMenu
               value={form.categorieId}
               onChange={(e) => update('categorieId', e.target.value)}
@@ -197,7 +198,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
           </div>
           {form.corps === 'Fonctionnaire' ? (
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Situation réglementaire (grille indiciaire)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Situation réglementaire (grille indiciaire)')}</label>
               <GrilleIndiciaireSelector
                 regime="FONCTIONNAIRE"
                 value={{ classe: form.classe, echelon: form.echelon, categorie: form.categorie, cadre: form.cadre, echelle: form.echelle, indice: form.indice }}
@@ -210,7 +211,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
           ) : (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Classe</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Classe')}</label>
                 <input
                   type="text" value={form.classe}
                   onChange={(e) => update('classe', e.target.value)}
@@ -218,7 +219,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Échelon</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Échelon')}</label>
                 <input
                   type="text" value={form.echelon}
                   onChange={(e) => update('echelon', e.target.value)}
@@ -226,7 +227,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Indice</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Indice')}</label>
                 <input
                   type="text" value={form.indice}
                   onChange={(e) => update('indice', e.target.value)}
@@ -238,7 +239,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
           {form.roles.includes('PE') && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Établissement (PE)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Établissement (PE)')}</label>
                 <SelectMenu
                   value={form.etablissementId}
                   onChange={(e) => update('etablissementId', e.target.value)}
@@ -249,16 +250,16 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
                 </SelectMenu>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Corps académique (PE)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Corps académique (PE)')}</label>
                 <input
                   type="text" value={form.corpsPe}
                   onChange={(e) => update('corpsPe', e.target.value)}
-                  placeholder="Ex. AES, MC, PT..."
+                  placeholder={traduire('Ex. AES, MC, PT...')}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Diplôme (PE)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Diplôme (PE)')}</label>
                 <input
                   type="text" value={form.diplome}
                   onChange={(e) => update('diplome', e.target.value)}
@@ -266,7 +267,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Spécialité (PE)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Spécialité (PE)')}</label>
                 <input
                   type="text" value={form.specialite}
                   onChange={(e) => update('specialite', e.target.value)}
@@ -277,7 +278,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Direction</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Direction')}</label>
             <SelectMenu
               value={selectedDirectionId}
               onChange={handleDirectionChange}
@@ -288,7 +289,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
             </SelectMenu>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Service')}</label>
             <SelectMenu
               value={services.find((s) => s.nom === form.service)?.id || ''}
               onChange={handleServiceChange}
@@ -300,7 +301,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
             </SelectMenu>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Téléphone</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Téléphone')}</label>
             <input
               type="text" value={form.telephone}
               onChange={(e) => update('telephone', e.target.value)}
@@ -308,7 +309,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type de contrat</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Type de contrat')}</label>
             <SelectMenu
               value={form.typeContrat}
               onChange={(e) => update('typeContrat', e.target.value)}
@@ -319,7 +320,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
             </SelectMenu>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date de recrutement</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Date de recrutement')}</label>
             <input
               type="date" value={form.dateRecrutement}
               onChange={(e) => update('dateRecrutement', e.target.value)}
@@ -334,12 +335,12 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
                 onChange={(e) => update('contratPermanent', e.target.checked)}
                 className="w-4 h-4 accent-navy"
               />
-              Contrat permanent
+              {traduire('Contrat permanent')}
             </label>
           </div>
           {!form.contratPermanent && (
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date de fin de contrat</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Date de fin de contrat')}</label>
               <input
                 type="date" value={form.dateEcheanceContrat}
                 onChange={(e) => update('dateEcheanceContrat', e.target.value)}
@@ -354,7 +355,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
               disabled={status === 'loading'}
               className="w-full bg-navy text-white rounded-md py-2 font-medium hover:opacity-90 disabled:opacity-50"
             >
-              {status === 'loading' ? 'Enregistrement...' : 'Enregistrer les modifications'}
+              {status === 'loading' ? 'Enregistrement...' : traduire('Enregistrer les modifications')}
             </button>
             {message && (
               <p className={`text-sm mt-2 ${status === 'success' ? 'text-status-approved' : 'text-status-rejected'}`}>

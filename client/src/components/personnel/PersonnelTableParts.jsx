@@ -1,3 +1,4 @@
+import { traduire } from '../../i18n';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 const photoUrl = (photo) => (photo ? `${API_URL.replace(/\/api\/?$/, '')}${photo}` : null);
 
@@ -50,7 +51,7 @@ export function TableFooter({ page, totalPages, total, pageSize, onPage }) {
       </p>
       {totalPages > 1 && (
         <div className="flex items-center gap-1">
-          <button type="button" onClick={() => onPage(page - 1)} disabled={page === 1} className={btn} aria-label="Page précédente">‹</button>
+          <button type="button" onClick={() => onPage(page - 1)} disabled={page === 1} className={btn} aria-label={traduire('Page précédente')}>‹</button>
           {pages.map((n) => (
             <button
               key={n}
@@ -62,7 +63,7 @@ export function TableFooter({ page, totalPages, total, pageSize, onPage }) {
               {n}
             </button>
           ))}
-          <button type="button" onClick={() => onPage(page + 1)} disabled={page === totalPages} className={btn} aria-label="Page suivante">›</button>
+          <button type="button" onClick={() => onPage(page + 1)} disabled={page === totalPages} className={btn} aria-label={traduire('Page suivante')}>›</button>
         </div>
       )}
     </div>

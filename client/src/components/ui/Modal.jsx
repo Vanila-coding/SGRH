@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { traduire } from '../../i18n';
 
 // Modale accessible partagée : Echap pour fermer, clic sur le fond pour fermer,
 // focus posé sur le premier champ à l'ouverture et restauré à la fermeture —
@@ -45,7 +46,7 @@ export default function Modal({ open = true, onClose, title, maxWidth = 'max-w-2
         {title && (
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-navy dark:text-gold">{title}</h3>
-            <button type="button" onClick={onClose} aria-label="Fermer" className="text-gray-400 hover:text-gray-600">
+            <button type="button" onClick={onClose} aria-label={traduire('Fermer')} className="text-gray-400 hover:text-gray-600">
               <X size={20} />
             </button>
           </div>

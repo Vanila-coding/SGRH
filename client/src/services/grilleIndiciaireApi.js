@@ -1,3 +1,4 @@
+import { traduire } from '../i18n';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
 function authHeaders() {
@@ -9,7 +10,7 @@ export async function fetchGrilles(regime) {
   const qs = regime ? `?regime=${encodeURIComponent(regime)}` : '';
   const res = await fetch(`${API_URL}/indiciaire/grilles${qs}`, { headers: authHeaders() });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Erreur de chargement');
+  if (!res.ok) throw new Error(traduire(data.message || 'Erreur de chargement'));
   return data.grilles;
 }
 
@@ -17,7 +18,7 @@ export async function rechercherLignes(filtres) {
   const qs = new URLSearchParams(Object.fromEntries(Object.entries(filtres).filter(([, v]) => v !== undefined && v !== null && v !== '')));
   const res = await fetch(`${API_URL}/indiciaire/recherche?${qs.toString()}`, { headers: authHeaders() });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Erreur de chargement');
+  if (!res.ok) throw new Error(traduire(data.message || 'Erreur de chargement'));
   return data.lignes;
 }
 
@@ -47,7 +48,7 @@ export async function fetchAlertesAvancement(personnelId) {
   const qs = personnelId ? `?personnel=${personnelId}` : '';
   const res = await fetch(`${API_URL}/carriere/alertes-avancement${qs}`, { headers: authHeaders() });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Erreur de chargement');
+  if (!res.ok) throw new Error(traduire(data.message || 'Erreur de chargement'));
   return data.alertes;
 }
 
@@ -68,7 +69,7 @@ export async function ignorerAlerteAvancement(id) {
     headers: authHeaders(),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Échec de l'ignorance de l'alerte");
+  if (!res.ok) throw new Error(traduire(data.message || "Échec de l'ignorance de l'alerte"));
   return data;
 }
 

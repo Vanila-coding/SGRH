@@ -4,6 +4,7 @@ import { getMaCarriere, telechargerJustificatifEvenement, telechargerDocumentDip
 import { getMesSituations } from '../../services/situationAdministrativeApi';
 import { formatIndiceDisplay } from '../../services/grilleIndiciaireApi';
 import { SkeletonPage } from '../../components/ui';
+import { traduire } from '../../i18n';
 
 export default function MaCarriere() {
   const [data, setData] = useState(null);
@@ -23,26 +24,26 @@ export default function MaCarriere() {
   return (
     <div className="max-w-[1600px] mx-auto space-y-6">
       <PageHeader
-        crumbs={[{ label: 'Mon espace', path: '/dashboard' }, { label: 'Ma carrière' }]}
-        title="Ma carrière"
-        subtitle="Situation administrative, parcours et diplômes"
+        crumbs={[{ label: traduire('Mon espace'), path: '/dashboard' }, { label: traduire('Ma carrière') }]}
+        title={traduire('Ma carrière')}
+        subtitle={traduire('Situation administrative, parcours et diplômes')}
       />
 
       {(situations?.actuelle || estPE) && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {situations?.actuelle && (
             <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 ${!estPE ? 'lg:col-span-2' : ''}`}>
-              <h3 className="font-semibold text-navy dark:text-gold mb-2">Situation administrative</h3>
+              <h3 className="font-semibold text-navy dark:text-gold mb-2">{traduire('Situation administrative')}</h3>
               <p className="text-sm text-navy dark:text-gray-100 font-medium">{situations.actuelle.libelle}</p>
-              <p className="text-xs text-gray-400">Depuis le {new Date(situations.actuelle.date_debut).toLocaleDateString('fr-FR')}</p>
-              {situations.actuelle.motif && <p className="text-xs text-gray-400">Motif : {situations.actuelle.motif}</p>}
+              <p className="text-xs text-gray-400">{traduire('Depuis le')} {new Date(situations.actuelle.date_debut).toLocaleDateString('fr-FR')}</p>
+              {situations.actuelle.motif && <p className="text-xs text-gray-400">{traduire('Motif :')} {situations.actuelle.motif}</p>}
               {(data.personnel.classe || data.personnel.echelon || data.personnel.indice) && (
                 <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 space-y-0.5">
-                  {data.personnel.classe && <p>Classe : {data.personnel.classe} {data.personnel.echelon && `— échelon ${data.personnel.echelon}`}</p>}
+                  {data.personnel.classe && <p>{traduire('Classe :')} {data.personnel.classe} {data.personnel.echelon && `— échelon ${data.personnel.echelon}`}</p>}
                   {data.personnel.indice && (
                     <p>
                       Indice : <span className="font-medium text-navy dark:text-gray-200">{data.personnel.indice}</span>
-                      {data.personnel.indice_source === 'A_CONFIRMER' && <span className="ml-1 text-amber-600 dark:text-amber-400">(à confirmer)</span>}
+                      {data.personnel.indice_source === 'A_CONFIRMER' && <span className="ml-1 text-amber-600 dark:text-amber-400">{traduire('(à confirmer)')}</span>}
                     </p>
                   )}
                 </div>
@@ -52,8 +53,8 @@ export default function MaCarriere() {
 
           {estPE && (
             <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 ${!situations?.actuelle ? 'lg:col-span-2' : ''}`}>
-              <h3 className="font-semibold text-navy dark:text-gold mb-3">Diplômes et qualifications</h3>
-              {data.diplomes.length === 0 && <p className="text-sm text-gray-400">Aucun diplôme enregistré.</p>}
+              <h3 className="font-semibold text-navy dark:text-gold mb-3">{traduire('Diplômes et qualifications')}</h3>
+              {data.diplomes.length === 0 && <p className="text-sm text-gray-400">{traduire('Aucun diplôme enregistré.')}</p>}
               <div className="space-y-2">
                 {data.diplomes.map((d) => (
                   <div key={d.id} className="border-b border-gray-100 dark:border-gray-700 pb-2 last:border-0">
@@ -65,7 +66,7 @@ export default function MaCarriere() {
                         onClick={() => telechargerDocumentDiplome(d.id, d.document_filename)}
                         className="text-xs text-navy underline"
                       >
-                        Voir le document
+                        {traduire('Voir le document')}
                       </button>
                     )}
                   </div>
@@ -77,8 +78,8 @@ export default function MaCarriere() {
       )}
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="font-semibold text-navy dark:text-gold mb-4">Ma carrière</h3>
-        {data.timeline.length === 0 && <p className="text-sm text-gray-400">Aucun événement enregistré pour l'instant.</p>}
+        <h3 className="font-semibold text-navy dark:text-gold mb-4">{traduire('Ma carrière')}</h3>
+        {data.timeline.length === 0 && <p className="text-sm text-gray-400">{traduire("Aucun événement enregistré pour l\'instant.")}</p>}
         <div className="relative border-l-2 border-gray-200 dark:border-gray-700 pl-4 space-y-4">
           {data.timeline.map((item, i) => (
             <div key={i} className="relative">
@@ -96,7 +97,7 @@ export default function MaCarriere() {
                 </p>
               )}
               {item.indiceSourceTexte && (
-                <p className="text-[11px] text-gray-400">Source : {item.indiceSourceTexte}</p>
+                <p className="text-[11px] text-gray-400">{traduire('Source :')} {item.indiceSourceTexte}</p>
               )}
               {item.justificatifPath && (
                 <button
@@ -104,7 +105,7 @@ export default function MaCarriere() {
                   onClick={() => telechargerJustificatifEvenement(item.id, item.justificatifFilename)}
                   className="text-xs text-navy underline"
                 >
-                  Voir le justificatif
+                  {traduire('Voir le justificatif')}
                 </button>
               )}
             </div>

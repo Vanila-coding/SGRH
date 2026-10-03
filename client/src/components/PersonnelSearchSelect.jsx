@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
+import { traduire } from '../i18n';
 
 const DEFAULT_LABEL = (item) => `${item.matricule ? `${item.matricule} — ` : ''}${[item.prenom, item.nom].filter(Boolean).join(' ')}`.trim();
 
@@ -92,7 +93,7 @@ export default function PersonnelSearchSelect({
           <button
             type="button"
             onClick={() => select(null)}
-            aria-label="Effacer la sélection"
+            aria-label={traduire('Effacer la sélection')}
             className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
           >
             <X size={15} aria-hidden="true" />

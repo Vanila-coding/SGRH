@@ -1,3 +1,4 @@
+import { traduire } from '../i18n';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
 function authHeaders() {
@@ -12,14 +13,14 @@ export async function sendNotification(target, title, message, type, lien) {
     body: JSON.stringify({ target, title, message, type, lien: lien || null }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Échec de l'envoi");
+  if (!res.ok) throw new Error(traduire(data.message || "Échec de l'envoi"));
   return data;
 }
 
 export async function getMyNotifications() {
   const res = await fetch(`${API_URL}/notifications/me`, { headers: authHeaders() });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Erreur de chargement');
+  if (!res.ok) throw new Error(traduire(data.message || 'Erreur de chargement'));
   return data.notifications;
 }
 
@@ -29,7 +30,7 @@ export async function markNotificationAsRead(id) {
     headers: authHeaders(),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Échec');
+  if (!res.ok) throw new Error(traduire(data.message || 'Échec'));
   return data;
 }
 
@@ -39,6 +40,6 @@ export async function markAllNotificationsAsRead() {
     headers: authHeaders(),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Échec');
+  if (!res.ok) throw new Error(traduire(data.message || 'Échec'));
   return data;
 }

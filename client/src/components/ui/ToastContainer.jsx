@@ -1,4 +1,5 @@
 import { CheckCircle2, AlertTriangle, XCircle, Info, X } from 'lucide-react';
+import { traduire } from '../../i18n';
 
 const STYLES = {
   success: { icon: CheckCircle2, className: 'bg-white dark:bg-gray-800 border-status-approved/30 text-status-approved' },
@@ -32,7 +33,7 @@ export default function ToastContainer({ toasts, onDismiss }) {
             <button
               type="button"
               onClick={() => onDismiss(t.id)}
-              aria-label="Fermer la notification"
+              aria-label={traduire('Fermer la notification')}
               className="text-gray-400 hover:text-gray-600 shrink-0"
             >
               <X size={16} />

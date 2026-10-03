@@ -12,15 +12,16 @@ import SelectMenu from '../../components/ui/SelectMenu';
 import { PersonnelAvatar, StatusPill, TableFooter } from '../../components/personnel/PersonnelTableParts';
 import ViewToggle from '../../components/ui/ViewToggle';
 import useVueListe from '../../hooks/useVueListe';
+import { traduire } from '../../i18n';
 
 const COLUMNS = [
-  { key: 'nom', label: 'Nom' },
-  { key: 'fonction', label: 'Fonction' },
-  { key: 'corps', label: 'Corps' },
-  { key: 'service', label: 'Service' },
-  { key: 'direction', label: 'Direction' },
-  { key: 'type_contrat', label: 'Contrat' },
-  { key: 'statut', label: 'Statut' },
+  { key: 'nom', label: traduire('Nom') },
+  { key: 'fonction', label: traduire('Fonction') },
+  { key: 'corps', label: traduire('Corps') },
+  { key: 'service', label: traduire('Service') },
+  { key: 'direction', label: traduire('Direction') },
+  { key: 'type_contrat', label: traduire('Contrat') },
+  { key: 'statut', label: traduire('Statut') },
 ];
 
 const PAGE_SIZE = 10;
@@ -132,7 +133,7 @@ export default function Personnel() {
 
   return (
     <div>
-      <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Personnel' }]} title="Personnel" subtitle="Recherchez, filtrez et gérez les fiches du personnel" />
+      <PageHeader crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Personnel') }]} title={traduire('Personnel')} subtitle={traduire('Recherchez, filtrez et gérez les fiches du personnel')} />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-5 flex items-center gap-4">
@@ -140,9 +141,9 @@ export default function Personnel() {
             <Wrench size={20} aria-hidden="true" />
           </span>
           <div>
-            <p className="text-xs text-gray-400">Administratif et technique (PAT)</p>
+            <p className="text-xs text-gray-400">{traduire('Administratif et technique (PAT)')}</p>
             <p className="text-2xl font-bold text-navy dark:text-gray-100">{effectifs.pat}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{effectifs.actifs} personnel ayant un compte activé · {effectifs.enAttente} en attente</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{effectifs.actifs} {traduire('personnel ayant un compte activé ·')} {effectifs.enAttente} {'en attente'}</p>
           </div>
         </div>
       </div>
@@ -154,7 +155,7 @@ export default function Personnel() {
             className="flex items-center gap-2 text-sm font-medium text-navy dark:text-gold underline underline-offset-2"
           >
             <Building2 size={16} aria-hidden="true" />
-            Gérer les directions & services
+            {traduire('Gérer les directions & services')}
           </Link>
         ) : <span />}
         <div className="flex gap-2">
@@ -163,7 +164,7 @@ export default function Personnel() {
           className="flex items-center gap-2 bg-navy text-white rounded-md px-4 py-2 text-sm font-medium hover:opacity-90"
         >
           <UserPlus size={16} />
-          Ajouter un employé
+          {traduire('Ajouter un employé')}
         </button>
         </div>
       </div>
@@ -177,7 +178,7 @@ export default function Personnel() {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Rechercher par nom, prénom ou matricule..."
+            placeholder={traduire('Rechercher par nom, prénom ou matricule...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
@@ -185,24 +186,24 @@ export default function Personnel() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <FilterSelect value={filterFonction} onChange={setFilterFonction} options={uniqueValues('fonction')} placeholder="Fonction" />
-          <FilterSelect value={filterCorps} onChange={setFilterCorps} options={uniqueValues('corps')} placeholder="Corps" />
-          <FilterSelect value={filterService} onChange={setFilterService} options={uniqueValues('service')} placeholder="Service" />
-          <FilterSelect value={filterDirection} onChange={setFilterDirection} options={uniqueValues('direction')} placeholder="Direction" />
-          <FilterSelect value={filterContrat} onChange={setFilterContrat} options={uniqueValues('type_contrat')} placeholder="Type de contrat" />
-          <FilterSelect value={filterStatut} onChange={setFilterStatut} options={['present', 'en_conge']} placeholder="Statut" />
+          <FilterSelect value={filterFonction} onChange={setFilterFonction} options={uniqueValues('fonction')} placeholder={traduire('Fonction')} />
+          <FilterSelect value={filterCorps} onChange={setFilterCorps} options={uniqueValues('corps')} placeholder={traduire('Corps')} />
+          <FilterSelect value={filterService} onChange={setFilterService} options={uniqueValues('service')} placeholder={traduire('Service')} />
+          <FilterSelect value={filterDirection} onChange={setFilterDirection} options={uniqueValues('direction')} placeholder={traduire('Direction')} />
+          <FilterSelect value={filterContrat} onChange={setFilterContrat} options={uniqueValues('type_contrat')} placeholder={traduire('Type de contrat')} />
+          <FilterSelect value={filterStatut} onChange={setFilterStatut} options={['present', 'en_conge']} placeholder={traduire('Statut')} />
           {(search || filterFonction || filterCorps || filterService || filterDirection || filterContrat || filterStatut) && (
             <button
               onClick={() => { setSearch(''); setFilterFonction(''); setFilterCorps(''); setFilterService(''); setFilterDirection(''); setFilterContrat(''); setFilterStatut(''); }}
               className="text-xs text-navy underline"
             >
-              Réinitialiser
+              {traduire('Réinitialiser')}
             </button>
           )}
           <ViewToggle value={vue} onChange={setVue} className="ml-auto" />
         </div>
 
-        <p className="text-xs text-gray-400">{filtered.length} résultat(s) sur {personnel.length}</p>
+        <p className="text-xs text-gray-400">{filtered.length} {traduire('résultat(s) sur')} {personnel.length}</p>
       </div>
 
       {loading && (
@@ -230,23 +231,23 @@ export default function Personnel() {
                   </div>
                 </div>
                 <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
-                  <dt className="text-gray-400">Fonction</dt>
+                  <dt className="text-gray-400">{traduire('Fonction')}</dt>
                   <dd className="text-gray-700 dark:text-gray-200 truncate">{p.fonction || '—'}</dd>
-                  <dt className="text-gray-400">Corps</dt>
+                  <dt className="text-gray-400">{traduire('Corps')}</dt>
                   <dd className="text-gray-700 dark:text-gray-200 truncate">{p.corps || '—'}</dd>
-                  <dt className="text-gray-400">Service</dt>
+                  <dt className="text-gray-400">{traduire('Service')}</dt>
                   <dd className="text-gray-700 dark:text-gray-200 truncate">{p.service || '—'}</dd>
-                  <dt className="text-gray-400">Direction</dt>
+                  <dt className="text-gray-400">{traduire('Direction')}</dt>
                   <dd className="text-gray-700 dark:text-gray-200 truncate">{p.direction || '—'}</dd>
                 </dl>
                 <div className="mt-auto flex items-center justify-between gap-2">
-                  {p.en_conge ? <StatusPill tone="pending">En congé</StatusPill> : <StatusPill tone="approved">Présent</StatusPill>}
-                  <span className="text-xs font-medium text-navy dark:text-gold">Voir la fiche →</span>
+                  {p.en_conge ? <StatusPill tone="pending">{traduire('En congé')}</StatusPill> : <StatusPill tone="approved">{traduire('Présent')}</StatusPill>}
+                  <span className="text-xs font-medium text-navy dark:text-gold">{traduire('Voir la fiche →')}</span>
                 </div>
               </Link>
             ))}
           </div>
-          {filtered.length === 0 && <p className="text-sm text-gray-400 text-center py-8">Aucun résultat pour ces critères.</p>}
+          {filtered.length === 0 && <p className="text-sm text-gray-400 text-center py-8">{traduire('Aucun résultat pour ces critères.')}</p>}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow mt-3">
             <TableFooter page={page} totalPages={totalPages} total={filtered.length} pageSize={PAGE_SIZE} onPage={setPage} />
           </div>
@@ -258,7 +259,7 @@ export default function Personnel() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-                <th className="w-12 px-4 py-3" aria-label="Détails" />
+                <th className="w-12 px-4 py-3" aria-label={traduire('Détails')} />
                 {COLUMNS.map((col) => (
                   <th
                     key={col.key}
@@ -271,7 +272,7 @@ export default function Personnel() {
                     </span>
                   </th>
                 ))}
-                <th className="px-4 py-3" aria-label="Actions" />
+                <th className="px-4 py-3" aria-label={traduire('Actions')} />
               </tr>
             </thead>
             <tbody>
@@ -306,14 +307,14 @@ export default function Personnel() {
                     <td className="px-4 py-3 text-gray-600 dark:text-gray-300 whitespace-nowrap">{p.direction || '—'}</td>
                     <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{p.type_contrat || '—'}</td>
                     <td className="px-4 py-3">
-                      {p.en_conge ? <StatusPill tone="pending">En congé</StatusPill> : <StatusPill tone="approved">Présent</StatusPill>}
+                      {p.en_conge ? <StatusPill tone="pending">{traduire('En congé')}</StatusPill> : <StatusPill tone="approved">{traduire('Présent')}</StatusPill>}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link
                         to={`/admin/personnel/${p.id}/fiche`}
                         onClick={(e) => e.stopPropagation()}
-                        aria-label="Voir la fiche"
-                        title="Voir la fiche"
+                        aria-label={traduire('Voir la fiche')}
+                        title={traduire('Voir la fiche')}
                         className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 dark:border-gray-600 text-navy dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
                       >
                         <Pencil size={14} aria-hidden="true" />
@@ -326,15 +327,15 @@ export default function Personnel() {
                         <div className="flex items-start justify-between">
                           <div className="grid grid-cols-3 gap-4 flex-1">
                             <div>
-                              <p className="text-xs text-gray-400">Matricule</p>
+                              <p className="text-xs text-gray-400">{traduire('Matricule')}</p>
                               <p className="text-sm text-navy dark:text-gray-100">{p.matricule || '—'}</p>
                             </div>
                             <div>
-                              <p className="text-xs text-gray-400">Email</p>
+                              <p className="text-xs text-gray-400">{traduire('Email')}</p>
                               <p className="text-sm text-navy dark:text-gray-100">{p.email}</p>
                             </div>
                             <div>
-                              <p className="text-xs text-gray-400">Grade</p>
+                              <p className="text-xs text-gray-400">{traduire('Grade')}</p>
                               <p className="text-sm text-navy dark:text-gray-100">{p.grade || '—'}</p>
                             </div>
                           </div>
@@ -342,10 +343,10 @@ export default function Personnel() {
 
                         {history.length > 0 && (
                           <div className="mt-3">
-                            <p className="text-xs text-gray-400 mb-1">Historique des fonctions</p>
+                            <p className="text-xs text-gray-400 mb-1">{traduire('Historique des fonctions')}</p>
                             {history.map((h) => (
                               <p key={h.id} className="text-xs text-gray-500">
-                                {new Date(h.changed_at).toLocaleDateString('fr-FR')} : {h.ancienne_fonction || 'Aucune'} → {h.nouvelle_fonction}
+                                {new Date(h.changed_at).toLocaleDateString('fr-FR')} : {h.ancienne_fonction || traduire('Aucune')} → {h.nouvelle_fonction}
                               </p>
                             ))}
                           </div>
@@ -358,7 +359,7 @@ export default function Personnel() {
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={COLUMNS.length + 2} className="px-4 py-8 text-center text-gray-400">
-                    Aucun résultat pour ces critères.
+                    {traduire('Aucun résultat pour ces critères.')}
                   </td>
                 </tr>
               )}

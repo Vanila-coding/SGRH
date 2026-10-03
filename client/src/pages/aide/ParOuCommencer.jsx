@@ -1,5 +1,6 @@
 import PageHeader from '../../components/PageHeader';
 import { useText } from '../../context/TextContext';
+import { traduire } from '../../i18n';
 
 const DEFAUT = `1. Consultez votre profil pour vérifier que vos informations (matricule, fonction, contrat) sont correctes.
 2. Utilisez la page Congés pour soumettre une demande — vos informations personnelles se remplissent automatiquement.
@@ -12,11 +13,11 @@ export default function ParOuCommencer() {
   return (
     <div className="max-w-[1600px] mx-auto">
       <PageHeader
-        crumbs={[{ label: 'Aide' }, { label: 'Par où commencer' }]}
-        title="Par où commencer ?"
+        crumbs={[{ label: traduire('Aide') }, { label: traduire('Par où commencer') }]}
+        title={traduire('Par où commencer ?')}
       />
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{contenu}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{traduire(contenu)}</p>
       </div>
     </div>
   );

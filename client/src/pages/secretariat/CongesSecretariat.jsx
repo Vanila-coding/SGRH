@@ -6,6 +6,7 @@ import { JUSTIFICATIF_OBLIGATOIRE } from '../../constants/conges';
 import { SkeletonCard, EmptyState } from '../../components/ui';
 import ViewToggle from '../../components/ui/ViewToggle';
 import useVueListe, { classeConteneur } from '../../hooks/useVueListe';
+import { traduire } from '../../i18n';
 
 // Vérification formelle avant transmission au RH : le secrétariat contrôle les
 // pièces et la cohérence, il ne décide pas d'accorder ou refuser le congé sur le
@@ -36,7 +37,7 @@ export default function CongesSecretariat() {
   async function handleReview(id, decision) {
     if (reviewingId) return;
     if (decision === 'refusee' && !(avisMap[id] || '').trim()) {
-      setActionError('Indique un motif avant de renvoyer une demande au demandeur.');
+      setActionError(traduire('Indique un motif avant de renvoyer une demande au demandeur.'));
       return;
     }
     setActionError('');
@@ -53,7 +54,7 @@ export default function CongesSecretariat() {
 
   return (
     <div>
-      <PageHeader crumbs={[{ label: 'Secrétariat' }, { label: 'Congés à vérifier' }]} title="Congés à vérifier" subtitle="Vérifiez les pièces et la cohérence avant transmission au RH" />
+      <PageHeader crumbs={[{ label: traduire('Secrétariat') }, { label: traduire('Congés à vérifier') }]} title={traduire('Congés à vérifier')} subtitle={traduire('Vérifiez les pièces et la cohérence avant transmission au RH')} />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
       </div>
@@ -65,7 +66,7 @@ export default function CongesSecretariat() {
           <SkeletonCard lines={2} />
         </div>
       )}
-      {!loading && demandes.length === 0 && <EmptyState title="Aucune demande en attente de vérification." />}
+      {!loading && demandes.length === 0 && <EmptyState title={traduire('Aucune demande en attente de vérification.')} />}
 
       <div className={classeConteneur(vue, 4)}>
         {demandes.map((d) => (
@@ -76,14 +77,14 @@ export default function CongesSecretariat() {
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                 Du {new Date(d.date_debut).toLocaleDateString('fr-FR')} au {new Date(d.date_fin).toLocaleDateString('fr-FR')}
               </p>
-              {d.lieu_jouissance && <p className="text-xs text-gray-400 dark:text-gray-500">Lieu : {d.lieu_jouissance}</p>}
-              {d.remplacant && <p className="text-xs text-gray-400 dark:text-gray-500">Remplaçant : {d.remplacant}</p>}
-              {d.motif && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Motif : {d.motif}</p>}
+              {d.lieu_jouissance && <p className="text-xs text-gray-400 dark:text-gray-500">{traduire('Lieu :')} {d.lieu_jouissance}</p>}
+              {d.remplacant && <p className="text-xs text-gray-400 dark:text-gray-500">{traduire('Remplaçant :')} {d.remplacant}</p>}
+              {d.motif && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{traduire('Motif :')} {d.motif}</p>}
             </div>
 
             <div className="flex items-center gap-3 mb-3">
               <Link to={`/demandes/${d.id}/fiche`} className="text-xs text-navy dark:text-gold underline inline-block">
-                Voir / télécharger la fiche
+                {traduire('Voir / télécharger la fiche')}
               </Link>
               {d.justificatif_path ? (
                 <button
@@ -91,15 +92,15 @@ export default function CongesSecretariat() {
                   onClick={() => telechargerJustificatifConge(d.id, d.justificatif_filename)}
                   className="text-xs text-navy dark:text-gold underline inline-block"
                 >
-                  Voir le justificatif
+                  {traduire('Voir le justificatif')}
                 </button>
               ) : JUSTIFICATIF_OBLIGATOIRE.includes(d.type_conge) && (
-                <span className="text-xs text-status-pending">Aucun justificatif fourni</span>
+                <span className="text-xs text-status-pending">{traduire('Aucun justificatif fourni')}</span>
               )}
             </div>
 
             <textarea
-              placeholder="Motif (obligatoire pour un renvoi)"
+              placeholder={traduire('Motif (obligatoire pour un renvoi)')}
               rows={2}
               value={avisMap[d.id] || ''}
               onChange={(e) => setAvisMap((prev) => ({ ...prev, [d.id]: e.target.value }))}
@@ -112,14 +113,14 @@ export default function CongesSecretariat() {
                 disabled={reviewingId !== null}
                 className="px-4 py-2 rounded-md border border-status-rejected text-status-rejected text-sm font-medium hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {reviewingId === d.id ? '...' : 'Renvoyer au demandeur'}
+                {reviewingId === d.id ? '...' : traduire('Renvoyer au demandeur')}
               </button>
               <button
                 onClick={() => handleReview(d.id, 'approuvee')}
                 disabled={reviewingId !== null}
                 className="px-4 py-2 rounded-md bg-navy dark:bg-gold text-white dark:text-navy text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {reviewingId === d.id ? '...' : 'Transmettre au RH'}
+                {reviewingId === d.id ? '...' : traduire('Transmettre au RH')}
               </button>
             </div>
           </div>

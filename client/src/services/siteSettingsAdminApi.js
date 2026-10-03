@@ -1,3 +1,4 @@
+import { traduire } from '../i18n';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
 export async function getSiteSettings() {
@@ -14,7 +15,7 @@ export async function updateSiteSetting(key, value) {
     body: JSON.stringify({ key, value }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Échec de la mise à jour');
+  if (!res.ok) throw new Error(traduire(data.message || 'Échec de la mise à jour'));
   return data;
 }
 
@@ -25,7 +26,7 @@ export async function resetSiteColors() {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Échec de la réinitialisation');
+  if (!res.ok) throw new Error(traduire(data.message || 'Échec de la réinitialisation'));
   return data;
 }
 
@@ -40,7 +41,7 @@ async function uploadSiteImage(slot, file) {
     body,
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Échec de l'envoi de l'image");
+  if (!res.ok) throw new Error(traduire(data.message || "Échec de l'envoi de l'image"));
   return data;
 }
 

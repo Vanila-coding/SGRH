@@ -4,6 +4,7 @@ import { getMesContrats, telechargerDocumentContrat } from '../../services/contr
 import { SkeletonCard } from '../../components/ui';
 import ViewToggle from '../../components/ui/ViewToggle';
 import useVueListe from '../../hooks/useVueListe';
+import { traduire } from '../../i18n';
 
 const STATUT_CONTRAT_LABELS = {
   actif: 'Actif', expire: 'Expiré', renouvele: 'Renouvelé', non_renouvele: 'Non renouvelé', resilie: 'Résilié',
@@ -39,16 +40,16 @@ export default function MesContrats() {
   return (
     <div className="max-w-[1600px] mx-auto space-y-6">
       <PageHeader
-        crumbs={[{ label: 'Mon espace', path: '/dashboard' }, { label: 'Mes contrats' }]}
-        title="Mes contrats"
-        subtitle="Historique de vos contrats et documents associés"
+        crumbs={[{ label: traduire('Mon espace'), path: '/dashboard' }, { label: traduire('Mes contrats') }]}
+        title={traduire('Mes contrats')}
+        subtitle={traduire('Historique de vos contrats et documents associés')}
       />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
       </div>
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         {error && <p className="text-sm text-status-rejected mb-2">{error}</p>}
-        {!contrats.contrats?.length && <p className="text-sm text-gray-400">Aucun contrat enregistré pour l'instant.</p>}
+        {!contrats.contrats?.length && <p className="text-sm text-gray-400">{traduire("Aucun contrat enregistré pour l\'instant.")}</p>}
         <div className={vue === 'liste' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 lg:grid-cols-2'}>
           {contrats.contrats?.map((c) => (
             <div key={c.id} className="border border-gray-100 dark:border-gray-700 rounded-md p-3">
@@ -74,7 +75,7 @@ export default function MesContrats() {
                       key={doc.id} type="button" onClick={() => handleTelecharger(doc)}
                       className="text-xs text-navy dark:text-gold underline"
                     >
-                      {doc.type_document === 'avenant' ? 'Avenant' : doc.type_document === 'autre' ? 'Document' : 'Contrat'} — {doc.filename}
+                      {doc.type_document === 'avenant' ? 'Avenant' : doc.type_document === 'autre' ? traduire('Document') : traduire('Contrat')} — {doc.filename}
                     </button>
                   ))}
                 </div>

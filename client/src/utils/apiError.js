@@ -1,3 +1,4 @@
+import { traduire } from '../i18n';
 // Classification centralisée des erreurs API (Phase 3). Principe : le message
 // métier du backend (déjà en français, déjà spécifique) est toujours prioritaire
 // quand il existe — on ne le remplace jamais par un texte générique (§2 "ne casse
@@ -27,9 +28,9 @@ export class ApiError extends Error {
 // spécifique à l'appel (texte déjà utilisé par chaque service, conservé pour ne
 // rien dégrader) > phrase générique en tout dernier recours.
 export function getFriendlyMessage(status, backendMessage, localFallback) {
-  if (backendMessage) return backendMessage;
-  if (FALLBACK_BY_STATUS[status]) return FALLBACK_BY_STATUS[status];
-  return localFallback || 'Une erreur inattendue est survenue.';
+  if (backendMessage) return traduire(backendMessage);
+  if (FALLBACK_BY_STATUS[status]) return traduire(FALLBACK_BY_STATUS[status]);
+  return traduire(localFallback || 'Une erreur inattendue est survenue.');
 }
 
 // À appeler dans le `if (!res.ok)` d'un service, à la place de

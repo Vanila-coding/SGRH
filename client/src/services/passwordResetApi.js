@@ -1,3 +1,4 @@
+import { traduire } from '../i18n';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
 export async function requestPasswordReset(email) {
@@ -7,7 +8,7 @@ export async function requestPasswordReset(email) {
     body: JSON.stringify({ email }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Erreur');
+  if (!res.ok) throw new Error(traduire(data.message || 'Erreur'));
   return data;
 }
 
@@ -18,6 +19,6 @@ export async function resetPassword(token, newPassword) {
     body: JSON.stringify({ token, newPassword }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Erreur');
+  if (!res.ok) throw new Error(traduire(data.message || 'Erreur'));
   return data;
 }

@@ -4,10 +4,11 @@ import { signalerProbleme, getMesReclamations } from '../../services/reclamation
 import { SkeletonText } from '../../components/ui';
 import ViewToggle from '../../components/ui/ViewToggle';
 import useVueListe from '../../hooks/useVueListe';
+import { traduire } from '../../i18n';
 
 const STATUT_LABELS = {
-  ouverte: { label: 'En attente', color: 'text-status-pending' },
-  traitee: { label: 'Traitée', color: 'text-status-approved' },
+  ouverte: { label: traduire('En attente'), color: 'text-status-pending' },
+  traitee: { label: traduire('Traitée'), color: 'text-status-approved' },
 };
 
 export default function Reclamation() {
@@ -41,7 +42,7 @@ export default function Reclamation() {
       setSujet('');
       setDescription('');
       setStatus('success');
-      setFeedback('Réclamation envoyée au Superadmin.');
+      setFeedback(traduire('Réclamation envoyée au Superadmin.'));
       load();
     } catch (err) {
       setStatus('error');
@@ -52,37 +53,37 @@ export default function Reclamation() {
   return (
     <div className="max-w-[1600px] mx-auto">
       <PageHeader
-        crumbs={[{ label: 'Aide' }, { label: 'Signaler un problème' }]}
-        title="Signaler un problème"
-        subtitle="Décrivez le problème rencontré : le Superadmin est notifié dès l'envoi"
+        crumbs={[{ label: traduire('Aide') }, { label: traduire('Signaler un problème') }]}
+        title={traduire('Signaler un problème')}
+        subtitle={traduire("Décrivez le problème rencontré : le Superadmin est notifié dès l\'envoi")}
       />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h3 className="font-semibold text-navy dark:text-gold mb-4">Nouvelle réclamation</h3>
+          <h3 className="font-semibold text-navy dark:text-gold mb-4">{traduire('Nouvelle réclamation')}</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sujet</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Sujet')}</label>
               <input
                 type="text"
                 required
                 maxLength={150}
                 value={sujet}
                 onChange={(e) => setSujet(e.target.value)}
-                placeholder="Ex : Impossible de télécharger ma fiche de congé"
+                placeholder={traduire('Ex : Impossible de télécharger ma fiche de congé')}
                 className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Description')}</label>
               <textarea
                 required
                 rows={5}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Décrivez le problème rencontré, avec le plus de détails possible."
+                placeholder={traduire('Décrivez le problème rencontré, avec le plus de détails possible.')}
                 className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
               />
             </div>
@@ -91,7 +92,7 @@ export default function Reclamation() {
               disabled={status === 'loading'}
               className="w-full bg-navy text-white rounded-md py-2 font-medium hover:opacity-90 disabled:opacity-50"
             >
-              {status === 'loading' ? 'Envoi...' : 'Envoyer au Superadmin'}
+              {status === 'loading' ? 'Envoi...' : traduire('Envoyer au Superadmin')}
             </button>
             {feedback && (
               <p className={`text-sm ${status === 'success' ? 'text-status-approved' : 'text-status-rejected'}`}>{feedback}</p>
@@ -100,10 +101,10 @@ export default function Reclamation() {
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h3 className="font-semibold text-navy dark:text-gold mb-4">Mes réclamations</h3>
+          <h3 className="font-semibold text-navy dark:text-gold mb-4">{traduire('Mes réclamations')}</h3>
           {loading && <SkeletonText lines={4} />}
           {!loading && mesReclamations.length === 0 && (
-            <p className="text-gray-400 dark:text-gray-500 text-sm">Aucune réclamation pour l'instant.</p>
+            <p className="text-gray-400 dark:text-gray-500 text-sm">{traduire("Aucune réclamation pour l\'instant.")}</p>
           )}
           <div className={vue === 'liste' ? 'space-y-3' : 'grid grid-cols-1 lg:grid-cols-2 gap-3'}>
             {mesReclamations.map((r) => (
@@ -118,7 +119,7 @@ export default function Reclamation() {
                 <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{r.description}</p>
                 {r.statut === 'traitee' && r.reponse && (
                   <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">Réponse du Superadmin</p>
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">{traduire('Réponse du Superadmin')}</p>
                     <p className="text-sm text-gray-700 dark:text-gray-200">{r.reponse}</p>
                   </div>
                 )}

@@ -7,6 +7,7 @@ import { usePermissions } from '../../context/PermissionContext';
 import { useText } from '../../context/TextContext';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
 import { urlFichierSite } from '../../utils/siteAssets';
+import { traduire } from '../../i18n';
 
 const estActif = (pathname, path) => pathname === path || pathname.startsWith(`${path}/`);
 
@@ -80,7 +81,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
     ));
 
   const groups = itemsSupplementaires.length > 0
-    ? [...intrinseque, { title: 'Accès supplémentaires', items: itemsSupplementaires }]
+    ? [...intrinseque, { title: traduire('Accès supplémentaires'), items: itemsSupplementaires }]
     : intrinseque;
 
   return (
@@ -109,25 +110,25 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
                 className={logoEstSvg ? 'h-11 w-11 shrink-0 object-contain brightness-0 invert' : 'h-11 w-11 shrink-0 rounded-lg bg-white object-contain p-0.5'}
               />
               <span className="font-display text-2xl font-bold leading-none tracking-wide bg-gradient-to-r from-[#5b74ff] to-[#9db0ff] bg-clip-text text-transparent">
-                UM-HR
+                {traduire('UM-HR')}
               </span>
             </div>
             <div className="min-w-0">
-              <p className="text-xs text-white/60 leading-tight">{titreLigne2} {titreLigne3}</p>
-              <p className="text-xs text-white/60 leading-tight">Gestion des Ressources Humaines</p>
+              <p className="text-xs text-white/60 leading-tight">{traduire(titreLigne2)} {traduire(titreLigne3)}</p>
+              <p className="text-xs text-white/60 leading-tight">{traduire('Gestion des Ressources Humaines')}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Fermer le menu"
+            aria-label={traduire('Fermer le menu')}
             className="shrink-0 rounded-md p-1 text-white/70 hover:bg-white/10 hover:text-white lg:hidden"
           >
             <X size={20} />
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-3 space-y-1" aria-label="Navigation principale">
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1" aria-label={traduire('Navigation principale')}>
           {(() => {
             // Mêmes règles de visibilité qu'avant (permissions, showIf) : seule la
             // présentation change.
@@ -155,7 +156,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
                 return (
                   <NavLink key={`${groupIndex}-${path}`} to={path} end onClick={onClose} className={classeLien}>
                     <Icon size={18} />
-                    {libellesMenu[label] || label}
+                    {traduire(libellesMenu[label] || label)}
                   </NavLink>
                 );
               }
@@ -189,7 +190,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
                         {group.items.map(({ label, path, icon: Icon }) => (
                           <NavLink key={path} to={path} end onClick={onClose} className={classeLien}>
                             <Icon size={18} />
-                            {libellesMenu[label] || label}
+                            {traduire(libellesMenu[label] || label)}
                           </NavLink>
                         ))}
                       </div>

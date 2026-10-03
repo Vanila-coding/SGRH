@@ -1,3 +1,4 @@
+import { traduire } from '../i18n';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
 export async function requestOtp(email) {
@@ -7,7 +8,7 @@ export async function requestOtp(email) {
     body: JSON.stringify({ email }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Échec de l'envoi du code");
+  if (!res.ok) throw new Error(traduire(data.message || "Échec de l'envoi du code"));
   return data;
 }
 
@@ -18,7 +19,7 @@ export async function verifyOtp(email, code) {
     body: JSON.stringify({ email, code }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Code invalide');
+  if (!res.ok) throw new Error(traduire(data.message || 'Code invalide'));
   return data;
 }
 
@@ -29,6 +30,6 @@ export async function registerWithMatricule(email, matricule, password) {
     body: JSON.stringify({ email, matricule, password }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Échec de l'inscription");
+  if (!res.ok) throw new Error(traduire(data.message || "Échec de l'inscription"));
   return data;
 }

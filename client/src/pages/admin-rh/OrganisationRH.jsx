@@ -7,14 +7,15 @@ import {
   fetchDirections, fetchServices, createDirection, deleteDirection, createService, deleteService,
   updateDirection, updateService, telechargerModeleOrganisation, importerOrganisationExcel,
 } from '../../services/organisationApi';
+import { traduire } from '../../i18n';
 
 const inputClass = 'flex-1 border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy';
 const boutonSecondaire = 'flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-navy dark:text-gray-100 rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50';
 
 function Pastille({ actif }) {
   return actif
-    ? <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-status-approved dark:bg-green-900/20 font-medium">Active</span>
-    : <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 font-medium">Désactivée</span>;
+    ? <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-status-approved dark:bg-green-900/20 font-medium">{traduire('Active')}</span>
+    : <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 font-medium">{traduire('Désactivée')}</span>;
 }
 
 // Gestion des directions et services : ajout, renommage, désactivation (sans suppression
@@ -61,7 +62,7 @@ export default function OrganisationRH() {
     try {
       await createDirection(nouvelleDirection);
       setNouvelleDirection('');
-      toast.success('Direction créée.');
+      toast.success(traduire('Direction créée.'));
       await load();
     } catch (err) {
       toast.error(err.message);
@@ -78,7 +79,7 @@ export default function OrganisationRH() {
     try {
       await createService(nom, direction.id);
       setNouveauServiceNom((prev) => ({ ...prev, [direction.id]: '' }));
-      toast.success('Service créé.');
+      toast.success(traduire('Service créé.'));
       await rechargerServices(direction.id);
     } catch (err) {
       toast.error(err.message);
@@ -96,7 +97,7 @@ export default function OrganisationRH() {
         await updateService(element.id, { actif: !element.actif });
         await rechargerServices(directionId);
       }
-      toast.success(element.actif ? 'Désactivé.' : 'Réactivé.');
+      toast.success(element.actif ? 'Désactivé.' : traduire('Réactivé.'));
     } catch (err) {
       toast.error(err.message);
     }
@@ -114,7 +115,7 @@ export default function OrganisationRH() {
         await rechargerServices(edition.directionId);
       }
       setEdition(null);
-      toast.success('Nom mis à jour.');
+      toast.success(traduire('Nom mis à jour.'));
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -128,7 +129,7 @@ export default function OrganisationRH() {
     try {
       if (confirmCible.type === 'direction') {
         await deleteDirection(confirmCible.id);
-        toast.success('Direction supprimée.');
+        toast.success(traduire('Direction supprimée.'));
         await load();
         setServicesByDirection((prev) => {
           const next = { ...prev };
@@ -137,7 +138,7 @@ export default function OrganisationRH() {
         });
       } else {
         await deleteService(confirmCible.id);
-        toast.success('Service supprimé.');
+        toast.success(traduire('Service supprimé.'));
         await rechargerServices(confirmCible.directionId);
       }
       setConfirmCible(null);
@@ -181,17 +182,17 @@ export default function OrganisationRH() {
   return (
     <div className="mx-auto max-w-[1600px]">
       <PageHeader
-        crumbs={[{ label: 'Admin RH' }, { label: 'Personnel', path: '/admin/personnel' }, { label: 'Directions & services' }]}
-        title="Directions & services"
-        subtitle="Structure de l'université : ajoutez, renommez ou désactivez une direction et ses services"
+        crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Personnel'), path: '/admin/personnel' }, { label: traduire('Directions & services') }]}
+        title={traduire('Directions & services')}
+        subtitle={traduire("Structure de l\'université : ajoutez, renommez ou désactivez une direction et ses services")}
       />
 
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <button type="button" onClick={handleModele} disabled={modele} className={boutonSecondaire}>
-          <FileSpreadsheet size={16} /> {modele ? 'Téléchargement…' : 'Modèle d’import'}
+          <FileSpreadsheet size={16} /> {modele ? 'Téléchargement…' : traduire('Modèle d’import')}
         </button>
         <button type="button" onClick={() => fileInputRef.current?.click()} disabled={importing} className={boutonSecondaire}>
-          <Upload size={16} /> {importing ? 'Import en cours…' : 'Importer un fichier Excel'}
+          <Upload size={16} /> {importing ? 'Import en cours…' : traduire('Importer un fichier Excel')}
         </button>
         <input ref={fileInputRef} type="file" accept=".xlsx" onChange={handleImportFile} className="hidden" />
       </div>
@@ -203,33 +204,33 @@ export default function OrganisationRH() {
           </p>
           {resultatImport.erreurs?.length > 0 && (
             <div className="mt-2">
-              <p className="text-sm text-status-rejected font-medium">{resultatImport.erreurs.length} ligne(s) ignorée(s) :</p>
+              <p className="text-sm text-status-rejected font-medium">{resultatImport.erreurs.length} {traduire('ligne(s) ignorée(s) :')}</p>
               <ul className="text-xs text-gray-500 list-disc list-inside mt-1">
-                {resultatImport.erreurs.map((e, i) => <li key={i}>Ligne {e.line} : {e.reason}</li>)}
+                {resultatImport.erreurs.map((e, i) => <li key={i}>{traduire('Ligne')} {e.line} : {e.reason}</li>)}
               </ul>
             </div>
           )}
-          <button onClick={() => setResultatImport(null)} className="text-xs text-navy underline mt-2">Fermer</button>
+          <button onClick={() => setResultatImport(null)} className="text-xs text-navy underline mt-2">{traduire('Fermer')}</button>
         </div>
       )}
 
       <form onSubmit={handleCreateDirection} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-4 flex flex-wrap gap-2">
         <input
           type="text" value={nouvelleDirection} onChange={(e) => setNouvelleDirection(e.target.value)}
-          placeholder="Nom de la nouvelle direction" maxLength={150} required className={`${inputClass} min-w-0`}
+          placeholder={traduire('Nom de la nouvelle direction')} maxLength={150} required className={`${inputClass} min-w-0`}
         />
         <button
           type="submit" disabled={creatingDirection}
           className="flex items-center gap-1.5 bg-navy text-white rounded-md px-4 py-1.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 shrink-0"
         >
-          <Plus size={16} aria-hidden="true" /> {creatingDirection ? 'Création...' : 'Ajouter une direction'}
+          <Plus size={16} aria-hidden="true" /> {creatingDirection ? 'Création...' : traduire('Ajouter une direction')}
         </button>
       </form>
 
       {!directions && <SkeletonCard lines={4} />}
 
       {directions?.length === 0 && (
-        <p className="text-sm text-gray-400 px-1">Aucune direction enregistrée pour le moment.</p>
+        <p className="text-sm text-gray-400 px-1">{traduire('Aucune direction enregistrée pour le moment.')}</p>
       )}
 
       <div className="space-y-3">
@@ -260,10 +261,10 @@ export default function OrganisationRH() {
                       onChange={(e) => setEdition({ ...edition, valeur: e.target.value })}
                       onKeyDown={(e) => { if (e.key === 'Enter') enregistrerEdition(); if (e.key === 'Escape') setEdition(null); }}
                       className={`${inputClass} min-w-0`}
-                      aria-label="Nouveau nom de la direction"
+                      aria-label={traduire('Nouveau nom de la direction')}
                     />
-                    <button type="button" onClick={enregistrerEdition} disabled={enregistrement} aria-label="Enregistrer" className="text-status-approved"><Check size={18} /></button>
-                    <button type="button" onClick={() => setEdition(null)} aria-label="Annuler" className="text-gray-400"><X size={18} /></button>
+                    <button type="button" onClick={enregistrerEdition} disabled={enregistrement} aria-label={traduire('Enregistrer')} className="text-status-approved"><Check size={18} /></button>
+                    <button type="button" onClick={() => setEdition(null)} aria-label={traduire('Annuler')} className="text-gray-400"><X size={18} /></button>
                   </div>
                 ) : (
                   <span className="flex items-center gap-3 shrink-0">
@@ -271,7 +272,7 @@ export default function OrganisationRH() {
                       <Pencil size={15} aria-hidden="true" />
                     </button>
                     <button type="button" onClick={() => basculerActif('direction', direction)} className="text-xs font-medium text-navy dark:text-gold underline underline-offset-2">
-                      {direction.actif ? 'Désactiver' : 'Réactiver'}
+                      {direction.actif ? 'Désactiver' : traduire('Réactiver')}
                     </button>
                     <button
                       type="button"
@@ -281,7 +282,7 @@ export default function OrganisationRH() {
                     >
                       <Trash2 size={16} aria-hidden="true" />
                     </button>
-                    <button type="button" onClick={() => toggleDirection(direction)} aria-label={ouverte ? 'Replier' : 'Déplier'}>
+                    <button type="button" onClick={() => toggleDirection(direction)} aria-label={ouverte ? 'Replier' : traduire('Déplier')}>
                       {ouverte ? <ChevronUp size={18} className="text-gray-400" aria-hidden="true" /> : <ChevronDown size={18} className="text-gray-400" aria-hidden="true" />}
                     </button>
                   </span>
@@ -290,8 +291,8 @@ export default function OrganisationRH() {
 
               {ouverte && (
                 <div className="border-t border-gray-100 dark:border-gray-700 px-4 py-3">
-                  {services === undefined && <p className="text-xs text-gray-400">Chargement...</p>}
-                  {services?.length === 0 && <p className="text-xs text-gray-400 mb-2">Aucun service dans cette direction.</p>}
+                  {services === undefined && <p className="text-xs text-gray-400">{traduire('Chargement...')}</p>}
+                  {services?.length === 0 && <p className="text-xs text-gray-400 mb-2">{traduire('Aucun service dans cette direction.')}</p>}
                   {services && services.length > 0 && (
                     <ul className="space-y-1.5 mb-3">
                       {services.map((service) => {
@@ -305,10 +306,10 @@ export default function OrganisationRH() {
                                   onChange={(e) => setEdition({ ...edition, valeur: e.target.value })}
                                   onKeyDown={(e) => { if (e.key === 'Enter') enregistrerEdition(); if (e.key === 'Escape') setEdition(null); }}
                                   className={`${inputClass} text-xs py-1 min-w-0`}
-                                  aria-label="Nouveau nom du service"
+                                  aria-label={traduire('Nouveau nom du service')}
                                 />
-                                <button type="button" onClick={enregistrerEdition} disabled={enregistrement} aria-label="Enregistrer" className="text-status-approved"><Check size={15} /></button>
-                                <button type="button" onClick={() => setEdition(null)} aria-label="Annuler" className="text-gray-400"><X size={15} /></button>
+                                <button type="button" onClick={enregistrerEdition} disabled={enregistrement} aria-label={traduire('Enregistrer')} className="text-status-approved"><Check size={15} /></button>
+                                <button type="button" onClick={() => setEdition(null)} aria-label={traduire('Annuler')} className="text-gray-400"><X size={15} /></button>
                               </span>
                             ) : (
                               <>
@@ -321,7 +322,7 @@ export default function OrganisationRH() {
                                     <Pencil size={13} aria-hidden="true" />
                                   </button>
                                   <button type="button" onClick={() => basculerActif('service', service, direction.id)} className="text-xs font-medium text-navy dark:text-gold underline underline-offset-2">
-                                    {service.actif ? 'Désactiver' : 'Réactiver'}
+                                    {service.actif ? 'Désactiver' : traduire('Réactiver')}
                                   </button>
                                   <button
                                     type="button"
@@ -344,7 +345,7 @@ export default function OrganisationRH() {
                       type="text"
                       value={nouveauServiceNom[direction.id] || ''}
                       onChange={(e) => setNouveauServiceNom((prev) => ({ ...prev, [direction.id]: e.target.value }))}
-                      placeholder="Nom du nouveau service" maxLength={150} required
+                      placeholder={traduire('Nom du nouveau service')} maxLength={150} required
                       className={`${inputClass} text-xs py-1 min-w-0`}
                     />
                     <button
@@ -363,9 +364,9 @@ export default function OrganisationRH() {
 
       <ConfirmDialog
         open={!!confirmCible}
-        title={confirmCible?.type === 'direction' ? 'Supprimer la direction' : 'Supprimer le service'}
+        title={confirmCible?.type === 'direction' ? traduire('Supprimer la direction') : traduire('Supprimer le service')}
         message={confirmCible ? `Confirmez-vous la suppression de « ${confirmCible.nom} » ? Cette action est bloquée s'il reste des services ou des personnes rattachées. Pour retirer une entrée sans la supprimer, utilisez plutôt « Désactiver ».` : ''}
-        confirmLabel="Supprimer"
+        confirmLabel={traduire('Supprimer')}
         danger
         loading={deleting}
         onConfirm={handleConfirmDelete}

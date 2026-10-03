@@ -15,6 +15,7 @@ import { getMyNotifications } from '../../services/notificationApi';
 import { Card, Badge, Skeleton, SkeletonText, EmptyState } from '../../components/ui';
 import { RH_ASSISTANT_QUESTIONS, answerRhQuestion } from '../../utils/rhAssistant';
 import { STATUT_CONTRAT_BADGE, STATUT_CONTRAT_LABELS, contratActuel, joursRestants, formatJours } from '../../utils/dossier';
+import { traduire } from '../../i18n';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 function photoUrl(photo) {
@@ -26,19 +27,19 @@ const CONGE_STATUS_LABELS = { en_attente: 'En attente', approuvee: 'Approuvée',
 const DOCUMENT_TYPE_LABELS = { certificat_administratif: 'Certificat administratif', lettre_confirmation: 'Lettre de confirmation', etat_conge: 'État de congé', decision_conge: "Décision d'octroi de congé" };
 
 const QUICK_LINKS = [
-  { label: 'Mon profil', to: '/profil', icon: UserRound },
-  { label: 'Ma carrière', to: '/carriere', icon: Award },
-  { label: 'Mes contrats', to: '/mes-contrats', icon: FileSignature },
-  { label: 'Mes congés', to: '/conges', icon: CalendarClock },
-  { label: 'Mes documents', to: '/mes-documents', icon: FileStack },
+  { label: traduire('Mon profil'), to: '/profil', icon: UserRound },
+  { label: traduire('Ma carrière'), to: '/carriere', icon: Award },
+  { label: traduire('Mes contrats'), to: '/mes-contrats', icon: FileSignature },
+  { label: traduire('Mes congés'), to: '/conges', icon: CalendarClock },
+  { label: traduire('Mes documents'), to: '/mes-documents', icon: FileStack },
 ];
 
 const CATEGORY_ICONS = { 'Contrat': FileSignature, 'Congés': CalendarClock, 'Situation / carrière': Award, 'Documents': FileStack };
 
 function DashboardSkeleton() {
   return (
-    <div className="space-y-6" role="status" aria-label="Chargement du tableau de bord">
-      <PageHeader crumbs={[{ label: 'Mon espace' }]} title="Tableau de bord" subtitle="Vue d'ensemble de votre espace personnel" />
+    <div className="space-y-6" role="status" aria-label={traduire('Chargement du tableau de bord')}>
+      <PageHeader crumbs={[{ label: traduire('Mon espace') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble de votre espace personnel")} />
       <Skeleton className="h-24 rounded-xl" />
       <Skeleton className="h-28 rounded-lg" />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -101,7 +102,7 @@ export default function Dashboard() {
   if (error) {
     return (
       <div>
-        <PageHeader crumbs={[{ label: 'Mon espace' }]} title="Tableau de bord" subtitle="Vue d'ensemble de votre espace personnel" />
+        <PageHeader crumbs={[{ label: traduire('Mon espace') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble de votre espace personnel")} />
         <p className="text-status-rejected text-sm">{error}</p>
       </div>
     );
@@ -114,8 +115,8 @@ export default function Dashboard() {
   if (!personnel) {
     return (
       <div>
-        <PageHeader crumbs={[{ label: 'Mon espace' }]} title="Tableau de bord" subtitle="Vue d'ensemble de votre espace personnel" />
-        <EmptyState title="Aucune fiche personnel associée à votre compte." description="Contactez le service RH si cela vous semble anormal." />
+        <PageHeader crumbs={[{ label: traduire('Mon espace') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble de votre espace personnel")} />
+        <EmptyState title={traduire('Aucune fiche personnel associée à votre compte.')} description={traduire('Contactez le service RH si cela vous semble anormal.')} />
       </div>
     );
   }
@@ -154,7 +155,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader crumbs={[{ label: 'Mon espace' }]} title="Tableau de bord" subtitle="Vue d'ensemble de votre espace personnel" />
+      <PageHeader crumbs={[{ label: traduire('Mon espace') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble de votre espace personnel")} />
 
       {/* En-tête personnel */}
       <div className="bg-navy rounded-xl p-6 text-white">
@@ -167,8 +168,8 @@ export default function Dashboard() {
             )}
           </div>
           <div>
-            <h2 className="text-xl font-bold">Bonjour, {personnel.prenom || personnel.email}</h2>
-            <p className="text-sm text-white/70 mt-1">Voici un aperçu de votre situation administrative.</p>
+            <h2 className="text-xl font-bold">{traduire('Bonjour,')} {personnel.prenom || personnel.email}</h2>
+            <p className="text-sm text-white/70 mt-1">{traduire('Voici un aperçu de votre situation administrative.')}</p>
           </div>
         </div>
       </div>
@@ -178,32 +179,32 @@ export default function Dashboard() {
       <Card as={Link} to="/conges" className="block transition hover:shadow-md hover:ring-1 hover:ring-navy/20 dark:hover:ring-gold/20" padding="p-6">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs text-gray-400 dark:text-gray-500">Solde de congés disponible</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">{traduire('Solde de congés disponible')}</p>
             {solde ? (
               <p className="mt-1 text-4xl font-bold text-navy dark:text-gold">{formatJours(solde.soldeDisponible)}</p>
             ) : (
-              <p className="mt-1 text-sm text-gray-400">Non disponible</p>
+              <p className="mt-1 text-sm text-gray-400">{traduire('Non disponible')}</p>
             )}
           </div>
           {solde?.dateRecrutementConnue && (
             <div className="flex gap-6 text-sm sm:border-l sm:border-gray-100 sm:pl-6 sm:dark:border-gray-700">
               <div>
-                <p className="text-xs text-gray-400 dark:text-gray-500">Droits acquis en {solde.annee}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{traduire('Droits acquis en')} {solde.annee}</p>
                 <p className="font-semibold text-navy dark:text-gray-100">{formatJours(solde.droitsAnnee)}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-400 dark:text-gray-500">Reliquat</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{traduire('Reliquat')}</p>
                 <p className="font-semibold text-navy dark:text-gray-100">{formatJours(solde.reliquat)}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-400 dark:text-gray-500">Déjà posés en {solde.annee}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{traduire('Déjà posés en')} {solde.annee}</p>
                 <p className="font-semibold text-navy dark:text-gray-100">{formatJours(solde.joursPrisAnnee)}</p>
               </div>
             </div>
           )}
         </div>
         {progressionSolde !== null && (
-          <div className="mt-4" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressionSolde} aria-label="Part des droits annuels déjà posée">
+          <div className="mt-4" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressionSolde} aria-label={traduire('Part des droits annuels déjà posée')}>
             <div className="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-gray-700">
               <div className="h-full rounded-full bg-gold" style={{ width: `${progressionSolde}%` }} />
             </div>
@@ -214,7 +215,7 @@ export default function Dashboard() {
       {/* Cartes de synthèse */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card as={Link} to="/carriere" className="block transition hover:shadow-md hover:ring-1 hover:ring-navy/20 dark:hover:ring-gold/20" padding="p-5">
-          <p className="text-xs text-gray-400 mb-1">Situation administrative</p>
+          <p className="text-xs text-gray-400 mb-1">{traduire('Situation administrative')}</p>
           {situations?.actuelle ? (
             <>
               <p className="text-lg font-bold text-navy dark:text-gray-100 truncate">{situations.actuelle.libelle}</p>
@@ -223,12 +224,12 @@ export default function Dashboard() {
               </p>
             </>
           ) : (
-            <p className="text-sm text-gray-400">Aucune situation enregistrée</p>
+            <p className="text-sm text-gray-400">{traduire('Aucune situation enregistrée')}</p>
           )}
         </Card>
 
         <Card as={Link} to="/mes-contrats" className="block transition hover:shadow-md hover:ring-1 hover:ring-navy/20 dark:hover:ring-gold/20" padding="p-5">
-          <p className="text-xs text-gray-400 mb-1">Contrat actuel</p>
+          <p className="text-xs text-gray-400 mb-1">{traduire('Contrat actuel')}</p>
           {contrat ? (
             <>
               <p className="text-lg font-bold text-navy dark:text-gray-100 truncate">{contrat.type_contrat}</p>
@@ -237,20 +238,20 @@ export default function Dashboard() {
               </Badge>
             </>
           ) : (
-            <p className="text-sm text-gray-400">Aucun contrat enregistré</p>
+            <p className="text-sm text-gray-400">{traduire('Aucun contrat enregistré')}</p>
           )}
         </Card>
 
         <Card as={Link} to="/mes-contrats" className="block transition hover:shadow-md hover:ring-1 hover:ring-navy/20 dark:hover:ring-gold/20" padding="p-5">
-          <p className="text-xs text-gray-400 mb-1">Échéance</p>
+          <p className="text-xs text-gray-400 mb-1">{traduire('Échéance')}</p>
           {!contrat ? (
-            <p className="text-sm text-gray-400">Aucun contrat enregistré</p>
+            <p className="text-sm text-gray-400">{traduire('Aucun contrat enregistré')}</p>
           ) : !contrat.date_fin ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">Sans date d'échéance</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{traduire("Sans date d\'échéance")}</p>
           ) : jours < 0 ? (
             <>
               <p className="text-lg font-bold text-status-rejected">{new Date(contrat.date_fin).toLocaleDateString('fr-FR')}</p>
-              <p className="text-xs text-status-rejected mt-1">Contrat expiré</p>
+              <p className="text-xs text-status-rejected mt-1">{traduire('Contrat expiré')}</p>
             </>
           ) : (
             <>
@@ -261,18 +262,18 @@ export default function Dashboard() {
         </Card>
 
         <Card as={Link} to="/carriere" className="block transition hover:shadow-md hover:ring-1 hover:ring-navy/20 dark:hover:ring-gold/20" padding="p-5">
-          <p className="text-xs text-gray-400 mb-1">Indice actuel</p>
+          <p className="text-xs text-gray-400 mb-1">{traduire('Indice actuel')}</p>
           {indice ? (
             <p className="text-lg font-bold text-navy dark:text-gray-100">{indice}</p>
           ) : (
-            <p className="text-sm text-gray-400">Non renseigné</p>
+            <p className="text-sm text-gray-400">{traduire('Non renseigné')}</p>
           )}
         </Card>
 
         <Card as={Link} to="/conges" className="block transition hover:shadow-md hover:ring-1 hover:ring-navy/20 dark:hover:ring-gold/20" padding="p-5">
-          <p className="text-xs text-gray-400 mb-1">Demandes en cours</p>
+          <p className="text-xs text-gray-400 mb-1">{traduire('Demandes en cours')}</p>
           <p className="text-lg font-bold text-navy dark:text-gray-100">{demandesEnCours}</p>
-          <p className="text-xs text-gray-400 mt-1">Congés + documents en attente</p>
+          <p className="text-xs text-gray-400 mt-1">{traduire('Congés + documents en attente')}</p>
         </Card>
       </div>
 
@@ -282,7 +283,7 @@ export default function Dashboard() {
       <Card padding="p-5">
         <div className="flex items-center gap-2 mb-3">
           <MessageCircleQuestion size={18} className="text-navy dark:text-gold shrink-0" />
-          <h3 className="font-semibold text-navy dark:text-gold">Assistant RH</h3>
+          <h3 className="font-semibold text-navy dark:text-gold">{traduire('Assistant RH')}</h3>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
@@ -320,9 +321,9 @@ export default function Dashboard() {
       {/* Activité récente + Accès rapides */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <Card className="lg:col-span-2">
-          <h3 className="font-semibold text-navy dark:text-gold mb-3">Activité récente</h3>
+          <h3 className="font-semibold text-navy dark:text-gold mb-3">{traduire('Activité récente')}</h3>
           {activite.length === 0 ? (
-            <EmptyState title="Aucune activité récente." />
+            <EmptyState title={traduire('Aucune activité récente.')} />
           ) : (
             <div className="space-y-1">
               {activite.map((item) => (
@@ -343,7 +344,7 @@ export default function Dashboard() {
         </Card>
 
         <Card>
-          <h3 className="font-semibold text-navy dark:text-gold mb-3">Accès rapides</h3>
+          <h3 className="font-semibold text-navy dark:text-gold mb-3">{traduire('Accès rapides')}</h3>
           <div className="space-y-1">
             {QUICK_LINKS.map(({ label, to, icon: Icon }) => (
               <Link

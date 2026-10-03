@@ -6,11 +6,12 @@ import { getEcheancesProches } from '../../services/carriereApi';
 import MiniCalendar from '../../components/Calendar';
 import PageHeader from '../../components/PageHeader';
 import { Skeleton, SkeletonText } from '../../components/ui/Skeleton';
+import { traduire } from '../../i18n';
 
 const STATUS_LABELS = {
-  en_attente: { label: 'En attente', color: 'text-status-pending' },
-  approuvee: { label: 'Approuvée', color: 'text-status-approved' },
-  refusee: { label: 'Refusée', color: 'text-status-rejected' },
+  en_attente: { label: traduire('En attente'), color: 'text-status-pending' },
+  approuvee: { label: traduire('Approuvée'), color: 'text-status-approved' },
+  refusee: { label: traduire('Refusée'), color: 'text-status-rejected' },
 };
 
 // `to` optionnel : la carte devient un lien vers la file correspondante quand une
@@ -64,8 +65,8 @@ export default function Dashboard() {
 
   if (!stats) {
     return (
-      <div className="space-y-6" role="status" aria-label="Chargement du tableau de bord">
-        <PageHeader crumbs={[{ label: 'Admin RH' }]} title="Tableau de bord" subtitle="Vue d'ensemble des ressources humaines" />
+      <div className="space-y-6" role="status" aria-label={traduire('Chargement du tableau de bord')}>
+        <PageHeader crumbs={[{ label: traduire('Admin RH') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble des ressources humaines")} />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-5 flex items-center gap-4">
@@ -101,25 +102,25 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader crumbs={[{ label: 'Admin RH' }]} title="Tableau de bord" subtitle="Vue d'ensemble des ressources humaines" />
+      <PageHeader crumbs={[{ label: traduire('Admin RH') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble des ressources humaines")} />
 
       <div className="space-y-3">
-        <SectionTitle>Effectifs</SectionTitle>
+        <SectionTitle>{traduire('Effectifs')}</SectionTitle>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard label="Personnel total" value={stats.totalPersonnel} to="/admin/personnel/pe" />
-          <StatCard label="Enseignants (PE)" value={stats.pe} to="/admin/personnel/pe" />
-          <StatCard label="Administratif (PAT)" value={stats.pat} to="/admin/personnel" />
-          <StatCard label="Nouveaux ce mois-ci" value={stats.newThisMonth} />
+          <StatCard label={traduire('Personnel total')} value={stats.totalPersonnel} to="/admin/personnel/pe" />
+          <StatCard label={traduire('Enseignants (PE)')} value={stats.pe} to="/admin/personnel/pe" />
+          <StatCard label={traduire('Administratif (PAT)')} value={stats.pat} to="/admin/personnel" />
+          <StatCard label={traduire('Nouveaux ce mois-ci')} value={stats.newThisMonth} />
         </div>
       </div>
 
       <div className="space-y-3">
-        <SectionTitle>À traiter</SectionTitle>
+        <SectionTitle>{traduire('À traiter')}</SectionTitle>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard label="Comptes en attente" value={stats.pendingValidation} to="/admin/comptes-attente" />
-          <StatCard label="Congés en attente" value={stats.congesEnAttente} to="/admin/conges" />
-          <StatCard label="Documents en attente" value={stats.documentsEnAttente} to="/admin/demandes-documents" />
-          <StatCard label="En attente au secrétariat" value={stats.secretariatEnAttente} />
+          <StatCard label={traduire('Comptes en attente')} value={stats.pendingValidation} to="/admin/comptes-attente" />
+          <StatCard label={traduire('Congés en attente')} value={stats.congesEnAttente} to="/admin/conges" />
+          <StatCard label={traduire('Documents en attente')} value={stats.documentsEnAttente} to="/admin/demandes-documents" />
+          <StatCard label={traduire('En attente au secrétariat')} value={stats.secretariatEnAttente} />
         </div>
       </div>
 
@@ -127,8 +128,8 @@ export default function Dashboard() {
         <MiniCalendar demandes={calendarDemandes} />
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
-          <h3 className="font-semibold text-navy dark:text-gold mb-3">Dernières demandes</h3>
-          {recent.length === 0 && <p className="text-sm text-gray-400 dark:text-gray-500">Aucune demande récente.</p>}
+          <h3 className="font-semibold text-navy dark:text-gold mb-3">{traduire('Dernières demandes')}</h3>
+          {recent.length === 0 && <p className="text-sm text-gray-400 dark:text-gray-500">{traduire('Aucune demande récente.')}</p>}
           <div className="space-y-3">
             {recent.map((d) => (
               <div key={d.id} className="border-b border-gray-100 dark:border-gray-700 last:border-0 pb-2">
@@ -149,7 +150,7 @@ export default function Dashboard() {
 
       {echeances.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-5">
-          <h3 className="font-semibold text-navy dark:text-gold mb-3">Échéances de contrat (30 prochains jours)</h3>
+          <h3 className="font-semibold text-navy dark:text-gold mb-3">{traduire('Échéances de contrat (30 prochains jours)')}</h3>
           <div className="space-y-2">
             {echeances.map((e) => (
               <div key={e.id} className="flex items-center justify-between border-b last:border-0 dark:border-gray-700 pb-2">
@@ -163,7 +164,7 @@ export default function Dashboard() {
                   to="/admin/notifications"
                   className="text-xs px-3 py-1.5 rounded-md bg-status-pending/10 text-status-pending font-medium hover:bg-status-pending/20"
                 >
-                  Notifier
+                  {traduire('Notifier')}
                 </Link>
               </div>
             ))}

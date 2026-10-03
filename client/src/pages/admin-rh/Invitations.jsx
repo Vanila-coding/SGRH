@@ -3,6 +3,7 @@ import { Search, Send, UserRoundCheck } from 'lucide-react';
 import { listPersonnelWithoutAccount, sendRegistrationLink } from '../../services/personnelApi';
 import PageHeader from '../../components/PageHeader';
 import { Skeleton } from '../../components/ui/Skeleton';
+import { traduire } from '../../i18n';
 
 export default function Invitations() {
   const [personnel, setPersonnel] = useState([]);
@@ -40,7 +41,7 @@ export default function Invitations() {
     try {
       await sendRegistrationLink(selectedId);
       setStatus('success');
-      setMessage("Lien d'inscription envoyé.");
+      setMessage(traduire("Lien d\'inscription envoyé."));
       setSelectedId(null);
       setSearch('');
       load();
@@ -52,7 +53,7 @@ export default function Invitations() {
 
   return (
     <section className="w-full max-w-[1600px] mx-auto">
-      <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Utilisateurs & comptes' }, { label: 'Inviter un personnel' }]} title="Inviter un personnel" />
+      <PageHeader crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Utilisateurs & comptes') }, { label: traduire('Inviter un personnel') }]} title={traduire('Inviter un personnel')} />
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="border-b border-slate-100 bg-slate-50 px-5 py-5 sm:px-7 sm:py-6 dark:border-gray-700 dark:bg-gray-900/40">
           <div className="flex items-start gap-3">
@@ -60,9 +61,9 @@ export default function Invitations() {
               <UserRoundCheck size={20} />
             </div>
             <div>
-              <h2 className="font-semibold text-navy dark:text-gold">Inviter un personnel</h2>
+              <h2 className="font-semibold text-navy dark:text-gold">{traduire('Inviter un personnel')}</h2>
               <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
-                Recherchez un employé déjà enregistré, puis envoyez-lui son lien de création de compte.
+                {traduire('Recherchez un employé déjà enregistré, puis envoyez-lui son lien de création de compte.')}
               </p>
             </div>
           </div>
@@ -73,7 +74,7 @@ export default function Invitations() {
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           type="text"
-          placeholder="Rechercher par nom ou matricule..."
+          placeholder={traduire('Rechercher par nom ou matricule...')}
           value={search}
           onChange={(e) => { setSearch(e.target.value); setSelectedId(null); }}
           className="w-full border border-gray-300 bg-white rounded-lg pl-10 pr-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-900"
@@ -81,7 +82,7 @@ export default function Invitations() {
       </div>
 
       {loading && (
-        <div className="border border-gray-200 rounded-xl divide-y divide-gray-100 dark:border-gray-700 dark:divide-gray-700 mb-5" role="status" aria-label="Chargement de la liste">
+        <div className="border border-gray-200 rounded-xl divide-y divide-gray-100 dark:border-gray-700 dark:divide-gray-700 mb-5" role="status" aria-label={traduire('Chargement de la liste')}>
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="px-4 py-3 space-y-2">
               <Skeleton className="h-3 w-1/3 rounded" />
@@ -94,7 +95,7 @@ export default function Invitations() {
       {!loading && (
         <div className="border border-gray-200 rounded-xl max-h-72 overflow-y-auto mb-5 divide-y divide-gray-100 dark:border-gray-700 dark:divide-gray-700">
           {filtered.length === 0 && (
-            <p className="text-sm text-gray-400 p-6 text-center">Aucun employé trouvé pour cette recherche.</p>
+            <p className="text-sm text-gray-400 p-6 text-center">{traduire('Aucun employé trouvé pour cette recherche.')}</p>
           )}
           {filtered.map((p) => (
             <button
@@ -105,7 +106,7 @@ export default function Invitations() {
               }`}
             >
               <span className="block font-medium">{p.prenom} {p.nom}</span>
-              <span className="mt-0.5 block text-xs text-gray-400">Matricule {p.matricule} · {p.role}</span>
+              <span className="mt-0.5 block text-xs text-gray-400">{traduire('Matricule')} {p.matricule} · {p.role}</span>
             </button>
           ))}
         </div>
@@ -117,7 +118,7 @@ export default function Invitations() {
         className="w-full inline-flex items-center justify-center gap-2 bg-navy text-white rounded-lg py-3 text-sm font-medium shadow-sm hover:bg-navy/90 focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <Send size={17} />
-        {status === 'loading' ? 'Envoi...' : "Envoyer le lien d'inscription"}
+        {status === 'loading' ? 'Envoi...' : traduire("Envoyer le lien d\'inscription")}
       </button>
 
       {message && (

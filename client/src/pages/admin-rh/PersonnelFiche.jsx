@@ -15,6 +15,7 @@ import { getSituationsForPersonnel } from '../../services/situationAdministrativ
 import { getHistoriquePersonnel } from '../../services/contratApi';
 import { getSuiviConges } from '../../services/congeApi';
 import { Skeleton, SkeletonAvatar, SkeletonText } from '../../components/ui';
+import { traduire } from '../../i18n';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 const photoUrl = (photo) => (photo ? `${API_URL.replace(/\/api\/?$/, '')}${photo}` : null);
@@ -28,9 +29,9 @@ const STATUT_COMPTE = {
 const SANS_COMPTE = ['Sans compte', 'bg-white/15 text-white/80'];
 
 const ONGLETS = [
-  { key: 'apercu', label: "Vue d'ensemble", icon: TrendingUp },
-  { key: 'dossier', label: 'Dossier', icon: UserRound },
-  { key: 'parcours', label: 'Parcours', icon: FileText },
+  { key: 'apercu', label: traduire("Vue d\'ensemble"), icon: TrendingUp },
+  { key: 'dossier', label: traduire('Dossier'), icon: UserRound },
+  { key: 'parcours', label: traduire('Parcours'), icon: FileText },
 ];
 
 // « Voir la fiche » (ADMIN_RH / SUPERADMIN) : le dossier d'un personnel, lecture seule, avec
@@ -77,7 +78,7 @@ export default function PersonnelFiche() {
   if (error) {
     return (
       <div className="mx-auto max-w-[1600px] space-y-4">
-        <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Personnel', path: '/admin/personnel' }, { label: 'Fiche' }]} title="Fiche du personnel" />
+        <PageHeader crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Personnel'), path: '/admin/personnel' }, { label: traduire('Fiche') }]} title={traduire('Fiche du personnel')} />
         <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-status-rejected dark:border-red-900 dark:bg-red-950/30">{error}</p>
         <div>{retour}</div>
       </div>
@@ -86,7 +87,7 @@ export default function PersonnelFiche() {
 
   if (!personnel) {
     return (
-      <div className="mx-auto max-w-[1600px] space-y-6" role="status" aria-label="Chargement de la fiche">
+      <div className="mx-auto max-w-[1600px] space-y-6" role="status" aria-label={traduire('Chargement de la fiche')}>
         <Skeleton className="h-8 w-64 rounded" />
         <div className="overflow-hidden rounded-2xl bg-navy p-7">
           <div className="flex items-center gap-5">
@@ -121,9 +122,9 @@ export default function PersonnelFiche() {
   return (
     <div className="mx-auto max-w-[1600px] space-y-6 pb-2">
       <PageHeader
-        crumbs={[{ label: 'Admin RH' }, { label: 'Personnel', path: '/admin/personnel' }, { label: nomComplet }]}
-        title="Fiche du personnel"
-        subtitle="Dossier, état de carrière, congés et contrat"
+        crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Personnel'), path: '/admin/personnel' }, { label: nomComplet }]}
+        title={traduire('Fiche du personnel')}
+        subtitle={traduire('Dossier, état de carrière, congés et contrat')}
       />
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
@@ -136,7 +137,7 @@ export default function PersonnelFiche() {
               {photo ? (
                 <img src={photo} alt={`Photo de ${nomComplet}`} className="h-20 w-20 shrink-0 rounded-full border-4 border-white/20 object-cover" />
               ) : (
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-white/20 bg-white/10" aria-label="Aucune photo de profil">
+                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-white/20 bg-white/10" aria-label={traduire('Aucune photo de profil')}>
                   <UserRound size={36} aria-hidden="true" />
                 </div>
               )}
@@ -162,14 +163,14 @@ export default function PersonnelFiche() {
           </div>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-            <h3 className="mb-4 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-gray-500">Informations clés</h3>
+            <h3 className="mb-4 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-gray-500">{traduire('Informations clés')}</h3>
             <div className="space-y-4">
-              <Field icon={Hash} label="Matricule" value={personnel.matricule} />
-              <Field icon={Briefcase} label="Fonction" value={personnel.fonction} />
-              <Field icon={Building2} label="Service" value={personnel.service} />
-              <Field icon={Building2} label="Direction" value={personnel.direction} />
-              <Field icon={CalendarClock} label="Date de recrutement" value={personnel.date_recrutement ? new Date(personnel.date_recrutement).toLocaleDateString('fr-FR') : null} />
-              <Field icon={CalendarClock} label="Ancienneté" value={seniority(personnel.date_recrutement)} />
+              <Field icon={Hash} label={traduire('Matricule')} value={personnel.matricule} />
+              <Field icon={Briefcase} label={traduire('Fonction')} value={personnel.fonction} />
+              <Field icon={Building2} label={traduire('Service')} value={personnel.service} />
+              <Field icon={Building2} label={traduire('Direction')} value={personnel.direction} />
+              <Field icon={CalendarClock} label={traduire('Date de recrutement')} value={personnel.date_recrutement ? new Date(personnel.date_recrutement).toLocaleDateString('fr-FR') : null} />
+              <Field icon={CalendarClock} label={traduire('Ancienneté')} value={seniority(personnel.date_recrutement)} />
             </div>
           </section>
         </div>
@@ -178,7 +179,7 @@ export default function PersonnelFiche() {
             même quantité d'information que l'ancienne mise en page, juste moins de
             défilement à la fois. */}
         <div className="min-w-0 flex-1 space-y-4">
-          <div className="flex gap-1 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1 dark:border-gray-700 dark:bg-gray-800" role="tablist" aria-label="Sections de la fiche">
+          <div className="flex gap-1 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1 dark:border-gray-700 dark:bg-gray-800" role="tablist" aria-label={traduire('Sections de la fiche')}>
             {ONGLETS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}

@@ -13,6 +13,7 @@ import { getSoldeConges } from '../../services/congeApi';
 import { present, toInputDate } from '../../utils/dossier';
 import { Skeleton, SkeletonAvatar, SkeletonText } from '../../components/ui';
 import SelectMenu from '../../components/ui/SelectMenu';
+import { traduire } from '../../i18n';
 
 const SITUATIONS_FAMILIALES = ['Célibataire', 'Marié(e)', 'Divorcé(e)', 'Veuf/Veuve'];
 const SEXES = ['Masculin', 'Féminin'];
@@ -79,12 +80,12 @@ export default function Profil() {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      setError('Choisissez une image JPG, PNG ou WebP.');
+      setError(traduire('Choisissez une image JPG, PNG ou WebP.'));
       event.target.value = '';
       return;
     }
     if (file.size > 3 * 1024 * 1024) {
-      setError("L'image ne doit pas dépasser 3 Mo.");
+      setError(traduire("L\'image ne doit pas dépasser 3 Mo."));
       event.target.value = '';
       return;
     }
@@ -162,7 +163,7 @@ export default function Profil() {
 
   if (!personnel && !error) {
     return (
-      <div className="mx-auto max-w-[1600px] space-y-6 pb-2" role="status" aria-label="Chargement du dossier personnel">
+      <div className="mx-auto max-w-[1600px] space-y-6 pb-2" role="status" aria-label={traduire('Chargement du dossier personnel')}>
         <Skeleton className="h-8 w-64 rounded" />
         <div className="overflow-hidden rounded-2xl bg-navy p-7">
           <div className="flex items-center gap-5">
@@ -193,9 +194,9 @@ export default function Profil() {
   return (
     <div className="mx-auto max-w-[1600px] space-y-6 pb-2">
       <PageHeader
-        crumbs={[{ label: 'Mon espace', path: '/dashboard' }, { label: 'Mon dossier' }]}
-        title="Mon dossier"
-        subtitle="Informations personnelles et administratives"
+        crumbs={[{ label: traduire('Mon espace'), path: '/dashboard' }, { label: traduire('Mon dossier') }]}
+        title={traduire('Mon dossier')}
+        subtitle={traduire('Informations personnelles et administratives')}
       />
 
       <div className="overflow-hidden rounded-2xl bg-navy shadow-sm">
@@ -205,14 +206,14 @@ export default function Profil() {
               {currentPhoto ? (
                 <img src={currentPhoto} alt={`Photo de ${fullName}`} className="h-24 w-24 rounded-full border-4 border-white/20 object-cover" />
               ) : (
-                <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/20 bg-white/10" aria-label="Aucune photo de profil">
+                <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/20 bg-white/10" aria-label={traduire('Aucune photo de profil')}>
                   <UserRound size={44} aria-hidden="true" />
                 </div>
               )}
               <button
                 type="button" onClick={() => inputRef.current?.click()}
                 className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-gold text-navy shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                aria-label="Modifier la photo de profil"
+                aria-label={traduire('Modifier la photo de profil')}
               >
                 <Camera size={16} aria-hidden="true" />
               </button>
@@ -220,12 +221,12 @@ export default function Profil() {
             </div>
             <div className="min-w-0">
               <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${estActif ? 'bg-emerald-400/20 text-emerald-300' : 'bg-red-400/20 text-red-300'}`}>
-                {estActif ? 'Actif' : 'Inactif'}
+                {estActif ? 'Actif' : traduire('Inactif')}
               </span>
-              <h2 className="mt-1.5 break-words text-xl font-bold">{fullName || 'Non renseigné'}</h2>
+              <h2 className="mt-1.5 break-words text-xl font-bold">{fullName || traduire('Non renseigné')}</h2>
               <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-white/80 sm:justify-start">
-                <span>Matricule : {present(personnel.matricule)}</span>
-                <span>Fonction : {present(personnel.fonction)}</span>
+                <span>{traduire('Matricule :')} {present(personnel.matricule)}</span>
+                <span>{traduire('Fonction :')} {present(personnel.fonction)}</span>
                 <span>Catégorie : {present((personnel.roles?.length > 0 ? personnel.roles : [personnel.role].filter(Boolean)).join(' + '))}</span>
               </div>
             </div>
@@ -242,9 +243,9 @@ export default function Profil() {
         {selectedPhoto && (
           <div className="border-t border-white/15 bg-white/10 p-5 text-white sm:px-7">
             <div className="flex flex-col items-center gap-4 sm:flex-row">
-              <img src={preview} alt="Aperçu de la nouvelle photo" className="h-20 w-20 rounded-xl object-cover" />
+              <img src={preview} alt={traduire('Aperçu de la nouvelle photo')} className="h-20 w-20 rounded-xl object-cover" />
               <div className="flex-1 text-center sm:text-left">
-                <p className="font-semibold">Aperçu de la nouvelle photo</p>
+                <p className="font-semibold">{traduire('Aperçu de la nouvelle photo')}</p>
                 <p className="text-sm text-white/75">{selectedPhoto.name}</p>
               </div>
               <div className="flex gap-3">
@@ -275,7 +276,7 @@ export default function Profil() {
           <form onSubmit={saveContact} className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">Sexe</label>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">{traduire('Sexe')}</label>
                 <SelectMenu
                   value={formSexe} onChange={(e) => setFormSexe(e.target.value)}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
@@ -284,35 +285,35 @@ export default function Profil() {
                 </SelectMenu>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">Date de naissance</label>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">{traduire('Date de naissance')}</label>
                 <input
                   type="date" value={formDateNaissance} onChange={(e) => setFormDateNaissance(e.target.value)}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">Lieu de naissance</label>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">{traduire('Lieu de naissance')}</label>
                 <input
                   type="text" value={formLieuNaissance} onChange={(e) => setFormLieuNaissance(e.target.value)}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">Nationalité</label>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">{traduire('Nationalité')}</label>
                 <input
                   type="text" value={formNationalite} onChange={(e) => setFormNationalite(e.target.value)}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">Date de prise de fonction</label>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">{traduire('Date de prise de fonction')}</label>
                 <input
                   type="date" value={formDatePriseFonction} onChange={(e) => setFormDatePriseFonction(e.target.value)}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">Situation familiale</label>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">{traduire('Situation familiale')}</label>
                 <SelectMenu
                   value={formSituation} onChange={(e) => setFormSituation(e.target.value)}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
@@ -322,14 +323,14 @@ export default function Profil() {
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">Téléphone</label>
+              <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">{traduire('Téléphone')}</label>
               <input
                 type="text" value={formTelephone} onChange={(e) => setFormTelephone(e.target.value)}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">Adresse</label>
+              <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">{traduire('Adresse')}</label>
               <textarea
                 rows={2} value={formAdresse} onChange={(e) => setFormAdresse(e.target.value)}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
@@ -340,13 +341,13 @@ export default function Profil() {
                 type="button" onClick={() => setEditingContact(false)} disabled={savingContact}
                 className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-slate-600 disabled:opacity-50 dark:border-gray-600 dark:text-gray-300"
               >
-                Annuler
+                {traduire('Annuler')}
               </button>
               <button
                 type="submit" disabled={savingContact}
                 className="rounded-md bg-navy px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
               >
-                {savingContact ? 'Enregistrement...' : 'Enregistrer'}
+                {savingContact ? 'Enregistrement...' : traduire('Enregistrer')}
               </button>
             </div>
           </form>

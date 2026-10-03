@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { usePermissions } from '../context/PermissionContext';
+import { traduire } from '../i18n';
 
 export default function ProtectedRoute({ children, allowedRoles = [], permission = null }) {
   const { user, loading } = useAuth();
@@ -21,9 +22,9 @@ export default function ProtectedRoute({ children, allowedRoles = [], permission
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 p-6">
           <div className="text-center">
-            <p className="text-status-rejected font-medium mb-2">Accès non autorisé</p>
+            <p className="text-status-rejected font-medium mb-2">{traduire('Accès non autorisé')}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Votre rôle ne dispose pas de la permission nécessaire pour accéder à cette page.
+              {traduire('Votre rôle ne dispose pas de la permission nécessaire pour accéder à cette page.')}
             </p>
           </div>
         </div>

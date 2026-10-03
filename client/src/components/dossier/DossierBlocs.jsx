@@ -12,6 +12,7 @@ import {
   CLASSE_LABELS, SEUIL_ECHEANCE_PROCHE_JOURS, STATUT_CONTRAT_BADGE, STATUT_CONTRAT_LABELS,
   contratActuel, dureeRestante, formatDate, formatJours, joursRestants, present, progressionContrat, roleLabels, seniority,
 } from '../../utils/dossier';
+import { traduire } from '../../i18n';
 
 // Pas d'icône par champ : une pastille colorée devant chaque ligne d'un dossier de
 // plusieurs dizaines de champs charge l'œil sans rien distinguer (tout a la même
@@ -51,44 +52,44 @@ export function InfosDossier({ personnel }) {
   return (
     <div className="space-y-6">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <Card icon={Users} title="Informations personnelles">
+          <Card icon={Users} title={traduire('Informations personnelles')}>
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-              <Field icon={UserRound} label="Nom" value={personnel.nom} />
-              <Field icon={UserRound} label="Prénom" value={personnel.prenom} />
-              <Field icon={Mail} label="E-mail" value={personnel.email} />
-              <Field icon={Users} label="Sexe" value={personnel.sexe} />
-              <Field icon={Calendar} label="Date de naissance" value={formatDate(personnel.date_naissance)} />
-              <Field icon={MapPin} label="Lieu de naissance" value={personnel.lieu_naissance} />
-              <Field icon={Globe2} label="Nationalité" value={personnel.nationalite} />
-              <Field icon={Heart} label="Situation familiale" value={personnel.situation_familiale} />
-              <Field icon={Phone} label="Téléphone" value={personnel.telephone} />
-              <Field icon={Home} label="Adresse" value={personnel.adresse} />
+              <Field icon={UserRound} label={traduire('Nom')} value={personnel.nom} />
+              <Field icon={UserRound} label={traduire('Prénom')} value={personnel.prenom} />
+              <Field icon={Mail} label={traduire('E-mail')} value={personnel.email} />
+              <Field icon={Users} label={traduire('Sexe')} value={personnel.sexe} />
+              <Field icon={Calendar} label={traduire('Date de naissance')} value={formatDate(personnel.date_naissance)} />
+              <Field icon={MapPin} label={traduire('Lieu de naissance')} value={personnel.lieu_naissance} />
+              <Field icon={Globe2} label={traduire('Nationalité')} value={personnel.nationalite} />
+              <Field icon={Heart} label={traduire('Situation familiale')} value={personnel.situation_familiale} />
+              <Field icon={Phone} label={traduire('Téléphone')} value={personnel.telephone} />
+              <Field icon={Home} label={traduire('Adresse')} value={personnel.adresse} />
             </div>
           </Card>
 
-          <Card icon={Briefcase} title="Informations administratives">
+          <Card icon={Briefcase} title={traduire('Informations administratives')}>
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-              <Field icon={Hash} label="Matricule" value={personnel.matricule} />
-              <Field icon={Users} label="Type de personnel" value={typePersonnelLabel} />
-              <Field icon={ShieldCheck} label="Type de contrat" value={contractStatus} />
-              <Field icon={Briefcase} label="Fonction" value={personnel.fonction} />
-              <Field icon={Briefcase} label="Poste" value={personnel.poste} />
-              <Field icon={Building2} label="Service" value={personnel.service} />
-              <Field icon={Building2} label="Direction" value={personnel.direction} />
-              <Field icon={UserRound} label="Supérieur hiérarchique" value={personnel.responsable_hierarchique} />
-              <Field icon={CalendarClock} label="Date de prise de fonction" value={formatDate(personnel.date_prise_fonction)} />
-              <Field icon={CalendarClock} label="Ancienneté" value={seniority(personnel.date_recrutement)} />
+              <Field icon={Hash} label={traduire('Matricule')} value={personnel.matricule} />
+              <Field icon={Users} label={traduire('Type de personnel')} value={typePersonnelLabel} />
+              <Field icon={ShieldCheck} label={traduire('Type de contrat')} value={contractStatus} />
+              <Field icon={Briefcase} label={traduire('Fonction')} value={personnel.fonction} />
+              <Field icon={Briefcase} label={traduire('Poste')} value={personnel.poste} />
+              <Field icon={Building2} label={traduire('Service')} value={personnel.service} />
+              <Field icon={Building2} label={traduire('Direction')} value={personnel.direction} />
+              <Field icon={UserRound} label={traduire('Supérieur hiérarchique')} value={personnel.responsable_hierarchique} />
+              <Field icon={CalendarClock} label={traduire('Date de prise de fonction')} value={formatDate(personnel.date_prise_fonction)} />
+              <Field icon={CalendarClock} label={traduire('Ancienneté')} value={seniority(personnel.date_recrutement)} />
             </div>
           </Card>
         </div>
 
         {roles.includes('PE') && (
-          <Card icon={GraduationCap} title="Informations enseignant (PE)">
+          <Card icon={GraduationCap} title={traduire('Informations enseignant (PE)')}>
             <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-              <Field icon={Building2} label="Établissement" value={personnel.etablissement_nom} />
-              <Field icon={ShieldCheck} label="Corps" value={personnel.corps_pe} />
-              <Field icon={Award} label="Diplôme" value={personnel.diplome} />
-              <Field icon={GraduationCap} label="Spécialité" value={personnel.specialite} />
+              <Field icon={Building2} label={traduire('Établissement')} value={personnel.etablissement_nom} />
+              <Field icon={ShieldCheck} label={traduire('Corps')} value={personnel.corps_pe} />
+              <Field icon={Award} label={traduire('Diplôme')} value={personnel.diplome} />
+              <Field icon={GraduationCap} label={traduire('Spécialité')} value={personnel.specialite} />
             </div>
           </Card>
         )}
@@ -126,45 +127,45 @@ export function SyntheseDossier({ personnel, situations, contrats, timeline, sol
   // Synthèse : état de carrière, congé restant, durée de contrat restante.
   return (
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3" data-testid="synthese-dossier">
-        <Card icon={TrendingUp} title="État de carrière" action={<Link to={liens.carriere} className="text-xs font-medium text-navy underline dark:text-gold">Détail</Link>}>
+        <Card icon={TrendingUp} title={traduire('État de carrière')} action={<Link to={liens.carriere} className="text-xs font-medium text-navy underline dark:text-gold">{traduire('Détail')}</Link>}>
           <div className="space-y-4">
-            <Field icon={ShieldCheck} label="Statut" value={personnel.corps} />
-            <Field icon={GraduationCap} label="Catégorie professionnelle" value={categorie} />
-            <Field icon={Award} label="Grade" value={personnel.grade} />
-            {classeEchelon && <Field icon={Award} label="Classe et échelon" value={classeEchelon} />}
-            <Field icon={Hash} label="Indice" value={indice} />
-            <Field icon={UserCog} label="Situation administrative actuelle"
-              value={situationActuelle ? `${situationActuelle.libelle} (depuis le ${formatDate(situationActuelle.date_debut)})` : (situations ? null : 'Non disponible')} />
-            <Field icon={FileText} label="Dernière évolution de carrière"
+            <Field icon={ShieldCheck} label={traduire('Statut')} value={personnel.corps} />
+            <Field icon={GraduationCap} label={traduire('Catégorie professionnelle')} value={categorie} />
+            <Field icon={Award} label={traduire('Grade')} value={personnel.grade} />
+            {classeEchelon && <Field icon={Award} label={traduire('Classe et échelon')} value={classeEchelon} />}
+            <Field icon={Hash} label={traduire('Indice')} value={indice} />
+            <Field icon={UserCog} label={traduire('Situation administrative actuelle')}
+              value={situationActuelle ? `${situationActuelle.libelle} (depuis le ${formatDate(situationActuelle.date_debut)})` : (situations ? null : traduire('Non disponible'))} />
+            <Field icon={FileText} label={traduire('Dernière évolution de carrière')}
               value={derniereEvolution ? `${derniereEvolution.type} — ${formatDate(derniereEvolution.date)}` : null} />
           </div>
         </Card>
 
-        <Card icon={CalendarCheck} title="Congés" action={<Link to={liens.conges} className="text-xs font-medium text-navy underline dark:text-gold">Mes congés</Link>}>
+        <Card icon={CalendarCheck} title={traduire('Congés')} action={<Link to={liens.conges} className="text-xs font-medium text-navy underline dark:text-gold">{traduire('Mes congés')}</Link>}>
           {solde ? (
             <div>
-              <p className="text-xs text-slate-500 dark:text-gray-400">Congé annuel restant</p>
+              <p className="text-xs text-slate-500 dark:text-gray-400">{traduire('Congé annuel restant')}</p>
               <p className="mt-1 text-3xl font-bold text-navy dark:text-gold" data-testid="solde-restant">{formatJours(solde.soldeDisponible)}</p>
               {solde.dateRecrutementConnue ? (
                 <dl className="mt-4 space-y-2 text-sm">
-                  <div className="flex justify-between gap-3"><dt className="text-slate-500 dark:text-gray-400">Droits acquis en {solde.annee}</dt><dd className="whitespace-nowrap font-semibold text-slate-800 dark:text-gray-100">{formatJours(solde.droitsAnnee)}</dd></div>
-                  <div className="flex justify-between gap-3"><dt className="text-slate-500 dark:text-gray-400">Reliquat des années précédentes</dt><dd className="whitespace-nowrap font-semibold text-slate-800 dark:text-gray-100">{formatJours(solde.reliquat)}</dd></div>
-                  <div className="flex justify-between gap-3"><dt className="text-slate-500 dark:text-gray-400">Déjà posés en {solde.annee}</dt><dd className="whitespace-nowrap font-semibold text-slate-800 dark:text-gray-100">{formatJours(solde.joursPrisAnnee)}</dd></div>
+                  <div className="flex justify-between gap-3"><dt className="text-slate-500 dark:text-gray-400">{traduire('Droits acquis en')} {solde.annee}</dt><dd className="whitespace-nowrap font-semibold text-slate-800 dark:text-gray-100">{formatJours(solde.droitsAnnee)}</dd></div>
+                  <div className="flex justify-between gap-3"><dt className="text-slate-500 dark:text-gray-400">{traduire('Reliquat des années précédentes')}</dt><dd className="whitespace-nowrap font-semibold text-slate-800 dark:text-gray-100">{formatJours(solde.reliquat)}</dd></div>
+                  <div className="flex justify-between gap-3"><dt className="text-slate-500 dark:text-gray-400">{traduire('Déjà posés en')} {solde.annee}</dt><dd className="whitespace-nowrap font-semibold text-slate-800 dark:text-gray-100">{formatJours(solde.joursPrisAnnee)}</dd></div>
                 </dl>
               ) : (
                 <p className="mt-3 text-xs text-slate-500 dark:text-gray-400">
-                  Date de recrutement non renseignée : les droits de l'année ne peuvent pas être calculés automatiquement. Votre solde actuel est conservé comme solde d'ouverture.
+                  {traduire('Date de recrutement non renseignée : les droits de l\'année ne peuvent pas être calculés automatiquement. Votre solde actuel est conservé comme solde d\'ouverture.')}
                 </p>
               )}
             </div>
           ) : (
-            <p className="text-sm text-slate-500 dark:text-gray-400">Solde de congés non disponible.</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400">{traduire('Solde de congés non disponible.')}</p>
           )}
         </Card>
 
-        <Card icon={FileSignature} title="Contrat" action={<Link to={liens.contrats} className="text-xs font-medium text-navy underline dark:text-gold">Mes contrats</Link>}>
+        <Card icon={FileSignature} title={traduire('Contrat')} action={<Link to={liens.contrats} className="text-xs font-medium text-navy underline dark:text-gold">{traduire('Mes contrats')}</Link>}>
           {!contratInfo ? (
-            <p className="text-sm text-slate-500 dark:text-gray-400">Aucun contrat enregistré.</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400">{traduire('Aucun contrat enregistré.')}</p>
           ) : (
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-2">
@@ -173,31 +174,31 @@ export function SyntheseDossier({ personnel, situations, contrats, timeline, sol
                   <Badge variant={STATUT_CONTRAT_BADGE[contratInfo.statut] || 'neutral'}>{STATUT_CONTRAT_LABELS[contratInfo.statut] || contratInfo.statut}</Badge>
                 )}
               </div>
-              {contratInfo.dateDebut && <Field icon={CalendarClock} label="Début du contrat" value={formatDate(contratInfo.dateDebut)} />}
+              {contratInfo.dateDebut && <Field icon={CalendarClock} label={traduire('Début du contrat')} value={formatDate(contratInfo.dateDebut)} />}
               {contratInfo.renouvellements > 0 && (
-                <Field icon={FileSignature} label="Renouvellements" value={`${contratInfo.renouvellements} renouvellement${contratInfo.renouvellements > 1 ? 's' : ''}`} />
+                <Field icon={FileSignature} label={traduire('Renouvellements')} value={`${contratInfo.renouvellements} renouvellement${contratInfo.renouvellements > 1 ? 's' : ''}`} />
               )}
               {contratInfo.permanent || !contratInfo.dateFin ? (
-                <Field icon={CalendarClock} label="Durée restante" value="Aucune échéance (sans date de fin)" />
+                <Field icon={CalendarClock} label={traduire('Durée restante')} value="Aucune échéance (sans date de fin)" />
               ) : joursContrat < 0 ? (
                 <div>
-                  <p className="text-xs text-slate-500 dark:text-gray-400">Échéance</p>
-                  <p className="mt-0.5 text-sm font-semibold text-status-rejected">Contrat expiré le {formatDate(contratInfo.dateFin)}</p>
+                  <p className="text-xs text-slate-500 dark:text-gray-400">{traduire('Échéance')}</p>
+                  <p className="mt-0.5 text-sm font-semibold text-status-rejected">{traduire('Contrat expiré le')} {formatDate(contratInfo.dateFin)}</p>
                 </div>
               ) : (
                 <div data-testid="duree-contrat-restante">
-                  <p className="text-xs text-slate-500 dark:text-gray-400">Durée restante avant le {formatDate(contratInfo.dateFin)}</p>
-                  <p className="mt-0.5 text-lg font-bold text-navy dark:text-gold">{dureeRestante(contratInfo.dateFin) || "Dernier jour aujourd'hui"}</p>
+                  <p className="text-xs text-slate-500 dark:text-gray-400">{traduire('Durée restante avant le')} {formatDate(contratInfo.dateFin)}</p>
+                  <p className="mt-0.5 text-lg font-bold text-navy dark:text-gold">{dureeRestante(contratInfo.dateFin) || traduire("Dernier jour aujourd\'hui")}</p>
                   <p className="text-xs text-slate-500 dark:text-gray-400">soit {joursContrat} jour{joursContrat > 1 ? 's' : ''}</p>
                   {joursContrat <= SEUIL_ECHEANCE_PROCHE_JOURS && (
-                    <Badge variant="pending" className="mt-2">Échéance dans moins de 6 mois</Badge>
+                    <Badge variant="pending" className="mt-2">{traduire('Échéance dans moins de 6 mois')}</Badge>
                   )}
                   {progression !== null && (
-                    <div className="mt-3" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progression} aria-label="Part du contrat écoulée">
+                    <div className="mt-3" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progression} aria-label={traduire('Part du contrat écoulée')}>
                       <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-gray-700">
                         <div className="h-full rounded-full bg-gold" style={{ width: `${progression}%` }} />
                       </div>
-                      <p className="mt-1 text-[11px] text-slate-500 dark:text-gray-400">{progression} % du contrat écoulé</p>
+                      <p className="mt-1 text-[11px] text-slate-500 dark:text-gray-400">{progression} {traduire('% du contrat écoulé')}</p>
                     </div>
                   )}
                 </div>
@@ -217,7 +218,7 @@ export function ParcoursCard({ timeline, dateRecrutement }) {
         </h2>
         <div className="p-5 sm:p-6">
           {timeline.length === 0 ? (
-            <p className="text-sm text-slate-500 dark:text-gray-400">Aucune information de carrière n'est actuellement enregistrée.</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400">{traduire("Aucune information de carrière n\'est actuellement enregistrée.")}</p>
           ) : (
             <ol className="space-y-4 border-l-2 border-slate-200 pl-5 dark:border-gray-700">
               {timeline.map((item, index) => (
@@ -231,7 +232,7 @@ export function ParcoursCard({ timeline, dateRecrutement }) {
             </ol>
           )}
           <div className="mt-5 flex items-center gap-2 border-t border-slate-100 pt-4 text-sm text-slate-600 dark:border-gray-700 dark:text-gray-300">
-            <FileText size={17} className="text-gold" aria-hidden="true" /> Date de recrutement : <span className="font-medium">{formatDate(dateRecrutement)}</span>
+            <FileText size={17} className="text-gold" aria-hidden="true" /> {traduire('Date de recrutement :')}<span className="font-medium">{formatDate(dateRecrutement)}</span>
           </div>
         </div>
       </section>

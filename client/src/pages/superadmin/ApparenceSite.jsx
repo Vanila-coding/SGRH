@@ -9,13 +9,14 @@ import { Skeleton } from '../../components/ui/Skeleton';
 import { ConfirmDialog } from '../../components/ui';
 import { Moon, RotateCcw } from 'lucide-react';
 import { urlFichierSite } from '../../utils/siteAssets';
+import { traduire } from '../../i18n';
 
 const COLOR_LABELS = {
   color_navy: 'Couleur principale (boutons, accents, sidebar)',
   color_gold: 'Couleur secondaire (élément actif de la sidebar, mise en valeur)',
-  color_status_pending: 'Statut — en attente',
-  color_status_approved: 'Statut — approuvé',
-  color_status_rejected: 'Statut — refusé',
+  color_status_pending: traduire('Statut — en attente'),
+  color_status_approved: traduire('Statut — approuvé'),
+  color_status_rejected: traduire('Statut — refusé'),
 };
 
 // Champs de contenu proposés à la personnalisation : une liste fixe, choisie dans le
@@ -24,53 +25,53 @@ const COLOR_LABELS = {
 // site_texts via useText, exactement comme les pages qui les consomment réellement
 // (Login, Footer, Sidebar, TopBar, authService côté serveur).
 const CHAMPS_CONNEXION = [
-  { key: 'login.titre_bienvenue', label: 'Titre', defaut: "Bienvenue sur l'espace RH" },
-  { key: 'login.slogan', label: 'Sous-titre', defaut: 'Excellence • Intégrité • Innovation' },
-  { key: 'login.description_bienvenue', label: "Message d'accueil", defaut: "Université de Mahajanga — Plateforme de gestion des ressources humaines. Consultez votre dossier, vos congés et vos notifications en un seul endroit.", multiligne: true },
+  { key: 'login.titre_bienvenue', label: traduire('Titre'), defaut: "Bienvenue sur l'espace RH" },
+  { key: 'login.slogan', label: traduire('Sous-titre'), defaut: 'Excellence • Intégrité • Innovation' },
+  { key: 'login.description_bienvenue', label: traduire("Message d\'accueil"), defaut: "Université de Mahajanga — Plateforme de gestion des ressources humaines. Consultez votre dossier, vos congés et vos notifications en un seul endroit.", multiligne: true },
 ];
 const CHAMPS_BARRE_LATERALE = [
-  { key: 'sidebar.titre_ligne_2', label: "Nom de l'université — 1re partie", defaut: 'UNIVERSITÉ' },
-  { key: 'sidebar.titre_ligne_3', label: "Nom de l'université — 2e partie", defaut: 'DE MAHAJANGA' },
+  { key: 'sidebar.titre_ligne_2', label: traduire("Nom de l\'université — 1re partie"), defaut: 'UNIVERSITÉ' },
+  { key: 'sidebar.titre_ligne_3', label: traduire("Nom de l\'université — 2e partie"), defaut: 'DE MAHAJANGA' },
 ];
 const CHAMPS_FOOTER = [
-  { key: 'footer.nom_application', label: "Nom de l'application", defaut: 'Université de Mahajanga' },
-  { key: 'footer.description', label: 'Description (optionnelle)', defaut: '' },
-  { key: 'footer.copyright', label: 'Mention de copyright', defaut: 'Tous droits réservés' },
-  { key: 'footer.developpeur', label: 'Développé par (laisser vide pour masquer)', defaut: 'JAOSOA Tanaël Faustin' },
+  { key: 'footer.nom_application', label: traduire("Nom de l\'application"), defaut: 'Université de Mahajanga' },
+  { key: 'footer.description', label: traduire('Description (optionnelle)'), defaut: '' },
+  { key: 'footer.copyright', label: traduire('Mention de copyright'), defaut: 'Tous droits réservés' },
+  { key: 'footer.developpeur', label: traduire('Développé par (laisser vide pour masquer)'), defaut: 'JAOSOA Tanaël Faustin' },
 ];
 const CHAMPS_SYSTEME = [
-  { key: 'systeme.message_compte_attente', label: 'Message — compte en attente', defaut: "Votre compte est en attente de validation par l'administration RH.", multiligne: true },
-  { key: 'systeme.message_compte_desactive', label: 'Message — compte désactivé', defaut: "Votre compte a été désactivé. Contactez l'administration RH pour plus d'informations.", multiligne: true },
+  { key: 'systeme.message_compte_attente', label: traduire('Message — compte en attente'), defaut: "Votre compte est en attente de validation par l'administration RH.", multiligne: true },
+  { key: 'systeme.message_compte_desactive', label: traduire('Message — compte désactivé'), defaut: "Votre compte a été désactivé. Contactez l'administration RH pour plus d'informations.", multiligne: true },
 ];
 const CHAMPS_MENU = [
-  { key: 'menu.libelle_tableau_de_bord', label: 'Dashboard / Tableau de bord', defaut: 'Tableau de bord' },
-  { key: 'menu.libelle_personnel', label: 'Personnel', defaut: 'Personnel' },
-  { key: 'menu.libelle_carriere', label: 'Carrière', defaut: 'Carrière' },
-  { key: 'menu.libelle_conges', label: 'Congés', defaut: 'Congés & absences' },
-  { key: 'menu.libelle_documents', label: 'Documents', defaut: 'Documents' },
-  { key: 'menu.libelle_parametres', label: 'Paramètres', defaut: 'Paramètres' },
+  { key: 'menu.libelle_tableau_de_bord', label: traduire('Dashboard / Tableau de bord'), defaut: 'Tableau de bord' },
+  { key: 'menu.libelle_personnel', label: traduire('Personnel'), defaut: 'Personnel' },
+  { key: 'menu.libelle_carriere', label: traduire('Carrière'), defaut: 'Carrière' },
+  { key: 'menu.libelle_conges', label: traduire('Congés'), defaut: 'Congés & absences' },
+  { key: 'menu.libelle_documents', label: traduire('Documents'), defaut: 'Documents' },
+  { key: 'menu.libelle_parametres', label: traduire('Paramètres'), defaut: 'Paramètres' },
 ];
 const CHAMPS_INSTITUTION = [
-  { key: 'institution.nom', label: "Nom de l'université", defaut: 'Université de Mahajanga' },
-  { key: 'institution.nom_court', label: 'Nom court / sigle', defaut: '' },
-  { key: 'institution.adresse', label: 'Adresse', defaut: '' },
-  { key: 'institution.telephone', label: 'Téléphone', defaut: '' },
-  { key: 'institution.email', label: 'Email institutionnel', defaut: '' },
-  { key: 'institution.site_officiel', label: 'Site officiel', defaut: '' },
+  { key: 'institution.nom', label: traduire("Nom de l\'université"), defaut: 'Université de Mahajanga' },
+  { key: 'institution.nom_court', label: traduire('Nom court / sigle'), defaut: '' },
+  { key: 'institution.adresse', label: traduire('Adresse'), defaut: '' },
+  { key: 'institution.telephone', label: traduire('Téléphone'), defaut: '' },
+  { key: 'institution.email', label: traduire('Email institutionnel'), defaut: '' },
+  { key: 'institution.site_officiel', label: traduire('Site officiel'), defaut: '' },
 ];
 // Contenu des 3 pages "Aide" du personnel (client/src/pages/aide/*.jsx) : texte brut
 // avec retours à la ligne (affiché en `whitespace-pre-line`), pas de mise en forme HTML
 // à gérer ici — reste simple à éditer pour le Superadmin.
 const CHAMPS_AIDE = [
   {
-    key: 'aide.par_ou_commencer', label: '« Par où commencer ? »', multiligne: true, rows: 6,
+    key: 'aide.par_ou_commencer', label: traduire('« Par où commencer ? »'), multiligne: true, rows: 6,
     defaut: `1. Consultez votre profil pour vérifier que vos informations (matricule, fonction, contrat) sont correctes.
 2. Utilisez la page Congés pour soumettre une demande — vos informations personnelles se remplissent automatiquement.
 3. Surveillez la cloche de notifications : vous y recevrez les décisions sur vos demandes et les annonces de l'administration.
 4. En cas de question, contactez le service RH de l'université.`,
   },
   {
-    key: 'aide.vos_droits', label: '« Vos droits »', multiligne: true, rows: 8,
+    key: 'aide.vos_droits', label: traduire('« Vos droits »'), multiligne: true, rows: 8,
     defaut: `Tout membre du personnel de l'Université de Mahajanga peut, selon sa situation :
 - Bénéficier d'un congé annuel, de permissions et d'autorisations d'absence selon la réglementation en vigueur
 - Consulter à tout moment ses informations administratives
@@ -80,7 +81,7 @@ const CHAMPS_AIDE = [
 Le détail complet des droits par statut (CDI, CDD, Vacataire, Stagiaire) sera précisé prochainement par l'administration.`,
   },
   {
-    key: 'aide.procedures', label: '« Les procédures »', multiligne: true, rows: 8,
+    key: 'aide.procedures', label: traduire('« Les procédures »'), multiligne: true, rows: 8,
     defaut: `Demande de congé / permission
 Remplissez le formulaire dans "Congés", en précisant le type, les dates et le motif. Votre demande part directement au service RH.
 
@@ -122,7 +123,7 @@ function ChampTexte({ champ }) {
     try {
       await updateText(champ.key, valeur);
       await reload();
-      toast.success('Texte enregistré.');
+      toast.success(traduire('Texte enregistré.'));
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -149,7 +150,7 @@ function ChampTexte({ champ }) {
           disabled={saving || !modifie}
           className="px-3 py-2 rounded-md text-xs font-medium bg-navy text-white hover:opacity-90 disabled:opacity-40 whitespace-nowrap shrink-0"
         >
-          {saving ? '...' : 'Enregistrer'}
+          {saving ? '...' : traduire('Enregistrer')}
         </button>
         {modifie && (
           <button
@@ -157,7 +158,7 @@ function ChampTexte({ champ }) {
             disabled={saving}
             className="px-3 py-2 rounded-md text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 whitespace-nowrap shrink-0"
           >
-            Annuler
+            {traduire('Annuler')}
           </button>
         )}
       </div>
@@ -179,7 +180,7 @@ function ChampImage({ label, hint, valeurActuelle, onUpload }) {
     setUploading(true);
     try {
       await onUpload(file);
-      toast.success('Image mise à jour.');
+      toast.success(traduire('Image mise à jour.'));
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -192,13 +193,13 @@ function ChampImage({ label, hint, valeurActuelle, onUpload }) {
   return (
     <div className="flex items-center gap-4">
       <div className="h-16 w-16 shrink-0 rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center justify-center overflow-hidden">
-        {src ? <img src={src} alt="" className="h-full w-full object-contain" /> : <span className="text-[10px] text-gray-400 text-center px-1">Aucune image</span>}
+        {src ? <img src={src} alt="" className="h-full w-full object-contain" /> : <span className="text-[10px] text-gray-400 text-center px-1">{traduire('Aucune image')}</span>}
       </div>
       <div className="min-w-0">
         <p className="text-sm font-medium text-navy dark:text-gray-100">{label}</p>
         {hint && <p className="text-xs text-gray-400 mb-2">{hint}</p>}
         <label className="inline-block px-3 py-1.5 rounded-md text-xs font-medium bg-navy text-white hover:opacity-90 cursor-pointer">
-          {uploading ? 'Envoi...' : 'Choisir une image'}
+          {uploading ? 'Envoi...' : traduire('Choisir une image')}
           <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="hidden" disabled={uploading} onChange={handleFile} />
         </label>
       </div>
@@ -234,7 +235,7 @@ export default function ApparenceSite() {
       await updateSiteSetting(key, value);
       await reloadSettings();
       setColorEdits((prev) => { const next = { ...prev }; delete next[key]; return next; });
-      toast.success('Couleur enregistrée.');
+      toast.success(traduire('Couleur enregistrée.'));
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -248,7 +249,7 @@ export default function ApparenceSite() {
       await resetSiteColors();
       await reloadSettings();
       setColorEdits({});
-      toast.success('Couleurs réinitialisées à la palette par défaut.');
+      toast.success(traduire('Couleurs réinitialisées à la palette par défaut.'));
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -273,7 +274,7 @@ export default function ApparenceSite() {
       await updateText(key, value);
       setAllTexts((prev) => prev.map((t) => (t.key === key ? { ...t, value } : t)));
       setAutresEdits((prev) => { const next = { ...prev }; delete next[key]; return next; });
-      toast.success('Texte enregistré.');
+      toast.success(traduire('Texte enregistré.'));
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -285,7 +286,7 @@ export default function ApparenceSite() {
 
   return (
     <div className="mx-auto max-w-[1600px]">
-      <PageHeader crumbs={[{ label: 'Administration' }, { label: 'Personnalisation' }]} title="Personnalisation" subtitle="Apparence, contenu et informations institutionnelles du site" />
+      <PageHeader crumbs={[{ label: traduire('Administration') }, { label: traduire('Personnalisation') }]} title={traduire('Personnalisation')} subtitle={traduire('Apparence, contenu et informations institutionnelles du site')} />
       <div className="flex flex-wrap gap-2 mb-6">
         {[
           ['apparence', 'Apparence'],
@@ -303,7 +304,7 @@ export default function ApparenceSite() {
       </div>
 
       {enChargement && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 grid grid-cols-1 sm:grid-cols-2 gap-4" role="status" aria-label="Chargement">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 grid grid-cols-1 sm:grid-cols-2 gap-4" role="status" aria-label={traduire('Chargement')}>
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3">
               <Skeleton className="w-10 h-10 rounded shrink-0" />
@@ -318,20 +319,20 @@ export default function ApparenceSite() {
 
       {!enChargement && tab === 'apparence' && (
         <>
-          <Section title="Logo et favicon">
-            <ChampImage label="Logo principal" hint="Utilisé dans la sidebar et par défaut sur la page de connexion." valeurActuelle={settings.logo_principal_url} onUpload={async (f) => { await uploadLogo(f); await reloadSettings(); }} />
-            <ChampImage label="Favicon" hint="Icône affichée dans l'onglet du navigateur." valeurActuelle={settings.favicon_url} onUpload={async (f) => { await uploadFavicon(f); await reloadSettings(); }} />
-            <ChampImage label="Logo — page de connexion (optionnel)" hint="Si vide, le logo principal est utilisé." valeurActuelle={settings.logo_connexion_url} onUpload={async (f) => { await uploadLogoConnexion(f); await reloadSettings(); }} />
+          <Section title={traduire('Logo et favicon')}>
+            <ChampImage label={traduire('Logo principal')} hint={traduire('Utilisé dans la sidebar et par défaut sur la page de connexion.')} valeurActuelle={settings.logo_principal_url} onUpload={async (f) => { await uploadLogo(f); await reloadSettings(); }} />
+            <ChampImage label={traduire('Favicon')} hint={traduire("Icône affichée dans l\'onglet du navigateur.")} valeurActuelle={settings.favicon_url} onUpload={async (f) => { await uploadFavicon(f); await reloadSettings(); }} />
+            <ChampImage label={traduire('Logo — page de connexion (optionnel)')} hint={traduire('Si vide, le logo principal est utilisé.')} valeurActuelle={settings.logo_connexion_url} onUpload={async (f) => { await uploadLogoConnexion(f); await reloadSettings(); }} />
           </Section>
 
-          <Section title="Couleurs" description="La couleur de base (bleu marine institutionnel, en référence au logo) est restaurable à tout moment.">
+          <Section title={traduire('Couleurs')} description={traduire('La couleur de base (bleu marine institutionnel, en référence au logo) est restaurable à tout moment.')}>
             <div className="flex justify-end -mt-2">
               <button
                 type="button"
                 onClick={() => setConfirmReset(true)}
                 className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-navy dark:hover:text-gold"
               >
-                <RotateCcw size={13} aria-hidden="true" /> Réinitialiser à la couleur de base
+                <RotateCcw size={13} aria-hidden="true" /> {traduire('Réinitialiser à la couleur de base')}
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -356,7 +357,7 @@ export default function ApparenceSite() {
                       disabled={savingKey === key}
                       className="px-3 py-1.5 rounded-md text-xs font-medium bg-navy text-white hover:opacity-90 disabled:opacity-50 shrink-0"
                     >
-                      {savingKey === key ? '...' : 'Enregistrer'}
+                      {savingKey === key ? '...' : traduire('Enregistrer')}
                     </button>
                   </div>
                 );
@@ -364,13 +365,13 @@ export default function ApparenceSite() {
             </div>
           </Section>
 
-          <Section title="Mode clair / sombre">
+          <Section title={traduire('Mode clair / sombre')}>
             <div className="flex items-start gap-3 text-sm text-gray-500 dark:text-gray-400">
               <Moon size={18} className="shrink-0 mt-0.5" />
               <p>
-                Le mode sombre est déjà disponible pour chaque utilisateur individuellement, via l'icône
-                lune/soleil dans la barre supérieure. C'est une préférence personnelle (mémorisée sur
-                l'appareil de chacun), il n'y a pas de bascule globale à configurer ici.
+                {traduire("Le mode sombre est déjà disponible pour chaque utilisateur individuellement, via l\'icône")}
+                {traduire('lune/soleil dans la barre supérieure. C\'est une préférence personnelle (mémorisée sur')}
+                {traduire('l\'appareil de chacun), il n\'y a pas de bascule globale à configurer ici.')}
               </p>
             </div>
           </Section>
@@ -379,22 +380,22 @@ export default function ApparenceSite() {
 
       {!enChargement && tab === 'contenu' && (
         <>
-          <Section title="Page de connexion">
+          <Section title={traduire('Page de connexion')}>
             {CHAMPS_CONNEXION.map((c) => <ChampTexte key={c.key} champ={c} />)}
           </Section>
-          <Section title="Barre latérale">
+          <Section title={traduire('Barre latérale')}>
             {CHAMPS_BARRE_LATERALE.map((c) => <ChampTexte key={c.key} champ={c} />)}
           </Section>
-          <Section title="Pied de page">
+          <Section title={traduire('Pied de page')}>
             {CHAMPS_FOOTER.map((c) => <ChampTexte key={c.key} champ={c} />)}
           </Section>
-          <Section title="Messages système" description="Affichés à la connexion selon l'état du compte. Le mode maintenance n'existe pas dans l'application actuelle — rien à personnaliser pour cet élément.">
+          <Section title={traduire('Messages système')} description={traduire('Affichés à la connexion selon l\'état du compte. Le mode maintenance n\'existe pas dans l\'application actuelle — rien à personnaliser pour cet élément.')}>
             {CHAMPS_SYSTEME.map((c) => <ChampTexte key={c.key} champ={c} />)}
           </Section>
-          <Section title="Libellés de navigation" description="Ces libellés remplacent le texte affiché pour ces éléments dans le menu ; la structure du menu elle-même n'est pas modifiable ici.">
+          <Section title={traduire('Libellés de navigation')} description={traduire("Ces libellés remplacent le texte affiché pour ces éléments dans le menu ; la structure du menu elle-même n\'est pas modifiable ici.")}>
             {CHAMPS_MENU.map((c) => <ChampTexte key={c.key} champ={c} />)}
           </Section>
-          <Section title="Aide (personnel)" description="Contenu des 3 pages d'aide affichées au personnel (PE/PAT) dans le menu Aide.">
+          <Section title={traduire('Aide (personnel)')} description={traduire('Contenu des 3 pages d\'aide affichées au personnel (PE/PAT) dans le menu Aide.')}>
             {CHAMPS_AIDE.map((c) => <ChampTexte key={c.key} champ={c} />)}
           </Section>
 
@@ -403,7 +404,7 @@ export default function ApparenceSite() {
               onClick={() => setAutresOuvert((v) => !v)}
               className="text-xs font-medium text-navy dark:text-gold hover:underline"
             >
-              {autresOuvert ? 'Masquer' : 'Afficher'} les autres textes de l'application ({autresTextes.length})
+              {autresOuvert ? 'Masquer' : traduire('Afficher')} les autres textes de l'application ({autresTextes.length})
             </button>
           </div>
 
@@ -411,7 +412,7 @@ export default function ApparenceSite() {
             <div className="max-w-3xl">
               <input
                 type="text"
-                placeholder="Rechercher un texte..."
+                placeholder={traduire('Rechercher un texte...')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-navy"
@@ -435,7 +436,7 @@ export default function ApparenceSite() {
                             disabled={savingKey === t.key}
                             className="px-3 py-2 rounded-md text-xs font-medium bg-navy text-white hover:opacity-90 disabled:opacity-50 whitespace-nowrap"
                           >
-                            {savingKey === t.key ? '...' : 'Enregistrer'}
+                            {savingKey === t.key ? '...' : traduire('Enregistrer')}
                           </button>
                         </div>
                       </div>
@@ -443,23 +444,23 @@ export default function ApparenceSite() {
                   </div>
                 </div>
               ))}
-              {autresFiltres.length === 0 && <p className="text-sm text-gray-400">Aucun autre texte trouvé.</p>}
+              {autresFiltres.length === 0 && <p className="text-sm text-gray-400">{traduire('Aucun autre texte trouvé.')}</p>}
             </div>
           )}
         </>
       )}
 
       {!enChargement && tab === 'institution' && (
-        <Section title="Informations institutionnelles" description="Réutilisées dans les endroits prévus de l'application (ex. pied de page). Laisser vide si l'information n'est pas confirmée.">
+        <Section title={traduire('Informations institutionnelles')} description={traduire('Réutilisées dans les endroits prévus de l\'application (ex. pied de page). Laisser vide si l\'information n\'est pas confirmée.')}>
           {CHAMPS_INSTITUTION.map((c) => <ChampTexte key={c.key} champ={c} />)}
         </Section>
       )}
 
       <ConfirmDialog
         open={confirmReset}
-        title="Réinitialiser les couleurs"
-        message="Les 5 couleurs personnalisées seront remplacées par la palette de base (bleu marine institutionnel et or, en référence au logo). Cette action s'applique immédiatement sur tout le site, y compris les pages de connexion et d'inscription."
-        confirmLabel="Réinitialiser"
+        title={traduire('Réinitialiser les couleurs')}
+        message={traduire('Les 5 couleurs personnalisées seront remplacées par la palette de base (bleu marine institutionnel et or, en référence au logo). Cette action s\'applique immédiatement sur tout le site, y compris les pages de connexion et d\'inscription.')}
+        confirmLabel={traduire('Réinitialiser')}
         loading={resetting}
         onConfirm={handleResetColors}
         onCancel={() => setConfirmReset(false)}

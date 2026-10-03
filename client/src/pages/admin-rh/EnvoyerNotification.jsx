@@ -4,6 +4,7 @@ import { listUsers } from '../../services/userApi';
 import PageHeader from '../../components/PageHeader';
 import { Skeleton } from '../../components/ui/Skeleton';
 import SelectMenu from '../../components/ui/SelectMenu';
+import { traduire } from '../../i18n';
 
 const FONCTIONS = [
   'Enseignant', 'Enseignant Chercheur', 'Maître de Conférences', 'Professeur',
@@ -15,12 +16,12 @@ const FONCTIONS = [
 // saisie libre d'URL. Doit rester synchronisé avec ALLOWED_LIENS côté backend
 // (notificationController.js).
 const DESTINATIONS = [
-  { value: '/profil', label: 'Mon profil' },
-  { value: '/carriere', label: 'Ma carrière' },
-  { value: '/mes-contrats', label: 'Mes contrats' },
-  { value: '/conges', label: 'Mes congés' },
-  { value: '/mes-documents', label: 'Mes documents' },
-  { value: '/notifications', label: 'Notifications' },
+  { value: '/profil', label: traduire('Mon profil') },
+  { value: '/carriere', label: traduire('Ma carrière') },
+  { value: '/mes-contrats', label: traduire('Mes contrats') },
+  { value: '/conges', label: traduire('Mes congés') },
+  { value: '/mes-documents', label: traduire('Mes documents') },
+  { value: '/notifications', label: traduire('Notifications') },
 ];
 
 export default function EnvoyerNotification() {
@@ -69,26 +70,26 @@ export default function EnvoyerNotification() {
 
   return (
     <div className="max-w-[1600px] mx-auto">
-      <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Envoyer une notification' }]} title="Envoyer une notification" subtitle="Ciblez un groupe, une fonction ou une personne précise" />
+      <PageHeader crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Envoyer une notification') }]} title={traduire('Envoyer une notification')} subtitle={traduire('Ciblez un groupe, une fonction ou une personne précise')} />
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 sm:p-8 w-full">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Destinataires</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Destinataires')}</label>
             <SelectMenu
               value={ciblage}
               onChange={(e) => setCiblage(e.target.value)}
               className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
             >
-              <option value="role">Tout un groupe (PE ou PAT)</option>
-              <option value="fonction">Une fonction précise (ex: chefs de service)</option>
-              <option value="individual">Une personne précise</option>
+              <option value="role">{traduire('Tout un groupe (PE ou PAT)')}</option>
+              <option value="fonction">{traduire('Une fonction précise (ex: chefs de service)')}</option>
+              <option value="individual">{traduire('Une personne précise')}</option>
             </SelectMenu>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {ciblage === 'role' ? 'Groupe' : ciblage === 'fonction' ? 'Fonction' : 'Personne'}
+              {ciblage === 'role' ? 'Groupe' : ciblage === 'fonction' ? traduire('Fonction') : traduire('Personne')}
             </label>
             {ciblage === 'role' && (
               <SelectMenu
@@ -96,8 +97,8 @@ export default function EnvoyerNotification() {
                 onChange={(e) => setRole(e.target.value)}
                 className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
               >
-                <option value="PE">Tous les PE</option>
-                <option value="PAT">Tous les PAT</option>
+                <option value="PE">{traduire('Tous les PE')}</option>
+                <option value="PAT">{traduire('Tous les PAT')}</option>
               </SelectMenu>
             )}
 
@@ -121,7 +122,7 @@ export default function EnvoyerNotification() {
                 onChange={(e) => setSelectedIndividual(e.target.value)}
                 className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
               >
-                <option value="">-- Choisir une personne --</option>
+                <option value="">{traduire('-- Choisir une personne --')}</option>
                 {individuals.map((u) => (
                   <option key={u.id} value={u.id}>{u.email} ({u.role}{u.fonction ? ` - ${u.fonction}` : ''})</option>
                 ))}
@@ -133,24 +134,24 @@ export default function EnvoyerNotification() {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Type')}</label>
             <SelectMenu
               value={type}
               onChange={(e) => setType(e.target.value)}
               className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
             >
-              <option value="info">Information</option>
-              <option value="reunion">Réunion</option>
-              <option value="echeance">Échéance de contrat</option>
+              <option value="info">{traduire('Information')}</option>
+              <option value="reunion">{traduire('Réunion')}</option>
+              <option value="echeance">{traduire('Échéance de contrat')}</option>
             </SelectMenu>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Titre</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Titre')}</label>
             <input
               type="text"
               required
-              placeholder="Titre"
+              placeholder={traduire('Titre')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
@@ -159,24 +160,24 @@ export default function EnvoyerNotification() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Destination (facultatif)</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Destination (facultatif)')}</label>
           <SelectMenu
             value={lien}
             onChange={(e) => setLien(e.target.value)}
             className="w-full sm:w-1/2 border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
           >
-            <option value="">Aucune</option>
+            <option value="">{traduire('Aucune')}</option>
             {DESTINATIONS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
           </SelectMenu>
-          <p className="text-xs text-gray-400 mt-1">Si une destination est choisie, la notification sera cliquable et renverra vers cette page.</p>
+          <p className="text-xs text-gray-400 mt-1">{traduire('Si une destination est choisie, la notification sera cliquable et renverra vers cette page.')}</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Message')}</label>
           <textarea
             required
             rows={4}
-            placeholder="Message"
+            placeholder={traduire('Message')}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
@@ -188,7 +189,7 @@ export default function EnvoyerNotification() {
           disabled={status === 'loading'}
           className="w-full sm:w-auto bg-navy text-white rounded-md px-8 py-2 font-medium hover:opacity-90 disabled:opacity-50"
         >
-          {status === 'loading' ? 'Envoi...' : 'Envoyer'}
+          {status === 'loading' ? 'Envoi...' : traduire('Envoyer')}
         </button>
 
         {feedback && (

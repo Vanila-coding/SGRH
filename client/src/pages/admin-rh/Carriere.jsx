@@ -19,6 +19,7 @@ import { SkeletonPage } from '../../components/ui';
 import SelectMenu from '../../components/ui/SelectMenu';
 import ViewToggle from '../../components/ui/ViewToggle';
 import useVueListe from '../../hooks/useVueListe';
+import { traduire } from '../../i18n';
 
 const TYPES_EVENEMENT = [
   'Recrutement', 'Stage', 'Titularisation', 'Prolongation de stage', "Avancement d'échelon",
@@ -189,10 +190,10 @@ export default function Carriere() {
 
       if (editingId) {
         await updateEvenement(editingId, payload, file);
-        setFeedback('Événement modifié.');
+        setFeedback(traduire('Événement modifié.'));
       } else {
         await addEvenement(selectedId, payload, file);
-        setFeedback('Événement ajouté.');
+        setFeedback(traduire('Événement ajouté.'));
       }
       setStatus('success');
       resetForm();
@@ -286,12 +287,12 @@ export default function Carriere() {
 
   return (
     <div className="space-y-6">
-      <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Carrière' }]} title="Carrière" subtitle="Situation administrative, événements de carrière et diplômes" />
+      <PageHeader crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Carrière') }]} title={traduire('Carrière')} subtitle={traduire('Situation administrative, événements de carrière et diplômes')} />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
       </div>
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <label htmlFor="carriere-personnel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Choisir un employé</label>
+        <label htmlFor="carriere-personnel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Choisir un employé')}</label>
         <PersonnelSearchSelect
           id="carriere-personnel"
           items={personnelList}
@@ -309,7 +310,7 @@ export default function Carriere() {
         return (
         <>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 className="font-semibold text-navy dark:text-gold mb-3">Situation administrative</h3>
+            <h3 className="font-semibold text-navy dark:text-gold mb-3">{traduire('Situation administrative')}</h3>
 
             {situations?.actuelle && (
               <div className="mb-4 p-3 bg-navy/5 rounded-md">
@@ -322,7 +323,7 @@ export default function Carriere() {
               </div>
             )}
             {!situations?.actuelle && situations && (
-              <p className="text-sm text-gray-400 mb-4">Aucune situation administrative enregistrée pour l'instant.</p>
+              <p className="text-sm text-gray-400 mb-4">{traduire("Aucune situation administrative enregistrée pour l\'instant.")}</p>
             )}
 
             <form onSubmit={handleAddSituation} className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
@@ -331,7 +332,7 @@ export default function Carriere() {
                 onChange={(e) => setSituationForm((p) => ({ ...p, typeSituationId: e.target.value }))}
                 className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm sm:col-span-2"
               >
-                <option value="">-- Nouvelle situation --</option>
+                <option value="">{traduire('-- Nouvelle situation --')}</option>
                 {typesSituation.map((t) => (
                   <option key={t.id} value={t.id}>{t.libelle}{t.categories_concernees ? ` (${t.categories_concernees})` : ''}</option>
                 ))}
@@ -342,17 +343,17 @@ export default function Carriere() {
                 className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
               />
               <input
-                type="text" placeholder="Référence décision" value={situationForm.referenceDecision}
+                type="text" placeholder={traduire('Référence décision')} value={situationForm.referenceDecision}
                 onChange={(e) => setSituationForm((p) => ({ ...p, referenceDecision: e.target.value }))}
                 className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
               />
               <input
-                type="text" placeholder="Observations" value={situationForm.observations}
+                type="text" placeholder={traduire('Observations')} value={situationForm.observations}
                 onChange={(e) => setSituationForm((p) => ({ ...p, observations: e.target.value }))}
                 className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
               />
               <input
-                type="text" placeholder="Motif du changement" value={situationForm.motif}
+                type="text" placeholder={traduire('Motif du changement')} value={situationForm.motif}
                 onChange={(e) => setSituationForm((p) => ({ ...p, motif: e.target.value }))}
                 className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
               />
@@ -366,37 +367,37 @@ export default function Carriere() {
                 disabled={situationStatus === 'loading'}
                 className="bg-navy text-white rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
               >
-                Enregistrer
+                {traduire('Enregistrer')}
               </button>
             </form>
 
             {situations?.historique?.length > 0 && (
               <div className={vue === 'liste' ? 'space-y-2' : 'grid grid-cols-1 lg:grid-cols-2 gap-2'}>
-                <p className="text-xs text-gray-400 font-medium">Historique des situations</p>
+                <p className="text-xs text-gray-400 font-medium">{traduire('Historique des situations')}</p>
                 {situations.historique.map((s) => (
                   <div key={s.id} className="border-b border-gray-100 dark:border-gray-700 pb-2">
                     {editingSituationId === s.id ? (
                       <form onSubmit={handleUpdateSituation} className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <input
-                          type="text" placeholder="Référence décision" value={situationEditForm.referenceDecision}
+                          type="text" placeholder={traduire('Référence décision')} value={situationEditForm.referenceDecision}
                           onChange={(e) => setSituationEditForm((p) => ({ ...p, referenceDecision: e.target.value }))}
                           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                         />
                         <input
-                          type="text" placeholder="Observations" value={situationEditForm.observations}
+                          type="text" placeholder={traduire('Observations')} value={situationEditForm.observations}
                           onChange={(e) => setSituationEditForm((p) => ({ ...p, observations: e.target.value }))}
                           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                         />
                         <input
-                          type="text" placeholder="Motif" value={situationEditForm.motif}
+                          type="text" placeholder={traduire('Motif')} value={situationEditForm.motif}
                           onChange={(e) => setSituationEditForm((p) => ({ ...p, motif: e.target.value }))}
                           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                         />
                         <div className="sm:col-span-3 flex gap-2">
                           <button type="submit" disabled={situationEditSaving} className="text-xs px-3 py-1 rounded-md bg-navy text-white font-medium disabled:opacity-50">
-                            {situationEditSaving ? 'Enregistrement...' : 'Enregistrer'}
+                            {situationEditSaving ? 'Enregistrement...' : traduire('Enregistrer')}
                           </button>
-                          <button type="button" onClick={() => setEditingSituationId(null)} disabled={situationEditSaving} className="text-xs px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 disabled:opacity-50">Annuler</button>
+                          <button type="button" onClick={() => setEditingSituationId(null)} disabled={situationEditSaving} className="text-xs px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 disabled:opacity-50">{traduire('Annuler')}</button>
                         </div>
                       </form>
                     ) : (
@@ -407,18 +408,18 @@ export default function Carriere() {
                             {s.date_fin ? ` au ${new Date(s.date_fin).toLocaleDateString('fr-FR')}` : ' (en cours)'}
                             {s.reference_decision && ` — réf. ${s.reference_decision}`}
                           </p>
-                          {s.motif && <p className="text-gray-400">Motif : {s.motif}</p>}
+                          {s.motif && <p className="text-gray-400">{traduire('Motif :')} {s.motif}</p>}
                         </div>
                         <div className="flex gap-2 shrink-0">
-                          <button onClick={() => startEditSituation(s)} className="text-xs text-navy dark:text-gold underline">Modifier</button>
+                          <button onClick={() => startEditSituation(s)} className="text-xs text-navy dark:text-gold underline">{traduire('Modifier')}</button>
                           {!s.date_fin && (
                             confirmDeleteSituationId === s.id ? (
                               <div className="flex gap-1">
-                                <button onClick={() => handleDeleteSituation(s.id)} className="text-xs text-status-rejected font-medium">Confirmer</button>
-                                <button onClick={() => setConfirmDeleteSituationId(null)} className="text-xs text-gray-400">Annuler</button>
+                                <button onClick={() => handleDeleteSituation(s.id)} className="text-xs text-status-rejected font-medium">{traduire('Confirmer')}</button>
+                                <button onClick={() => setConfirmDeleteSituationId(null)} className="text-xs text-gray-400">{traduire('Annuler')}</button>
                               </div>
                             ) : (
-                              <button onClick={() => setConfirmDeleteSituationId(s.id)} className="text-xs text-gray-400 hover:text-status-rejected">Supprimer</button>
+                              <button onClick={() => setConfirmDeleteSituationId(s.id)} className="text-xs text-gray-400 hover:text-status-rejected">{traduire('Supprimer')}</button>
                             )
                           )}
                         </div>
@@ -432,7 +433,7 @@ export default function Carriere() {
 
           {alertes.length > 0 && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border-l-4 border-amber-400">
-              <h3 className="font-semibold text-navy dark:text-gold mb-3">Alertes avancement</h3>
+              <h3 className="font-semibold text-navy dark:text-gold mb-3">{traduire('Alertes avancement')}</h3>
               <div className="space-y-3">
                 {alertes.map((a) => (
                   <div key={a.id} className="border border-amber-200 dark:border-amber-800 rounded-md p-3">
@@ -450,7 +451,7 @@ export default function Carriere() {
                           onChange={(e) => setTraiterForm((p) => ({ ...p, categorie: e.target.value }))}
                           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                         >
-                          <option value="">-- Catégorie --</option>
+                          <option value="">{traduire('-- Catégorie --')}</option>
                           {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'].map((c) => <option key={c} value={c}>{c}</option>)}
                         </SelectMenu>
                         <input
@@ -459,24 +460,24 @@ export default function Carriere() {
                           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                         />
                         <input
-                          type="text" placeholder="Réf. décision" value={traiterForm.referenceDecision}
+                          type="text" placeholder={traduire('Réf. décision')} value={traiterForm.referenceDecision}
                           onChange={(e) => setTraiterForm((p) => ({ ...p, referenceDecision: e.target.value }))}
                           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                         />
                         <input
-                          type="text" placeholder="Autorité" value={traiterForm.autoriteDecision}
+                          type="text" placeholder={traduire('Autorité')} value={traiterForm.autoriteDecision}
                           onChange={(e) => setTraiterForm((p) => ({ ...p, autoriteDecision: e.target.value }))}
                           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                         />
                         <div className="col-span-2 sm:col-span-4 flex gap-2">
-                          <button type="submit" disabled={traiterStatus === 'loading'} className="text-xs px-3 py-1 rounded-md bg-navy text-white font-medium disabled:opacity-50">Valider l'avancement</button>
-                          <button type="button" onClick={() => setTraiterAlerteId(null)} className="text-xs px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300">Annuler</button>
+                          <button type="submit" disabled={traiterStatus === 'loading'} className="text-xs px-3 py-1 rounded-md bg-navy text-white font-medium disabled:opacity-50">{traduire("Valider l\'avancement")}</button>
+                          <button type="button" onClick={() => setTraiterAlerteId(null)} className="text-xs px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300">{traduire('Annuler')}</button>
                         </div>
                       </form>
                     ) : (
                       <div className="flex gap-3 mt-2">
-                        <button onClick={() => ouvrirTraitementAlerte(a)} className="text-xs text-navy dark:text-gold underline">Traiter</button>
-                        <button onClick={() => handleIgnorerAlerte(a.id)} className="text-xs text-gray-400 hover:text-status-rejected">Ignorer</button>
+                        <button onClick={() => ouvrirTraitementAlerte(a)} className="text-xs text-navy dark:text-gold underline">{traduire('Traiter')}</button>
+                        <button onClick={() => handleIgnorerAlerte(a.id)} className="text-xs text-gray-400 hover:text-status-rejected">{traduire('Ignorer')}</button>
                       </div>
                     )}
                   </div>
@@ -487,7 +488,7 @@ export default function Carriere() {
 
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h3 className="font-semibold text-navy dark:text-gold mb-3">
-              {editingId ? "Modifier l'événement" : 'Ajouter un événement'}
+              {editingId ? "Modifier l'événement" : traduire('Ajouter un événement')}
             </h3>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <SelectMenu
@@ -499,7 +500,7 @@ export default function Carriere() {
               </SelectMenu>
 
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Date de l'événement *</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire("Date de l\'événement *")}</label>
                 <input
                   type="date" required value={form.dateEvenement}
                   onChange={(e) => updateForm('dateEvenement', e.target.value)}
@@ -507,7 +508,7 @@ export default function Carriere() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Date d'effet</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire("Date d\'effet")}</label>
                 <input
                   type="date" value={form.dateEffet}
                   onChange={(e) => updateForm('dateEffet', e.target.value)}
@@ -515,7 +516,7 @@ export default function Carriere() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Référence de la décision</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Référence de la décision')}</label>
                 <input
                   type="text" value={form.referenceDecision}
                   onChange={(e) => updateForm('referenceDecision', e.target.value)}
@@ -524,7 +525,7 @@ export default function Carriere() {
               </div>
 
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Corps</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Corps')}</label>
                 <input
                   type="text" value={form.corps}
                   onChange={(e) => updateForm('corps', e.target.value)}
@@ -532,7 +533,7 @@ export default function Carriere() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Grade</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Grade')}</label>
                 <input
                   type="text" value={form.grade}
                   onChange={(e) => updateForm('grade', e.target.value)}
@@ -541,7 +542,7 @@ export default function Carriere() {
               </div>
               {regimeFonctionnaire ? (
                 <div className="sm:col-span-3">
-                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Situation réglementaire (grille indiciaire)</label>
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Situation réglementaire (grille indiciaire)')}</label>
                   <GrilleIndiciaireSelector
                     regime="FONCTIONNAIRE"
                     dateEffet={form.dateEffet || form.dateEvenement || undefined}
@@ -555,7 +556,7 @@ export default function Carriere() {
               ) : (
                 <>
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Classe</label>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Classe')}</label>
                     <input
                       type="text" value={form.classe}
                       onChange={(e) => updateForm('classe', e.target.value)}
@@ -563,7 +564,7 @@ export default function Carriere() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Échelon</label>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Échelon')}</label>
                     <input
                       type="text" value={form.echelon}
                       onChange={(e) => updateForm('echelon', e.target.value)}
@@ -571,7 +572,7 @@ export default function Carriere() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Indice</label>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Indice')}</label>
                     <input
                       type="text" value={form.indice}
                       onChange={(e) => updateForm('indice', e.target.value)}
@@ -581,7 +582,7 @@ export default function Carriere() {
                 </>
               )}
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Fonction</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Fonction')}</label>
                 <input
                   type="text" value={form.fonction}
                   onChange={(e) => updateForm('fonction', e.target.value)}
@@ -589,7 +590,7 @@ export default function Carriere() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Affectation</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Affectation')}</label>
                 <input
                   type="text" value={form.affectation}
                   onChange={(e) => updateForm('affectation', e.target.value)}
@@ -598,7 +599,7 @@ export default function Carriere() {
               </div>
 
               <div className="sm:col-span-3">
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Autorité ayant pris la décision</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Autorité ayant pris la décision')}</label>
                 <input
                   type="text" value={form.autoriteDecision}
                   onChange={(e) => updateForm('autoriteDecision', e.target.value)}
@@ -607,7 +608,7 @@ export default function Carriere() {
               </div>
 
               <div className="sm:col-span-3">
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Motif</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Motif')}</label>
                 <textarea
                   rows={2} value={form.motif}
                   onChange={(e) => updateForm('motif', e.target.value)}
@@ -616,7 +617,7 @@ export default function Carriere() {
               </div>
 
               <div className="sm:col-span-3">
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Description / observations</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Description / observations')}</label>
                 <textarea
                   rows={2} value={form.description}
                   onChange={(e) => updateForm('description', e.target.value)}
@@ -625,7 +626,7 @@ export default function Carriere() {
               </div>
 
               <div className="sm:col-span-3">
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Document justificatif (PDF, JPG, PNG)</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire('Document justificatif (PDF, JPG, PNG)')}</label>
                 <input
                   type="file" accept=".pdf,.jpg,.jpeg,.png"
                   onChange={(e) => setFile(e.target.files[0] || null)}
@@ -639,7 +640,7 @@ export default function Carriere() {
                   disabled={status === 'loading'}
                   className="bg-navy text-white rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
                 >
-                  {editingId ? 'Enregistrer les modifications' : 'Ajouter'}
+                  {editingId ? 'Enregistrer les modifications' : traduire('Ajouter')}
                 </button>
                 {editingId && (
                   <button
@@ -647,7 +648,7 @@ export default function Carriere() {
                     onClick={resetForm}
                     className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm text-gray-600 dark:text-gray-300"
                   >
-                    Annuler la modification
+                    {traduire('Annuler la modification')}
                   </button>
                 )}
               </div>
@@ -663,10 +664,10 @@ export default function Carriere() {
             <h3 className="font-semibold text-navy dark:text-gold mb-4">
               Timeline — {data.personnel.prenom} {data.personnel.nom}
               <span className="ml-2 text-xs font-normal text-gray-400">
-                ({estPE ? 'Enseignant-chercheur' : 'PATS'} — {data.personnel.corps || 'statut non renseigné'})
+                ({estPE ? 'Enseignant-chercheur' : traduire('PATS')} — {data.personnel.corps || traduire('statut non renseigné')})
               </span>
             </h3>
-            {data.timeline.length === 0 && <p className="text-sm text-gray-400">Aucun événement enregistré.</p>}
+            {data.timeline.length === 0 && <p className="text-sm text-gray-400">{traduire('Aucun événement enregistré.')}</p>}
             <div className="relative border-l-2 border-gray-200 dark:border-gray-700 pl-4 space-y-4">
               {data.timeline.map((item, i) => (
                 <div key={i} className="relative">
@@ -684,39 +685,39 @@ export default function Carriere() {
                           {[item.corps, item.grade, item.classe && `classe ${item.classe}`, item.echelon && `échelon ${item.echelon}`,
                             item.indice && `indice ${formatIndiceDisplay(item.indiceNum ?? item.indice, item.codeGrille)}`].filter(Boolean).join(' · ')}
                           {item.indiceSource === 'REGLEMENTAIRE' && (
-                            <span className="ml-1 inline-block px-1.5 py-0.5 rounded bg-status-approved/10 text-status-approved text-[10px] font-medium align-middle">réglementaire</span>
+                            <span className="ml-1 inline-block px-1.5 py-0.5 rounded bg-status-approved/10 text-status-approved text-[10px] font-medium align-middle">{traduire('réglementaire')}</span>
                           )}
                           {item.indiceSource === 'A_CONFIRMER' && item.indice && (
-                            <span className="ml-1 inline-block px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-medium align-middle">à confirmer</span>
+                            <span className="ml-1 inline-block px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-medium align-middle">{traduire('à confirmer')}</span>
                           )}
                         </p>
                       )}
                       {item.indiceSourceTexte && (
-                        <p className="text-[11px] text-gray-400" title={item.indiceSourceArticle || ''}>Source : {item.indiceSourceTexte}</p>
+                        <p className="text-[11px] text-gray-400" title={item.indiceSourceArticle || ''}>{traduire('Source :')} {item.indiceSourceTexte}</p>
                       )}
-                      {item.referenceDecision && <p className="text-xs text-gray-400">Réf. décision : {item.referenceDecision}</p>}
-                      {item.autoriteDecision && <p className="text-xs text-gray-400">Autorité : {item.autoriteDecision}</p>}
+                      {item.referenceDecision && <p className="text-xs text-gray-400">{traduire('Réf. décision :')} {item.referenceDecision}</p>}
+                      {item.autoriteDecision && <p className="text-xs text-gray-400">{traduire('Autorité :')} {item.autoriteDecision}</p>}
                       {item.justificatifPath && (
                         <button
                           type="button"
                           onClick={() => telechargerJustificatifEvenement(item.id, item.justificatifFilename)}
                           className="text-xs text-navy underline"
                         >
-                          Voir le justificatif
+                          {traduire('Voir le justificatif')}
                         </button>
                       )}
                     </div>
                     {item.source === 'evenement' && (
                       <div className="flex gap-2 shrink-0">
-                        <button onClick={() => startEdit(item)} className="text-xs text-navy underline">Modifier</button>
+                        <button onClick={() => startEdit(item)} className="text-xs text-navy underline">{traduire('Modifier')}</button>
                         {can('delete_carriere_evenement') && (
                           confirmDeleteId === item.id ? (
                             <div className="flex gap-1">
-                              <button onClick={() => handleDelete(item.id)} className="text-xs text-status-rejected font-medium">Confirmer</button>
-                              <button onClick={() => setConfirmDeleteId(null)} className="text-xs text-gray-400">Annuler</button>
+                              <button onClick={() => handleDelete(item.id)} className="text-xs text-status-rejected font-medium">{traduire('Confirmer')}</button>
+                              <button onClick={() => setConfirmDeleteId(null)} className="text-xs text-gray-400">{traduire('Annuler')}</button>
                             </div>
                           ) : (
-                            <button onClick={() => setConfirmDeleteId(item.id)} className="text-xs text-gray-400 hover:text-status-rejected">Supprimer</button>
+                            <button onClick={() => setConfirmDeleteId(item.id)} className="text-xs text-gray-400 hover:text-status-rejected">{traduire('Supprimer')}</button>
                           )
                         )}
                       </div>
@@ -729,20 +730,20 @@ export default function Carriere() {
 
           {estPE && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h3 className="font-semibold text-navy dark:text-gold mb-3">Diplômes et qualifications</h3>
+              <h3 className="font-semibold text-navy dark:text-gold mb-3">{traduire('Diplômes et qualifications')}</h3>
               <form onSubmit={handleAddDiplome} className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
                 <input
-                  type="text" required placeholder="Intitulé" value={diplomeForm.intitule}
+                  type="text" required placeholder={traduire('Intitulé')} value={diplomeForm.intitule}
                   onChange={(e) => setDiplomeForm((p) => ({ ...p, intitule: e.target.value }))}
                   className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm sm:col-span-2"
                 />
                 <input
-                  type="text" placeholder="Établissement" value={diplomeForm.etablissement}
+                  type="text" placeholder={traduire('Établissement')} value={diplomeForm.etablissement}
                   onChange={(e) => setDiplomeForm((p) => ({ ...p, etablissement: e.target.value }))}
                   className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
                 />
                 <input
-                  type="number" placeholder="Année" value={diplomeForm.anneeObtention}
+                  type="number" placeholder={traduire('Année')} value={diplomeForm.anneeObtention}
                   onChange={(e) => setDiplomeForm((p) => ({ ...p, anneeObtention: e.target.value }))}
                   className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
                 />
@@ -756,10 +757,10 @@ export default function Carriere() {
                   disabled={diplomeStatus === 'loading'}
                   className="bg-navy text-white rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
                 >
-                  Ajouter
+                  {traduire('Ajouter')}
                 </button>
               </form>
-              {data.diplomes.length === 0 && <p className="text-sm text-gray-400">Aucun diplôme enregistré.</p>}
+              {data.diplomes.length === 0 && <p className="text-sm text-gray-400">{traduire('Aucun diplôme enregistré.')}</p>}
               <div className={vue === 'liste' ? 'space-y-2' : 'grid grid-cols-1 lg:grid-cols-2 gap-2'}>
                 {data.diplomes.map((d) => (
                   <div key={d.id} className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
@@ -774,11 +775,11 @@ export default function Carriere() {
                           onClick={() => telechargerDocumentDiplome(d.id, d.document_filename)}
                           className="text-xs text-navy underline"
                         >
-                          Voir le document
+                          {traduire('Voir le document')}
                         </button>
                       )}
                     </div>
-                    <button onClick={() => handleDeleteDiplome(d.id)} className="text-xs text-gray-400 hover:text-status-rejected">Supprimer</button>
+                    <button onClick={() => handleDeleteDiplome(d.id)} className="text-xs text-gray-400 hover:text-status-rejected">{traduire('Supprimer')}</button>
                   </div>
                 ))}
               </div>

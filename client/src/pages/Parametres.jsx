@@ -8,6 +8,7 @@ import { ProfilCompte, Securite, Sessions } from './parametres/CompteTabs';
 import { Apparence, Notifications, LangueRegion, Accessibilite } from './parametres/PreferencesTabs';
 import { PreferencesTableaux, Documents } from './parametres/DonneesTabs';
 import { Fonctionnalites, Maintenance } from './parametres/SystemeTabs';
+import { traduire } from '../i18n';
 
 const CONTENT = {
   profil: ProfilCompte, securite: Securite, sessions: Sessions,
@@ -38,7 +39,7 @@ export default function Parametres() {
   const activeItem = allItems.find((i) => i.key === activeKey) || allItems[0];
 
   if (!activeItem) {
-    return <p className="text-sm text-gray-500 dark:text-gray-400">Aucun paramètre disponible pour votre rôle.</p>;
+    return <p className="text-sm text-gray-500 dark:text-gray-400">{traduire('Aucun paramètre disponible pour votre rôle.')}</p>;
   }
 
   const ContentComponent = CONTENT[activeItem.key];
@@ -46,9 +47,9 @@ export default function Parametres() {
   return (
     <div>
       <PageHeader
-        crumbs={[{ label: 'Paramètres' }]}
-        title="Paramètres"
-        subtitle="Gérez votre compte, vos préférences et les paramètres de votre espace SGRH"
+        crumbs={[{ label: traduire('Paramètres') }]}
+        title={traduire('Paramètres')}
+        subtitle={traduire('Gérez votre compte, vos préférences et les paramètres de votre espace SGRH')}
       />
 
       <div className="flex flex-col gap-6 lg:flex-row">

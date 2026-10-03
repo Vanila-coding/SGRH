@@ -6,6 +6,7 @@ import { usePermissions } from '../../context/PermissionContext';
 import { useText } from '../../context/TextContext';
 import NotificationBell from './NotificationBell';
 import ThemeToggle from './ThemeToggle';
+import { traduire } from '../../i18n';
 
 const roleLabels = {
   ADMIN_RH: 'Admin RH',
@@ -22,7 +23,7 @@ export default function TopBar({ title, subtitle, onMenuClick }) {
   const profileMenuRef = useRef(null);
   const isPersonnel = user?.role === 'PE' || user?.role === 'PAT';
   const canViewProfile = isPersonnel && (loading || can('view_profil'));
-  const fullName = [user?.prenom, user?.nom].filter(Boolean).join(' ') || user?.email || 'Utilisateur';
+  const fullName = [user?.prenom, user?.nom].filter(Boolean).join(' ') || user?.email || traduire('Utilisateur');
   const initial = (user?.prenom?.[0] || user?.email?.[0] || '?').toUpperCase();
 
   useEffect(() => {
@@ -56,7 +57,7 @@ export default function TopBar({ title, subtitle, onMenuClick }) {
         <button
           type="button"
           onClick={onMenuClick}
-          aria-label="Ouvrir le menu"
+          aria-label={traduire('Ouvrir le menu')}
           className="shrink-0 rounded-md p-1.5 text-gray-500 hover:bg-slate-100 dark:text-gray-300 dark:hover:bg-gray-700 lg:hidden"
         >
           <Menu size={22} />
@@ -87,13 +88,13 @@ export default function TopBar({ title, subtitle, onMenuClick }) {
               <span className="block text-xs text-gray-500 dark:text-gray-400">{roleLabels[user?.role] || user?.role}</span>
             </span>
             <ChevronDown size={16} className={`hidden text-gray-400 transition sm:block ${profileOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-            <span className="sr-only">Ouvrir le menu utilisateur</span>
+            <span className="sr-only">{traduire('Ouvrir le menu utilisateur')}</span>
           </button>
 
           {profileOpen && (
             <div
               role="menu"
-              aria-label="Menu utilisateur"
+              aria-label={traduire('Menu utilisateur')}
               className="absolute right-0 z-50 mt-2 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
             >
               <div className="flex items-center gap-3 px-4 py-3">
@@ -102,7 +103,7 @@ export default function TopBar({ title, subtitle, onMenuClick }) {
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-navy dark:text-gray-100">{fullName}</p>
-                  <p className="truncate text-xs text-gray-500 dark:text-gray-400">{roleLabels[user?.role] || user?.role || 'Utilisateur'}</p>
+                  <p className="truncate text-xs text-gray-500 dark:text-gray-400">{roleLabels[user?.role] || user?.role || traduire('Utilisateur')}</p>
                 </div>
               </div>
 
@@ -110,19 +111,19 @@ export default function TopBar({ title, subtitle, onMenuClick }) {
                 {canViewProfile && (
                   <Link to="/profil" role="menuitem" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 focus:bg-slate-50 focus:outline-none dark:text-gray-200 dark:hover:bg-gray-700 dark:focus:bg-gray-700">
                     <UserRound size={17} />
-                    Mon profil
+                    {traduire('Mon profil')}
                   </Link>
                 )}
                 <Link to="/parametres" role="menuitem" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 focus:bg-slate-50 focus:outline-none dark:text-gray-200 dark:hover:bg-gray-700 dark:focus:bg-gray-700">
                   <Settings size={17} />
-                  {libelleParametres}
+                  {traduire(libelleParametres)}
                 </Link>
               </div>
 
               <div className="border-t border-slate-100 py-1 dark:border-gray-700">
                 <button type="button" role="menuitem" onClick={handleLogout} className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-status-rejected transition hover:bg-red-50 focus:bg-red-50 focus:outline-none dark:hover:bg-red-950/30 dark:focus:bg-red-950/30">
                   <LogOut size={17} />
-                  Déconnexion
+                  {traduire('Déconnexion')}
                 </button>
               </div>
             </div>

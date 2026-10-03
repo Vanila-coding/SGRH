@@ -6,11 +6,12 @@ import PageHeader from '../../components/PageHeader';
 import PersonnelSearchSelect from '../../components/PersonnelSearchSelect';
 import { Skeleton } from '../../components/ui/Skeleton';
 import SelectMenu from '../../components/ui/SelectMenu';
+import { traduire } from '../../i18n';
 
 const TYPES_DOCUMENT = [
-  { value: 'certificat_administratif', label: 'Certificat administratif' },
-  { value: 'lettre_confirmation', label: 'Lettre de confirmation' },
-  { value: 'etat_conge', label: 'État de congé' },
+  { value: 'certificat_administratif', label: traduire('Certificat administratif') },
+  { value: 'lettre_confirmation', label: traduire('Lettre de confirmation') },
+  { value: 'etat_conge', label: traduire('État de congé') },
 ];
 
 // La décision d'octroi n'est pas sélectionnable ici : elle est établie depuis un congé approuvé (page Congés).
@@ -47,7 +48,7 @@ export default function DocumentsAdmin() {
     try {
       const document = await generateDocument(selectedId, typeDocument);
       setStatus('success');
-      setMessage('Document généré.');
+      setMessage(traduire('Document généré.'));
       loadHistorique(selectedId);
       window.open(`/documents/${document.id}`, '_blank');
     } catch (err) {
@@ -58,10 +59,10 @@ export default function DocumentsAdmin() {
 
   return (
     <div className="space-y-6">
-      <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Documents' }, { label: 'Documents administratifs' }]} title="Documents administratifs" subtitle="Générer des certificats et lettres pour le personnel" />
+      <PageHeader crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Documents') }, { label: traduire('Documents administratifs') }]} title={traduire('Documents administratifs')} subtitle={traduire('Générer des certificats et lettres pour le personnel')} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
       <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 ${!selectedId ? 'lg:col-span-2' : ''}`}>
-        <h3 className="font-semibold text-navy dark:text-gold mb-4">Générer un document</h3>
+        <h3 className="font-semibold text-navy dark:text-gold mb-4">{traduire('Générer un document')}</h3>
         <form onSubmit={handleGenerate} className="grid grid-cols-2 gap-3 max-w-lg">
           {listLoading ? (
             <Skeleton className="col-span-2 h-9 rounded-md" />
@@ -88,7 +89,7 @@ export default function DocumentsAdmin() {
             disabled={status === 'loading'}
             className="bg-navy text-white rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
           >
-            {status === 'loading' ? 'Génération...' : 'Générer'}
+            {status === 'loading' ? 'Génération...' : traduire('Générer')}
           </button>
         </form>
         {message && (
@@ -100,8 +101,8 @@ export default function DocumentsAdmin() {
 
       {selectedId && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h3 className="font-semibold text-navy dark:text-gold mb-3">Historique des documents</h3>
-          {historique.length === 0 && <p className="text-sm text-gray-400">Aucun document généré pour cet employé.</p>}
+          <h3 className="font-semibold text-navy dark:text-gold mb-3">{traduire('Historique des documents')}</h3>
+          {historique.length === 0 && <p className="text-sm text-gray-400">{traduire('Aucun document généré pour cet employé.')}</p>}
           <div className="space-y-2">
             {historique.map((d) => (
               <div key={d.id} className="flex items-center justify-between border-b last:border-0 dark:border-gray-700 pb-2">
@@ -114,7 +115,7 @@ export default function DocumentsAdmin() {
                   </p>
                 </div>
                 <Link to={`/documents/${d.id}`} target="_blank" className="text-xs text-navy underline">
-                  Voir
+                  {traduire('Voir')}
                 </Link>
               </div>
             ))}

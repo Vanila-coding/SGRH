@@ -14,6 +14,8 @@ import { Card, Badge, Skeleton, SkeletonText } from '../../components/ui';
 import PageHeader from '../../components/PageHeader';
 import { ACTION_LABELS } from '../../constants/activityLabels';
 import SelectMenu from '../../components/ui/SelectMenu';
+import { traduire } from '../../i18n';
+import { traduireJournal } from '../../i18n/journal';
 
 // Les 6 rôles réels de l'app (Secrétaire PE/PAT ajoutés cette session) — une liste
 // restée à 4 aurait sous-compté "Rôles" et caché deux lignes dans la répartition.
@@ -25,13 +27,13 @@ const ROLE_LABELS = {
 const CORBEILLE_TYPE_LABELS = { compte: 'Compte utilisateur' };
 
 const QUICK_ACTIONS = [
-  { label: 'Gérer les comptes', to: '/superadmin/comptes', icon: ShieldCheck },
-  { label: 'Comptes en attente', to: '/admin/comptes-attente', icon: UserCheck },
-  { label: 'Gérer les permissions', to: '/superadmin/permissions', icon: KeyRound },
-  { label: "Consulter l'activité", to: '/admin/historique', icon: History },
-  { label: 'Ouvrir la corbeille', to: '/superadmin/corbeille', icon: Trash2 },
-  { label: 'Réclamations', to: '/superadmin/reclamations', icon: MessageSquareWarning },
-  { label: 'Paramètres', to: '/parametres', icon: Settings },
+  { label: traduire('Gérer les comptes'), to: '/superadmin/comptes', icon: ShieldCheck },
+  { label: traduire('Comptes en attente'), to: '/admin/comptes-attente', icon: UserCheck },
+  { label: traduire('Gérer les permissions'), to: '/superadmin/permissions', icon: KeyRound },
+  { label: traduire("Consulter l\'activité"), to: '/admin/historique', icon: History },
+  { label: traduire('Ouvrir la corbeille'), to: '/superadmin/corbeille', icon: Trash2 },
+  { label: traduire('Réclamations'), to: '/superadmin/reclamations', icon: MessageSquareWarning },
+  { label: traduire('Paramètres'), to: '/parametres', icon: Settings },
 ];
 
 // Pas de pastille d'icône : même choix que les tableaux de bord Admin RH et personnel
@@ -110,7 +112,7 @@ export default function SuperadminDashboard() {
   if (error) {
     return (
       <div>
-        <PageHeader crumbs={[{ label: 'Administration' }]} title="Tableau de bord" subtitle="Vue d'ensemble administrative et technique du SGRH" />
+        <PageHeader crumbs={[{ label: traduire('Administration') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble administrative et technique du SGRH")} />
         <p className="text-status-rejected text-sm">{error}</p>
       </div>
     );
@@ -120,8 +122,8 @@ export default function SuperadminDashboard() {
 
   if (loading) {
     return (
-      <div className="space-y-6" role="status" aria-label="Chargement du tableau de bord">
-        <PageHeader crumbs={[{ label: 'Administration' }]} title="Tableau de bord" subtitle="Vue d'ensemble administrative et technique du SGRH" />
+      <div className="space-y-6" role="status" aria-label={traduire('Chargement du tableau de bord')}>
+        <PageHeader crumbs={[{ label: traduire('Administration') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble administrative et technique du SGRH")} />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} padding="p-5">
@@ -182,14 +184,14 @@ export default function SuperadminDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader crumbs={[{ label: 'Administration' }]} title="Tableau de bord" subtitle="Vue d'ensemble administrative et technique du SGRH" />
+      <PageHeader crumbs={[{ label: traduire('Administration') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble administrative et technique du SGRH")} />
 
       {/* Ligne 1 — Comptes utilisateurs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Comptes total" value={totalComptes} to="/superadmin/comptes" />
-        <StatCard label="Comptes actifs" value={actifs} to="/superadmin/comptes" />
-        <StatCard label="En attente" value={enAttente} to="/admin/comptes-attente" />
-        <StatCard label="Inactifs / désactivés" value={inactifs} to="/superadmin/comptes" />
+        <StatCard label={traduire('Comptes total')} value={totalComptes} to="/superadmin/comptes" />
+        <StatCard label={traduire('Comptes actifs')} value={actifs} to="/superadmin/comptes" />
+        <StatCard label={traduire('En attente')} value={enAttente} to="/admin/comptes-attente" />
+        <StatCard label={traduire('Inactifs / désactivés')} value={inactifs} to="/superadmin/comptes" />
       </div>
 
       {/* Ligne 2 — Aperçu RH : le Superadmin hérite des permissions Admin RH mais n'a pas
@@ -197,12 +199,12 @@ export default function SuperadminDashboard() {
           dans son menu) — sans cette ligne, il n'avait aucune visibilité sur les files
           d'attente congés/documents/secrétariat que l'Admin RH voit, lui, au quotidien. */}
       <div className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">Aperçu RH</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">{traduire('Aperçu RH')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard label="Personnel (PE + PAT)" value={rhStats.totalPersonnel} to="/admin/personnel/pe" />
-          <StatCard label="Congés en attente" value={rhStats.congesEnAttente} to="/admin/conges" />
-          <StatCard label="Documents en attente" value={rhStats.documentsEnAttente} to="/admin/demandes-documents" />
-          <StatCard label="En attente au secrétariat" value={rhStats.secretariatEnAttente} />
+          <StatCard label={traduire('Personnel (PE + PAT)')} value={rhStats.totalPersonnel} to="/admin/personnel/pe" />
+          <StatCard label={traduire('Congés en attente')} value={rhStats.congesEnAttente} to="/admin/conges" />
+          <StatCard label={traduire('Documents en attente')} value={rhStats.documentsEnAttente} to="/admin/demandes-documents" />
+          <StatCard label={traduire('En attente au secrétariat')} value={rhStats.secretariatEnAttente} />
         </div>
       </div>
 
@@ -210,7 +212,7 @@ export default function SuperadminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <Card className="lg:col-span-2">
           <div className="flex items-start justify-between gap-3 mb-1">
-            <SectionTitle icon={History}>Activité récente</SectionTitle>
+            <SectionTitle icon={History}>{traduire('Activité récente')}</SectionTitle>
             <SelectMenu
               value={activityLimit}
               onChange={(e) => setActivityLimit(Number(e.target.value))}
@@ -221,11 +223,11 @@ export default function SuperadminDashboard() {
               <option value={20}>20 dernières</option>
             </SelectMenu>
           </div>
-          <p className="text-xs text-gray-400 mb-3">Activité du personnel (congés, documents, carrière...), hors connexions.</p>
+          <p className="text-xs text-gray-400 mb-3">{traduire('Activité du personnel (congés, documents, carrière...), hors connexions.')}</p>
           {activity === null ? (
-            <p className="text-sm text-gray-400">Chargement...</p>
+            <p className="text-sm text-gray-400">{traduire('Chargement...')}</p>
           ) : activity.length === 0 ? (
-            <p className="text-sm text-gray-400">Aucune activité enregistrée.</p>
+            <p className="text-sm text-gray-400">{traduire('Aucune activité enregistrée.')}</p>
           ) : (
             <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
               {activity.map((log) => {
@@ -233,9 +235,9 @@ export default function SuperadminDashboard() {
                 return (
                   <div key={log.id} className="flex items-start justify-between gap-3 border-b last:border-0 border-gray-100 dark:border-gray-700 pb-2">
                     <div className="min-w-0">
-                      <p className="text-sm text-navy dark:text-gray-100 truncate">{log.description}</p>
+                      <p className="text-sm text-navy dark:text-gray-100 truncate">{traduireJournal(log.description)}</p>
                       <p className="text-xs text-gray-400 mt-0.5">
-                        {log.email ? `${log.prenom || ''} ${log.nom || log.email}`.trim() : 'Système'}
+                        {log.email ? `${log.prenom || ''} ${log.nom || log.email}`.trim() : traduire('Système')}
                         {' — '}
                         {new Date(log.created_at).toLocaleString('fr-FR')}
                       </p>
@@ -246,23 +248,23 @@ export default function SuperadminDashboard() {
               })}
             </div>
           )}
-          <ShortcutLink to="/admin/historique">Voir le journal complet</ShortcutLink>
+          <ShortcutLink to="/admin/historique">{traduire('Voir le journal complet')}</ShortcutLink>
         </Card>
 
         <Card>
-          <SectionTitle icon={KeyRound}>Rôles & permissions</SectionTitle>
+          <SectionTitle icon={KeyRound}>{traduire('Rôles & permissions')}</SectionTitle>
           <div className="grid grid-cols-3 gap-2 mb-4 text-center">
             <div>
               <p className="text-xl font-bold text-navy dark:text-gray-100">{ROLES.length}</p>
-              <p className="text-[11px] text-gray-400">Rôles</p>
+              <p className="text-[11px] text-gray-400">{traduire('Rôles')}</p>
             </div>
             <div>
               <p className="text-xl font-bold text-navy dark:text-gray-100">{nbPermissions}</p>
-              <p className="text-[11px] text-gray-400">Permissions</p>
+              <p className="text-[11px] text-gray-400">{traduire('Permissions')}</p>
             </div>
             <div>
               <p className="text-xl font-bold text-navy dark:text-gray-100">{nbAffectations}</p>
-              <p className="text-[11px] text-gray-400">Affectations</p>
+              <p className="text-[11px] text-gray-400">{traduire('Affectations')}</p>
             </div>
           </div>
           <div className="space-y-1.5">
@@ -273,14 +275,14 @@ export default function SuperadminDashboard() {
               </div>
             ))}
           </div>
-          <ShortcutLink to="/superadmin/permissions">Gérer les permissions</ShortcutLink>
+          <ShortcutLink to="/superadmin/permissions">{traduire('Gérer les permissions')}</ShortcutLink>
         </Card>
       </div>
 
       {/* Ligne 4 — Corbeille / Sécurité & système / Actions rapides */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <Card>
-          <SectionTitle icon={Trash2}>Corbeille</SectionTitle>
+          <SectionTitle icon={Trash2}>{traduire('Corbeille')}</SectionTitle>
           <p className="text-3xl font-bold text-navy dark:text-gray-100">{corbeille.length}</p>
           <p className="text-xs text-gray-400 mb-3">élément{corbeille.length > 1 ? 's' : ''} actuellement dans la corbeille</p>
           {corbeille.length > 0 && (
@@ -293,17 +295,17 @@ export default function SuperadminDashboard() {
               ))}
             </div>
           )}
-          <ShortcutLink to="/superadmin/corbeille">Ouvrir la corbeille</ShortcutLink>
+          <ShortcutLink to="/superadmin/corbeille">{traduire('Ouvrir la corbeille')}</ShortcutLink>
         </Card>
 
         <Card>
-          <SectionTitle icon={Lock}>Sécurité & système</SectionTitle>
+          <SectionTitle icon={Lock}>{traduire('Sécurité & système')}</SectionTitle>
           <ul className="space-y-2.5 text-sm text-gray-600 dark:text-gray-300">
             <li>
-              <span className="block text-xs text-gray-400 mb-0.5">Dernière activité</span>
+              <span className="block text-xs text-gray-400 mb-0.5">{traduire('Dernière activité')}</span>
               {derniereActivite ? (
                 <>
-                  {derniereActivite.description}
+                  {traduireJournal(derniereActivite.description)}
                   <span className="block text-xs text-gray-400 mt-0.5">
                     {new Date(derniereActivite.created_at).toLocaleString('fr-FR')}
                   </span>
@@ -311,23 +313,23 @@ export default function SuperadminDashboard() {
               ) : 'Aucune activité enregistrée.'}
             </li>
             <li className="flex items-center justify-between">
-              <span>Comptes en attente de validation</span>
+              <span>{traduire('Comptes en attente de validation')}</span>
               <Badge variant={enAttente > 0 ? 'pending' : 'approved'}>{enAttente}</Badge>
             </li>
             <li className="flex items-center justify-between">
-              <span>Éléments dans la corbeille</span>
+              <span>{traduire('Éléments dans la corbeille')}</span>
               <Badge variant={corbeille.length > 0 ? 'pending' : 'neutral'}>{corbeille.length}</Badge>
             </li>
             <li className="flex items-center justify-between">
-              <Link to="/superadmin/reclamations" className="hover:underline">Réclamations ouvertes</Link>
+              <Link to="/superadmin/reclamations" className="hover:underline">{traduire('Réclamations ouvertes')}</Link>
               <Badge variant={reclamationsOuvertes > 0 ? 'pending' : 'approved'}>{reclamationsOuvertes}</Badge>
             </li>
           </ul>
-          <ShortcutLink to="/admin/historique">Consulter l'audit complet</ShortcutLink>
+          <ShortcutLink to="/admin/historique">{traduire("Consulter l\'audit complet")}</ShortcutLink>
         </Card>
 
         <Card>
-          <SectionTitle icon={Settings}>Actions rapides</SectionTitle>
+          <SectionTitle icon={Settings}>{traduire('Actions rapides')}</SectionTitle>
           <div className="space-y-1">
             {QUICK_ACTIONS.map(({ label, to, icon: Icon }) => (
               <Link

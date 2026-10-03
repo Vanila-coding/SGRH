@@ -1,5 +1,6 @@
 import PageHeader from '../../components/PageHeader';
 import { useText } from '../../context/TextContext';
+import { traduire } from '../../i18n';
 
 const DEFAUT = `Demande de congé / permission
 Remplissez le formulaire dans "Congés", en précisant le type, les dates et le motif. Votre demande part directement au service RH.
@@ -15,9 +16,9 @@ export default function Procedures() {
 
   return (
     <div className="max-w-[1600px] mx-auto">
-      <PageHeader crumbs={[{ label: 'Aide' }, { label: 'Les procédures' }]} title="Les procédures" />
+      <PageHeader crumbs={[{ label: traduire('Aide') }, { label: traduire('Les procédures') }]} title={traduire('Les procédures')} />
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{contenu}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{traduire(contenu)}</p>
       </div>
     </div>
   );

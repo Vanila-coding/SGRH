@@ -1,5 +1,6 @@
 import { Children, isValidElement, useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
+import { traduire } from '../../i18n';
 
 const TAILLES = {
   sm: 'px-3 py-1.5 text-xs',

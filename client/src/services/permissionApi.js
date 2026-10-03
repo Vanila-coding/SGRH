@@ -1,3 +1,4 @@
+import { traduire } from '../i18n';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
 function authHeaders() {
@@ -8,14 +9,14 @@ function authHeaders() {
 export async function getMyPermissions() {
   const res = await fetch(`${API_URL}/permissions/me`, { headers: authHeaders() });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Erreur de chargement');
+  if (!res.ok) throw new Error(traduire(data.message || 'Erreur de chargement'));
   return data.permissions;
 }
 
 export async function listAllPermissions() {
   const res = await fetch(`${API_URL}/permissions`, { headers: authHeaders() });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Erreur de chargement');
+  if (!res.ok) throw new Error(traduire(data.message || 'Erreur de chargement'));
   return data.permissions;
 }
 
@@ -26,6 +27,6 @@ export async function updatePermission(role, permissionId, enabled) {
     body: JSON.stringify({ role, permissionId, enabled }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Échec de la mise à jour');
+  if (!res.ok) throw new Error(traduire(data.message || 'Échec de la mise à jour'));
   return data;
 }

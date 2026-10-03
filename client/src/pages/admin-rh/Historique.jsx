@@ -7,6 +7,8 @@ import { ACTION_LABELS } from '../../constants/activityLabels';
 import SelectMenu from '../../components/ui/SelectMenu';
 import ViewToggle from '../../components/ui/ViewToggle';
 import useVueListe from '../../hooks/useVueListe';
+import { traduire } from '../../i18n';
+import { traduireJournal } from '../../i18n/journal';
 
 export default function Historique() {
   const [vue, setVue] = useVueListe('journal');
@@ -31,7 +33,7 @@ export default function Historique() {
 
   return (
     <div className="max-w-[1600px] mx-auto">
-      <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Audit & journal' }]} title="Audit & journal" subtitle="Historique des actions effectuées dans le SGRH" />
+      <PageHeader crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Audit & journal') }]} title={traduire('Audit & journal')} subtitle={traduire('Historique des actions effectuées dans le SGRH')} />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
       </div>
@@ -42,7 +44,7 @@ export default function Historique() {
             type="text"
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
-            placeholder="Rechercher par personne ou description..."
+            placeholder={traduire('Rechercher par personne ou description...')}
             className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
           />
         </div>
@@ -51,7 +53,7 @@ export default function Historique() {
           onChange={(e) => setFilterType(e.target.value)}
           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy shrink-0"
         >
-          <option value="">Tous les types d'action</option>
+          <option value="">{traduire("Tous les types d\'action")}</option>
           {Object.entries(ACTION_LABELS).map(([type, { label }]) => (
             <option key={type} value={type}>{label}</option>
           ))}
@@ -60,12 +62,12 @@ export default function Historique() {
 
       {!loading && filtered.length === 0 && (
         <p className="text-gray-400 text-sm">
-          {logs.length === 0 ? 'Aucune activité enregistrée.' : 'Aucune activité ne correspond à ce filtre.'}
+          {logs.length === 0 ? 'Aucune activité enregistrée.' : traduire('Aucune activité ne correspond à ce filtre.')}
         </p>
       )}
 
       {loading && (
-        <div className={vue === 'liste' ? 'space-y-2' : 'grid grid-cols-1 lg:grid-cols-2 gap-2'} role="status" aria-label="Chargement du journal d'activité">
+        <div className={vue === 'liste' ? 'space-y-2' : 'grid grid-cols-1 lg:grid-cols-2 gap-2'} role="status" aria-label={traduire("Chargement du journal d\'activité")}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-start gap-3">
               <Skeleton className="h-5 w-28 rounded shrink-0" />
@@ -87,9 +89,9 @@ export default function Historique() {
                 {meta.label}
               </span>
               <div className="flex-1">
-                <p className="text-sm text-navy dark:text-gray-100">{log.description}</p>
+                <p className="text-sm text-navy dark:text-gray-100">{traduireJournal(log.description)}</p>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  {log.email ? `${log.prenom || ''} ${log.nom || log.email}`.trim() : 'Système'}
+                  {log.email ? `${log.prenom || ''} ${log.nom || log.email}`.trim() : traduire('Système')}
                   {' — '}
                   {new Date(log.created_at).toLocaleString('fr-FR')}
                 </p>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { listAllPermissions, updatePermission } from '../../services/permissionApi';
 import PageHeader from '../../components/PageHeader';
 import { SkeletonTable } from '../../components/ui/Skeleton';
+import { traduire } from '../../i18n';
 
 const ROLES = ['ADMIN_RH', 'SUPERADMIN', 'PE', 'PAT', 'SECRETAIRE_PE', 'SECRETAIRE_PAT'];
 const ROLE_LABELS = {
@@ -56,9 +57,9 @@ export default function Permissions() {
     return (
       <div className="max-w-[1600px] mx-auto">
         <PageHeader
-          crumbs={[{ label: 'Administration' }, { label: 'Rôles & permissions' }]}
-          title="Rôles & permissions"
-          subtitle="Coche ou décoche pour activer/désactiver une fonctionnalité pour un rôle — la modification est immédiate"
+          crumbs={[{ label: traduire('Administration') }, { label: traduire('Rôles & permissions') }]}
+          title={traduire('Rôles & permissions')}
+          subtitle={traduire('Coche ou décoche pour activer/désactiver une fonctionnalité pour un rôle — la modification est immédiate')}
         />
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
           <SkeletonTable rows={8} columns={5} />
@@ -70,9 +71,9 @@ export default function Permissions() {
   return (
     <div className="max-w-[1600px] mx-auto">
       <PageHeader
-        crumbs={[{ label: 'Administration' }, { label: 'Rôles & permissions' }]}
-        title="Rôles & permissions"
-        subtitle="Coche ou décoche pour activer/désactiver une fonctionnalité pour un rôle — la modification est immédiate"
+        crumbs={[{ label: traduire('Administration') }, { label: traduire('Rôles & permissions') }]}
+        title={traduire('Rôles & permissions')}
+        subtitle={traduire('Coche ou décoche pour activer/désactiver une fonctionnalité pour un rôle — la modification est immédiate')}
       />
 
       {error && <p className="text-sm text-status-rejected mb-4">{error}</p>}
@@ -80,12 +81,12 @@ export default function Permissions() {
       {Object.entries(grouped).map(([category, permissions]) => (
         <div key={category} className="bg-white dark:bg-gray-800 rounded-lg shadow mb-4 overflow-x-auto">
           <div className="bg-gray-50 dark:bg-gray-700 px-4 py-2 font-semibold text-navy dark:text-gold text-sm">
-            {category}
+            {traduire(category)}
           </div>
           <table className="w-full min-w-max text-sm">
             <thead>
               <tr className="border-b dark:border-gray-700">
-                <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Fonctionnalité</th>
+                <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">{traduire('Fonctionnalité')}</th>
                 {ROLES.map((role) => (
                   <th key={role} className="px-3 py-2 font-medium text-gray-500 dark:text-gray-400 text-center">{ROLE_LABELS[role]}</th>
                 ))}
@@ -94,7 +95,7 @@ export default function Permissions() {
             <tbody>
               {Object.values(permissions).map((perm) => (
                 <tr key={perm.key} className="border-b last:border-0 dark:border-gray-700">
-                  <td className="px-4 py-2 text-navy dark:text-gray-100">{perm.label}</td>
+                  <td className="px-4 py-2 text-navy dark:text-gray-100">{traduire(perm.label)}</td>
                   {ROLES.map((role) => {
                     const enabled = perm.byRole[role] || false;
                     const isSaving = savingKey === `${role}-${perm.key}`;

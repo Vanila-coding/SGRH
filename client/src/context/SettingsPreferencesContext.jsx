@@ -56,6 +56,7 @@ export function SettingsPreferencesProvider({ children }) {
     localStorage.setItem(KEY, JSON.stringify(prefs));
     const root = document.documentElement;
     root.setAttribute('data-density', prefs.density);
+    root.lang = prefs.langue === 'en' ? 'en' : 'fr';
     root.setAttribute('data-text-size', prefs.textSize);
     root.classList.toggle('reduce-motion', prefs.reduceMotion || !prefs.animations);
     root.classList.toggle('high-contrast', prefs.highContrast);
@@ -63,6 +64,15 @@ export function SettingsPreferencesProvider({ children }) {
   }, [prefs]);
 
   function update(key, value) {
+    if (key === 'langue' && value !== prefs.langue) {
+      try {
+        localStorage.setItem(KEY, JSON.stringify({ ...prefs, langue: value }));
+      } catch {
+        // stockage indisponible : le changement reste appliqué jusqu'au rechargement
+      }
+      window.location.reload();
+      return;
+    }
     setPrefs((prev) => ({ ...prev, [key]: value }));
   }
 
@@ -72,7 +82,7 @@ export function SettingsPreferencesProvider({ children }) {
 
   return (
     <SettingsPreferencesContext.Provider value={{ prefs, update, updateNested }}>
-      {children}
+      <div key={prefs.langue} className="contents">{children}</div>
     </SettingsPreferencesContext.Provider>
   );
 }

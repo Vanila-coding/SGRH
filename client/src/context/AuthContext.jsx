@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { loginRequest, fetchCurrentUser } from '../services/authApi';
 import { registerUnauthorizedHandler } from '../utils/apiError';
 import { toast } from '../utils/toast';
+import { traduire } from '../i18n';
 
 const AuthContext = createContext(null);
 const TOKEN_KEY = 'rh_token';

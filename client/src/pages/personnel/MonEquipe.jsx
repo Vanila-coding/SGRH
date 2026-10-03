@@ -4,6 +4,7 @@ import { getMonEquipe } from '../../services/personnelApi';
 import { SkeletonAvatar, Skeleton } from '../../components/ui/Skeleton';
 import ViewToggle from '../../components/ui/ViewToggle';
 import useVueListe from '../../hooks/useVueListe';
+import { traduire } from '../../i18n';
 
 export default function MonEquipe() {
   const [vue, setVue] = useVueListe('mon-equipe');
@@ -19,11 +20,11 @@ export default function MonEquipe() {
   if (!data) {
     return (
       <div>
-        <PageHeader crumbs={[{ label: 'Mon espace', path: '/dashboard' }, { label: 'Mon équipe' }]} title="Mon équipe" />
+        <PageHeader crumbs={[{ label: traduire('Mon espace'), path: '/dashboard' }, { label: traduire('Mon équipe') }]} title={traduire('Mon équipe')} />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
       </div>
-        <div className={vue === 'liste' ? 'flex flex-col gap-4' : 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'} role="status" aria-label="Chargement de l'équipe">
+        <div className={vue === 'liste' ? 'flex flex-col gap-4' : 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'} role="status" aria-label={traduire("Chargement de l\'équipe")}>
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-center gap-3">
               <SkeletonAvatar size={40} />
@@ -41,14 +42,14 @@ export default function MonEquipe() {
   return (
     <div>
       <PageHeader
-        crumbs={[{ label: 'Mon espace', path: '/dashboard' }, { label: 'Mon équipe' }]}
-        title="Mon équipe"
-        subtitle={`${data.portee === 'service' ? 'Service' : 'Direction'} : ${data.nom}`}
+        crumbs={[{ label: traduire('Mon espace'), path: '/dashboard' }, { label: traduire('Mon équipe') }]}
+        title={traduire('Mon équipe')}
+        subtitle={`${data.portee === 'service' ? 'Service' : traduire('Direction')} : ${data.nom}`}
       />
 
       {data.equipe.length === 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <p className="text-sm text-gray-400">Aucun membre dans cette équipe pour l'instant.</p>
+          <p className="text-sm text-gray-400">{traduire("Aucun membre dans cette équipe pour l\'instant.")}</p>
         </div>
       )}
       <div className={vue === 'liste' ? 'flex flex-col gap-4' : 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'}>
@@ -64,9 +65,9 @@ export default function MonEquipe() {
               </div>
             </div>
             {m.en_conge ? (
-              <span className="text-xs px-2 py-0.5 rounded bg-amber-50 text-status-pending font-medium shrink-0">En congé</span>
+              <span className="text-xs px-2 py-0.5 rounded bg-amber-50 text-status-pending font-medium shrink-0">{traduire('En congé')}</span>
             ) : (
-              <span className="text-xs px-2 py-0.5 rounded bg-green-50 text-status-approved font-medium shrink-0">Présent</span>
+              <span className="text-xs px-2 py-0.5 rounded bg-green-50 text-status-approved font-medium shrink-0">{traduire('Présent')}</span>
             )}
           </div>
         ))}

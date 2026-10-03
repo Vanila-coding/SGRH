@@ -724,6 +724,15 @@ Incident maîtrisé : un script de test a cliqué le bouton « Générer la déc
 - **Vérifié** : API (export filtré, modèle, rename et cascade, désactivation, import deux fois, renommage d'établissement restauré), navigateur (boutons et pages des personnels, page Organisation, vue carte PAT, libellés des dates, lien PE, logo SVG). Données de test supprimées.
 - **Non traité** : toggle liste/carte sur Invitations, Contrats (liste admin), Gestion des fonctions, tableaux de grilles indiciaires et de soldes d'ouverture, matrice des permissions. Export Excel des directions et services non prévu.
 
+# 📦 Interface bilingue français / anglais — bilan (2026-10-04)
+
+- **Choix de langue** : Paramètres > Langue & région et boutons FR / EN sur la page de connexion. La langue est mémorisée dans le navigateur ; un changement recharge l'application pour retraduire les constantes de module.
+- **Mécanisme** : `traduire('Texte français')` (module `client/src/i18n/index.js`) renvoie la traduction du dictionnaire `dictionnaires.js` (clé = texte français d'origine ; absent du dictionnaire = reste en français). Les modèles dynamiques du journal sont dans `i18n/journal.js`.
+- **Couverture** : pages, composants, libellés de configuration, messages d'erreur de l'API (`makeApiError`, toasts), permissions et catégories de permissions. Route par route vérifiée en anglais sans texte français résiduel, hors mots identiques et données saisies.
+- **Reste en français, volontairement** : documents officiels imprimables (certificats, décisions de congé, lettres, fiche de demande, vérification d'avis), données saisies par les utilisateurs, et les descriptions du journal hors modèles traduits.
+
+---
+
 ---
 
 ## 🎯 Les 10 prochaines tâches prioritaires

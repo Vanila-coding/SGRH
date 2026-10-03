@@ -1,3 +1,4 @@
+import { traduire } from '../i18n';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
 function authHeaders() {
@@ -7,14 +8,14 @@ function authHeaders() {
 
 async function lireOuErreur(res, messageParDefaut) {
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message || messageParDefaut);
+  if (!res.ok) throw new Error(traduire(data.message || messageParDefaut));
   return data;
 }
 
 export async function fetchDirections({ tous = false } = {}) {
   const res = await fetch(`${API_URL}/organisation/directions${tous ? '?tous=1' : ''}`, { headers: authHeaders() });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Erreur de chargement des directions');
+  if (!res.ok) throw new Error(traduire(data.message || 'Erreur de chargement des directions'));
   return data.directions;
 }
 
@@ -26,7 +27,7 @@ export async function fetchServices(directionId, { tous = false } = {}) {
   const url = `${API_URL}/organisation/services${query ? `?${query}` : ''}`;
   const res = await fetch(url, { headers: authHeaders() });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Erreur de chargement des services');
+  if (!res.ok) throw new Error(traduire(data.message || 'Erreur de chargement des services'));
   return data.services;
 }
 

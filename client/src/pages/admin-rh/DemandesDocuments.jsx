@@ -5,6 +5,7 @@ import PageHeader from '../../components/PageHeader';
 import { SkeletonCard } from '../../components/ui/Skeleton';
 import ViewToggle from '../../components/ui/ViewToggle';
 import useVueListe from '../../hooks/useVueListe';
+import { traduire } from '../../i18n';
 
 const TYPE_LABELS = { certificat_administratif: 'Certificat administratif', lettre_confirmation: 'Lettre de confirmation', etat_conge: 'État de congé' };
 
@@ -59,20 +60,20 @@ export default function DemandesDocuments() {
 
   return (
     <div>
-      <PageHeader crumbs={[{ label: 'Admin RH' }, { label: 'Documents' }, { label: 'Demandes de documents' }]} title="Demandes de documents" subtitle="Demandes en attente, initiées par le personnel" />
+      <PageHeader crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Documents') }, { label: traduire('Demandes de documents') }]} title={traduire('Demandes de documents')} subtitle={traduire('Demandes en attente, initiées par le personnel')} />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
       </div>
 
       {error && <p className="text-sm text-status-rejected mb-4">{error}</p>}
-      {!loading && demandes.length === 0 && <p className="text-gray-500">Aucune demande en attente.</p>}
+      {!loading && demandes.length === 0 && <p className="text-gray-500">{traduire('Aucune demande en attente.')}</p>}
 
       {!loading && demandes.length > 0 && (
         <div className="relative mb-4 max-w-md">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
           <input
             type="text"
-            placeholder="Rechercher par nom ou matricule…"
+            placeholder={traduire('Rechercher par nom ou matricule…')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
@@ -88,7 +89,7 @@ export default function DemandesDocuments() {
       ) : (
       <>
       {demandes.length > 0 && filtered.length === 0 && (
-        <p className="text-sm text-gray-400">Aucune demande ne correspond à « {search} ».</p>
+        <p className="text-sm text-gray-400">{traduire('Aucune demande ne correspond à «')} {search} ».</p>
       )}
       <div className={vue === 'liste' ? 'flex flex-col gap-4' : 'grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'}>
         {filtered.map((d) => (
@@ -96,7 +97,7 @@ export default function DemandesDocuments() {
             <div className="min-w-0">
               <p className="font-medium text-navy dark:text-gray-100 truncate">{d.prenom} {d.nom} <span className="font-normal text-gray-400">({d.matricule})</span></p>
               <p className="text-sm text-gray-500">{TYPE_LABELS[d.type_document] || d.type_document}</p>
-              {d.motif && <p className="text-xs text-gray-400 mt-1">Motif : {d.motif}</p>}
+              {d.motif && <p className="text-xs text-gray-400 mt-1">{traduire('Motif :')} {d.motif}</p>}
               <p className="text-xs text-gray-400 mt-1">
                 Demandé le {new Date(d.date_demande).toLocaleDateString('fr-FR')}
               </p>
@@ -106,13 +107,13 @@ export default function DemandesDocuments() {
                 onClick={() => handleRefuser(d.id)}
                 className="px-4 py-2 rounded-md border border-status-rejected text-status-rejected text-sm font-medium hover:bg-red-50"
               >
-                Refuser
+                {traduire('Refuser')}
               </button>
               <button
                 onClick={() => handleTraiter(d.id)}
                 className="px-4 py-2 rounded-md bg-status-approved text-white text-sm font-medium hover:opacity-90"
               >
-                Générer et envoyer
+                {traduire('Générer et envoyer')}
               </button>
             </div>
           </div>

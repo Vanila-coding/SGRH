@@ -6,11 +6,14 @@ import { useText } from '../context/TextContext';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import Footer from '../components/layout/Footer';
 import { urlFichierSite } from '../utils/siteAssets';
+import { useSettingsPreferences } from '../context/SettingsPreferencesContext';
+import { traduire } from '../i18n';
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const { settings } = useSiteSettings();
+  const { prefs, update } = useSettingsPreferences();
   const logoConnexion = urlFichierSite(settings.logo_connexion_url || settings.logo_principal_url) || '/logo-univ-mahajanga.png';
   const logoConnexionEstSvg = /\.svg$/i.test(logoConnexion);
   const [email, setEmail] = useState('');
@@ -64,27 +67,42 @@ export default function Login() {
             <div className="relative z-10 flex items-center gap-2">
               <img
                 src={logoConnexion}
-                alt="Université de Mahajanga"
+                alt={traduire('Université de Mahajanga')}
                 className={logoConnexionEstSvg ? 'h-8 w-8 object-contain brightness-0 invert' : 'h-8 w-8 rounded-md bg-white object-contain p-0.5'}
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
             </div>
 
             <div className="relative z-10 text-white">
-              {slogan && <p className="text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">{slogan}</p>}
-              <h1 className="text-2xl sm:text-3xl font-bold leading-snug mb-3">{titreBienvenue}</h1>
-              <p className="text-white/80 text-sm max-w-sm">{descriptionBienvenue}</p>
+              {slogan && <p className="text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">{traduire(slogan)}</p>}
+              <h1 className="text-2xl sm:text-3xl font-bold leading-snug mb-3">{traduire(titreBienvenue)}</h1>
+              <p className="text-white/80 text-sm max-w-sm">{traduire(descriptionBienvenue)}</p>
             </div>
           </div>
 
           <div className="flex items-center justify-center p-8 sm:p-10">
             <div className="w-full max-w-sm">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">{labelConnexion}</p>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">{titreFormulaire}</h2>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">{traduire(labelConnexion)}</p>
+              <div className="flex justify-end mb-2">
+                <div role="group" aria-label={traduire('Langue')} className="inline-flex rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden text-xs">
+                  {[{ code: 'fr', label: traduire('FR') }, { code: 'en', label: traduire('EN') }].map(({ code, label }) => (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => update('langue', code)}
+                      aria-pressed={prefs.langue === code}
+                      className={`px-2.5 py-1 font-medium ${prefs.langue === code ? 'bg-navy text-white' : 'bg-white text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400'}`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">{traduire(titreFormulaire)}</h2>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{placeholderEmail}</label>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{traduire(placeholderEmail)}</label>
                   <div className="relative">
                     <Mail size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
@@ -98,7 +116,7 @@ export default function Login() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{placeholderMdp}</label>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{traduire(placeholderMdp)}</label>
                   <div className="relative">
                     <Lock size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
@@ -127,10 +145,10 @@ export default function Login() {
                       onChange={(e) => setRemember(e.target.checked)}
                       className="w-4 h-4 accent-navy"
                     />
-                    {labelRemember}
+                    {traduire(labelRemember)}
                   </label>
                   <Link to="/mot-de-passe-oublie" className="text-navy dark:text-gold font-medium hover:underline">
-                    {labelMdpOublie}
+                    {traduire(labelMdpOublie)}
                   </Link>
                 </div>
 
@@ -139,14 +157,14 @@ export default function Login() {
                   disabled={loading}
                   className="w-full bg-navy text-white rounded-xl py-3 font-medium hover:opacity-90 disabled:opacity-50 transition"
                 >
-                  {loading ? boutonConnexionChargement : boutonConnexion}
+                  {traduire(loading ? boutonConnexionChargement : boutonConnexion)}
                 </button>
 
                 {error && <p className="text-sm text-status-rejected text-center">{error}</p>}
               </form>
 
               <p className="text-xs text-gray-400 text-center mt-6">
-                {texteInscription} <Link to="/register" className="text-navy dark:text-gold font-medium">{lienInscription}</Link>
+                {traduire(texteInscription)} <Link to="/register" className="text-navy dark:text-gold font-medium">{traduire(lienInscription)}</Link>
               </p>
             </div>
           </div>

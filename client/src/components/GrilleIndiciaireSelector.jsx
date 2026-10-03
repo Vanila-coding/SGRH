@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { resolveIndice, CLASSES_GRILLE } from '../services/grilleIndiciaireApi';
 import SelectMenu from './ui/SelectMenu';
+import { traduire } from '../i18n';
 
 const CATEGORIES = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 
@@ -62,16 +63,16 @@ export default function GrilleIndiciaireSelector({ regime, value, onChange, date
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Classe</label>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{traduire('Classe')}</label>
           <SelectMenu className={inputClass} value={value.classe || ''} onChange={(e) => update('classe', e.target.value)}>
-            <option value="">-- Choisir --</option>
+            <option value="">{traduire('-- Choisir --')}</option>
             {CLASSES_GRILLE.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
           </SelectMenu>
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Échelon</label>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{traduire('Échelon')}</label>
           <SelectMenu className={inputClass} value={value.echelon || ''} onChange={(e) => update('echelon', e.target.value)} disabled={!classeInfo}>
-            <option value="">-- Choisir --</option>
+            <option value="">{traduire('-- Choisir --')}</option>
             {echelons.map((e) => <option key={e} value={e}>{e}</option>)}
           </SelectMenu>
         </div>
@@ -80,32 +81,32 @@ export default function GrilleIndiciaireSelector({ regime, value, onChange, date
       {regime === 'FONCTIONNAIRE' && (
         <div>
           <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
-            Catégorie (régime transitoire — Décret n°97-009, Circulaire n°132/2005)
+            {traduire('Catégorie (régime transitoire — Décret n°97-009, Circulaire n°132/2005)')}
           </label>
           <SelectMenu className={inputClass} value={value.categorie || ''} onChange={(e) => update('categorie', e.target.value)}>
-            <option value="">-- Choisir --</option>
-            {CATEGORIES.map((c) => <option key={c} value={c}>Catégorie {c}</option>)}
+            <option value="">{traduire('-- Choisir --')}</option>
+            {CATEGORIES.map((c) => <option key={c} value={c}>{traduire('Catégorie')} {c}</option>)}
           </SelectMenu>
         </div>
       )}
 
-      {loading && <p className="text-xs text-gray-400">Recherche dans la grille…</p>}
+      {loading && <p className="text-xs text-gray-400">{traduire('Recherche dans la grille…')}</p>}
 
       {resolution && (
         <div className="rounded-md bg-status-approved/10 border border-status-approved/30 px-3 py-2 text-sm">
-          <p className="font-medium text-status-approved">Indice réglementaire : {resolution.display}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Source : {resolution.source}{resolution.reference ? ` (${resolution.reference})` : ''}</p>
+          <p className="font-medium text-status-approved">{traduire('Indice réglementaire :')} {resolution.display}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{traduire('Source :')} {resolution.source}{resolution.reference ? ` (${resolution.reference})` : ''}</p>
         </div>
       )}
 
       {!resolution && resolutionError && (
         <div className="rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 px-3 py-2 text-sm">
-          <p className="text-amber-700 dark:text-amber-400">À confirmer — {resolutionError}</p>
-          <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mt-2 mb-1">Indice (saisie manuelle, non vérifiée)</label>
+          <p className="text-amber-700 dark:text-amber-400">{traduire('À confirmer —')} {resolutionError}</p>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mt-2 mb-1">{traduire('Indice (saisie manuelle, non vérifiée)')}</label>
           <input
             type="text" className={inputClass} value={value.indice || ''}
             onChange={(e) => onChange({ ...value, indice: e.target.value }, null)}
-            placeholder="Ex. 950-FOP"
+            placeholder={traduire('Ex. 950-FOP')}
           />
         </div>
       )}

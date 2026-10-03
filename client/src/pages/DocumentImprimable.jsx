@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { getDocument } from '../services/documentApi';
 import { Skeleton, SkeletonText } from '../components/ui/Skeleton';
 import { DecisionConge, EtatConge } from '../components/documents/DocumentsConge';
+import { traduire } from '../i18n';
 
 function fmt(date) {
   if (!date) return '____/____/____';
@@ -12,12 +13,12 @@ function fmt(date) {
 function EnTeteUniversite() {
   return (
     <div className="text-center mb-6 text-sm">
-      <p className="text-xs">REPOBLIKAN'I MADAGASIKARA</p>
-      <p className="text-xs italic">Fitiavana - Tanindrazana - Fandrosoana</p>
-      <p className="font-semibold mt-2">MINISTÈRE DE L'ENSEIGNEMENT SUPÉRIEUR ET DE LA RECHERCHE SCIENTIFIQUE</p>
-      <p className="font-semibold">UNIVERSITÉ DE MAHAJANGA</p>
-      <p className="text-xs mt-1">DIRECTION DES AFFAIRES ADMINISTRATIVES ET FINANCIÈRES</p>
-      <p className="text-xs">SERVICE PERSONNEL</p>
+      <p className="text-xs">{traduire("REPOBLIKAN\'I MADAGASIKARA")}</p>
+      <p className="text-xs italic">{traduire('Fitiavana - Tanindrazana - Fandrosoana')}</p>
+      <p className="font-semibold mt-2">{traduire("MINISTÈRE DE L\'ENSEIGNEMENT SUPÉRIEUR ET DE LA RECHERCHE SCIENTIFIQUE")}</p>
+      <p className="font-semibold">{traduire('UNIVERSITÉ DE MAHAJANGA')}</p>
+      <p className="text-xs mt-1">{traduire('DIRECTION DES AFFAIRES ADMINISTRATIVES ET FINANCIÈRES')}</p>
+      <p className="text-xs">{traduire('SERVICE PERSONNEL')}</p>
       <div className="border-t border-black mt-3" />
     </div>
   );
@@ -31,7 +32,7 @@ function CertificatAdministratif({ doc }) {
   return (
     <>
       <p className="text-sm mb-4">N° {doc.donnees?.numero}</p>
-      <h1 className="text-center font-bold underline mb-6 text-lg">CERTIFICAT ADMINISTRATIF</h1>
+      <h1 className="text-center font-bold underline mb-6 text-lg">{traduire('CERTIFICAT ADMINISTRATIF')}</h1>
 
       <p className="text-sm mb-4">
         Je soussigné(e), <strong>{doc.donnees?.nomSignataire || '..........................'}</strong>,{' '}
@@ -56,7 +57,7 @@ function CertificatAdministratif({ doc }) {
         <strong>{doc.fonction}</strong> {serviceOuDirection}.
       </p>
 
-      <p className="text-sm">En foi de quoi le présent Certificat lui est délivré pour servir et valoir ce que de droit.</p>
+      <p className="text-sm">{traduire('En foi de quoi le présent Certificat lui est délivré pour servir et valoir ce que de droit.')}</p>
     </>
   );
 }
@@ -68,7 +69,7 @@ function LettreConfirmation({ doc }) {
 
   return (
     <>
-      <h1 className="text-center font-bold underline mb-6 text-lg">LETTRE DE CONFIRMATION</h1>
+      <h1 className="text-center font-bold underline mb-6 text-lg">{traduire('LETTRE DE CONFIRMATION')}</h1>
 
       <p className="text-sm mb-4">
         Je soussigné(e), <strong>{doc.donnees?.nomSignataire || '..........................'}</strong>,{' '}
@@ -84,7 +85,7 @@ function LettreConfirmation({ doc }) {
         Il/Elle renouvellera son engagement le <strong>{fmt(doc.donnees?.dateRenouvellement)}</strong> et sans suspension de solde.
       </p>
 
-      <p className="text-sm">En foi de quoi la présente lettre lui est délivrée pour servir et valoir ce que de droit.</p>
+      <p className="text-sm">{traduire('En foi de quoi la présente lettre lui est délivrée pour servir et valoir ce que de droit.')}</p>
     </>
   );
 }
@@ -103,7 +104,7 @@ export default function DocumentImprimable() {
   if (!doc) {
     return (
       <div className="min-h-screen bg-gray-100 py-8">
-        <div className="max-w-2xl mx-auto bg-white p-10 shadow" role="status" aria-label="Chargement du document">
+        <div className="max-w-2xl mx-auto bg-white p-10 shadow" role="status" aria-label={traduire('Chargement du document')}>
           <Skeleton className="h-3 w-2/3 rounded mx-auto mb-2" />
           <Skeleton className="h-3 w-1/2 rounded mx-auto mb-6" />
           <Skeleton className="h-5 w-1/3 rounded mx-auto mb-8" />

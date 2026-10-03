@@ -1,3 +1,4 @@
+import { traduire } from '../i18n';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
 function authHeaders() {
@@ -8,7 +9,7 @@ function authHeaders() {
 export async function listCorbeille() {
   const res = await fetch(`${API_URL}/corbeille`, { headers: authHeaders() });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Erreur de chargement');
+  if (!res.ok) throw new Error(traduire(data.message || 'Erreur de chargement'));
   return data.items;
 }
 
@@ -18,7 +19,7 @@ export async function restoreFromCorbeille(id) {
     headers: authHeaders(),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Échec de la restauration');
+  if (!res.ok) throw new Error(traduire(data.message || 'Échec de la restauration'));
   return data;
 }
 
@@ -28,7 +29,7 @@ export async function deletePermanently(id) {
     headers: authHeaders(),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Échec de la suppression');
+  if (!res.ok) throw new Error(traduire(data.message || 'Échec de la suppression'));
   return data;
 }
 
@@ -38,6 +39,6 @@ export async function emptyCorbeille() {
     headers: authHeaders(),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Échec du vidage de la corbeille');
+  if (!res.ok) throw new Error(traduire(data.message || 'Échec du vidage de la corbeille'));
   return data;
 }

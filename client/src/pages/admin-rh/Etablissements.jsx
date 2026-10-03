@@ -5,6 +5,7 @@ import { toast } from '../../utils/toast';
 import { SkeletonCard } from '../../components/ui';
 import { fetchEtablissements, createEtablissement, desactiverEtablissement, reactiverEtablissement, renommerEtablissement } from '../../services/etablissementApi';
 import SelectMenu from '../../components/ui/SelectMenu';
+import { traduire } from '../../i18n';
 
 const inputClass = 'flex-1 border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy';
 
@@ -51,7 +52,7 @@ export default function Etablissements() {
     try {
       await createEtablissement(nouveauNom);
       setNouveauNom('');
-      toast.success('Établissement créé.');
+      toast.success(traduire('Établissement créé.'));
       await load();
     } catch (err) {
       toast.error(err.message);
@@ -80,10 +81,10 @@ export default function Etablissements() {
     try {
       if (etablissement.statut === 'ACTIF') {
         await desactiverEtablissement(etablissement.id);
-        toast.success('Établissement désactivé.');
+        toast.success(traduire('Établissement désactivé.'));
       } else {
         await reactiverEtablissement(etablissement.id);
-        toast.success('Établissement réactivé.');
+        toast.success(traduire('Établissement réactivé.'));
       }
       await load();
     } catch (err) {
@@ -101,7 +102,7 @@ export default function Etablissements() {
 
   const badgeStatut = (etablissement) => (
     <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${etablissement.statut === 'ACTIF' ? 'bg-green-50 text-status-approved' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
-      {etablissement.statut === 'ACTIF' ? 'Actif' : 'Inactif'}
+      {etablissement.statut === 'ACTIF' ? 'Actif' : traduire('Inactif')}
     </span>
   );
 
@@ -118,11 +119,11 @@ export default function Etablissements() {
           autoFocus value={edition.valeur} maxLength={200}
           onChange={(e) => setEdition({ ...edition, valeur: e.target.value })}
           onKeyDown={(e) => { if (e.key === 'Enter') enregistrerNom(); if (e.key === 'Escape') setEdition(null); }}
-          aria-label="Nouveau nom de l'établissement"
+          aria-label={traduire("Nouveau nom de l\'établissement")}
           className="flex-1 min-w-0 border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
         />
-        <button type="button" onClick={enregistrerNom} disabled={enregistrementNom} aria-label="Enregistrer" className="text-status-approved"><Check size={16} /></button>
-        <button type="button" onClick={() => setEdition(null)} aria-label="Annuler" className="text-gray-400"><X size={16} /></button>
+        <button type="button" onClick={enregistrerNom} disabled={enregistrementNom} aria-label={traduire('Enregistrer')} className="text-status-approved"><Check size={16} /></button>
+        <button type="button" onClick={() => setEdition(null)} aria-label={traduire('Annuler')} className="text-gray-400"><X size={16} /></button>
       </span>
     ) : (
       <span className={`font-medium truncate ${classes}`}>{etablissement.nom}</span>
@@ -149,28 +150,28 @@ export default function Etablissements() {
       disabled={togglingId === etablissement.id}
       className={`text-xs font-medium px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 shrink-0 ${className}`}
     >
-      {togglingId === etablissement.id ? '...' : etablissement.statut === 'ACTIF' ? 'Désactiver' : 'Réactiver'}
+      {togglingId === etablissement.id ? '...' : etablissement.statut === 'ACTIF' ? traduire('Désactiver') : traduire('Réactiver')}
     </button>
   );
 
   return (
     <div className="mx-auto max-w-[1600px]">
       <PageHeader
-        crumbs={[{ label: 'Admin RH' }, { label: 'Personnel', path: '/admin/personnel/pe' }, { label: 'Établissements' }]}
-        title="Établissements"
-        subtitle="Établissements de l'université auxquels rattacher un PE"
+        crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Personnel'), path: '/admin/personnel/pe' }, { label: traduire('Établissements') }]}
+        title={traduire('Établissements')}
+        subtitle={traduire("Établissements de l\'université auxquels rattacher un PE")}
       />
 
       <form onSubmit={handleCreate} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-4 flex flex-wrap gap-2">
         <input
           type="text" value={nouveauNom} onChange={(e) => setNouveauNom(e.target.value)}
-          placeholder="Nom du nouvel établissement" maxLength={200} required className={`${inputClass} min-w-0`}
+          placeholder={traduire('Nom du nouvel établissement')} maxLength={200} required className={`${inputClass} min-w-0`}
         />
         <button
           type="submit" disabled={creating}
           className="flex items-center gap-1.5 bg-navy text-white rounded-md px-4 py-1.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 shrink-0"
         >
-          <Plus size={16} aria-hidden="true" /> {creating ? 'Création...' : 'Ajouter un établissement'}
+          <Plus size={16} aria-hidden="true" /> {creating ? 'Création...' : traduire('Ajouter un établissement')}
         </button>
       </form>
 
@@ -181,7 +182,7 @@ export default function Etablissements() {
             type="text"
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
-            placeholder="Rechercher un établissement..."
+            placeholder={traduire('Rechercher un établissement...')}
             className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md pl-9 pr-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
           />
         </div>
@@ -192,7 +193,7 @@ export default function Etablissements() {
         >
           {CATEGORIES.map((c) => <option key={c} value={c}>{CATEGORIE_LABELS[c]}</option>)}
         </SelectMenu>
-        <div className="flex items-center rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden shrink-0" role="group" aria-label="Mode d'affichage">
+        <div className="flex items-center rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden shrink-0" role="group" aria-label={traduire("Mode d\'affichage")}>
           <button
             type="button"
             onClick={() => setVue('liste')}
@@ -214,10 +215,10 @@ export default function Etablissements() {
 
       {!etablissements && <SkeletonCard lines={4} />}
       {etablissements?.length === 0 && (
-        <p className="text-sm text-gray-400 px-1">Aucun établissement enregistré pour le moment.</p>
+        <p className="text-sm text-gray-400 px-1">{traduire('Aucun établissement enregistré pour le moment.')}</p>
       )}
       {etablissements?.length > 0 && filtres.length === 0 && (
-        <p className="text-sm text-gray-400 px-1">Aucun établissement ne correspond à ce filtre.</p>
+        <p className="text-sm text-gray-400 px-1">{traduire('Aucun établissement ne correspond à ce filtre.')}</p>
       )}
 
       {vue === 'liste' ? (

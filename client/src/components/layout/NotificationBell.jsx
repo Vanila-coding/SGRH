@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Bell, CheckCheck } from 'lucide-react';
 import { getMyNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../../services/notificationApi';
 import { Link, useNavigate } from 'react-router-dom';
+import { traduire } from '../../i18n';
 
 export default function NotificationBell() {
   const [notifications, setNotifications] = useState([]);
@@ -55,7 +56,7 @@ export default function NotificationBell() {
     <div className="relative" ref={ref}>
       <button
         onClick={handleOpen}
-        aria-label="Notifications"
+        aria-label={traduire('Notifications')}
         className="relative shrink-0 rounded-md p-1.5 text-gray-500 hover:bg-slate-100 dark:text-gray-300 dark:hover:bg-gray-700 transition"
       >
         <Bell size={20} />
@@ -77,7 +78,7 @@ export default function NotificationBell() {
             </button>
           )}
           {notifications.length === 0 && (
-            <p className="p-4 text-sm text-gray-500 dark:text-gray-400">Aucune notification.</p>
+            <p className="p-4 text-sm text-gray-500 dark:text-gray-400">{traduire('Aucune notification.')}</p>
           )}
           {notifications.slice(0, 5).map((n) => (
             <button
@@ -96,7 +97,7 @@ export default function NotificationBell() {
             onClick={() => setOpen(false)}
             className="block text-center text-sm text-navy dark:text-gold font-medium py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
           >
-            Voir toutes mes notifications
+            {traduire('Voir toutes mes notifications')}
           </Link>
         </div>
       )}

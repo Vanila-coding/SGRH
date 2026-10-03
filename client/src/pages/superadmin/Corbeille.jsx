@@ -5,6 +5,7 @@ import PageHeader from '../../components/PageHeader';
 import { SkeletonCard } from '../../components/ui/Skeleton';
 import ViewToggle from '../../components/ui/ViewToggle';
 import useVueListe, { classeConteneur } from '../../hooks/useVueListe';
+import { traduire } from '../../i18n';
 
 const TYPE_LABELS = { compte: 'Compte utilisateur' };
 
@@ -79,9 +80,9 @@ export default function Corbeille() {
   return (
     <div className="max-w-[1600px] mx-auto">
       <PageHeader
-        crumbs={[{ label: 'Administration' }, { label: 'Corbeille' }]}
-        title="Corbeille"
-        subtitle="Les éléments supprimés restent ici jusqu'à restauration ou suppression définitive"
+        crumbs={[{ label: traduire('Administration') }, { label: traduire('Corbeille') }]}
+        title={traduire('Corbeille')}
+        subtitle={traduire("Les éléments supprimés restent ici jusqu\'à restauration ou suppression définitive")}
       />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
@@ -95,26 +96,26 @@ export default function Corbeille() {
               type="text"
               value={recherche}
               onChange={(e) => setRecherche(e.target.value)}
-              placeholder="Rechercher par email, rôle ou supprimé par..."
+              placeholder={traduire('Rechercher par email, rôle ou supprimé par...')}
               className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md pl-9 pr-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
             />
           </div>
           {confirmEmptyAll ? (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Supprimer définitivement les {items.length} éléments ?</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{traduire('Supprimer définitivement les')} {items.length} {traduire('éléments ?')}</span>
               <button
                 onClick={handleEmptyAll}
                 disabled={emptying}
                 className="px-3 py-1.5 rounded-md text-xs font-medium bg-status-rejected text-white disabled:opacity-50"
               >
-                {emptying ? '...' : 'Confirmer'}
+                {emptying ? '...' : traduire('Confirmer')}
               </button>
               <button
                 onClick={() => setConfirmEmptyAll(false)}
                 disabled={emptying}
                 className="px-3 py-1.5 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
               >
-                Annuler
+                {traduire('Annuler')}
               </button>
             </div>
           ) : (
@@ -129,9 +130,9 @@ export default function Corbeille() {
       )}
 
       {error && <p className="text-sm text-status-rejected mb-4">{error}</p>}
-      {!loading && items.length === 0 && <p className="text-gray-500">La corbeille est vide.</p>}
+      {!loading && items.length === 0 && <p className="text-gray-500">{traduire('La corbeille est vide.')}</p>}
       {!loading && items.length > 0 && filtered.length === 0 && (
-        <p className="text-gray-500">Aucun élément ne correspond à cette recherche.</p>
+        <p className="text-gray-500">{traduire('Aucun élément ne correspond à cette recherche.')}</p>
       )}
 
       {loading ? (
@@ -165,7 +166,7 @@ export default function Corbeille() {
                   onClick={() => handleRestore(item.id)}
                   className="px-3 py-1.5 rounded-md text-xs font-medium border border-status-approved text-status-approved hover:bg-green-50"
                 >
-                  Restaurer
+                  {traduire('Restaurer')}
                 </button>
                 {confirmDeleteId === item.id ? (
                   <div className="flex gap-1">
@@ -173,13 +174,13 @@ export default function Corbeille() {
                       onClick={() => handleDelete(item.id)}
                       className="px-3 py-1.5 rounded-md text-xs font-medium bg-status-rejected text-white"
                     >
-                      Confirmer
+                      {traduire('Confirmer')}
                     </button>
                     <button
                       onClick={() => setConfirmDeleteId(null)}
                     className="px-3 py-1.5 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
                     >
-                      Annuler
+                      {traduire('Annuler')}
                     </button>
                   </div>
                 ) : (
@@ -187,13 +188,13 @@ export default function Corbeille() {
                     onClick={() => setConfirmDeleteId(item.id)}
                     className="px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 hover:text-status-rejected"
                   >
-                    Suppr. définitive
+                    {traduire('Suppr. définitive')}
                   </button>
                 )}
               </div>
             </div>
             <p className="text-xs text-gray-400 mt-2">
-              Supprimé par {item.supprime_par_email || 'système'} le {new Date(item.supprime_le).toLocaleString('fr-FR')}
+              Supprimé par {item.supprime_par_email || traduire('système')} le {new Date(item.supprime_le).toLocaleString('fr-FR')}
             </p>
           </div>
           );

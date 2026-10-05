@@ -36,7 +36,12 @@ export default function Reclamations() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    getToutesReclamations()
+      .then(setReclamations)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleTraiter(id) {
     setError('');

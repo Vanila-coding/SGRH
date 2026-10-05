@@ -16,6 +16,7 @@ import { getHistoriquePersonnel } from '../../services/contratApi';
 import { getSuiviConges } from '../../services/congeApi';
 import { Skeleton, SkeletonAvatar, SkeletonText } from '../../components/ui';
 import { traduire } from '../../i18n';
+import BoutonDossierPdf from '../../components/personnel/BoutonDossierPdf';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 const photoUrl = (photo) => (photo ? `${API_URL.replace(/\/api\/?$/, '')}${photo}` : null);
@@ -29,7 +30,7 @@ const STATUT_COMPTE = {
 const SANS_COMPTE = ['Sans compte', 'bg-white/15 text-white/80'];
 
 const ONGLETS = [
-  { key: 'apercu', label: traduire("Vue d\'ensemble"), icon: TrendingUp },
+  { key: 'apercu', label: traduire("Vue d'ensemble"), icon: TrendingUp },
   { key: 'dossier', label: traduire('Dossier'), icon: UserRound },
   { key: 'parcours', label: traduire('Parcours'), icon: FileText },
 ];
@@ -123,6 +124,7 @@ export default function PersonnelFiche() {
     <div className="mx-auto max-w-[1600px] space-y-6 pb-2">
       <PageHeader
         crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Personnel'), path: '/admin/personnel' }, { label: nomComplet }]}
+        actions={<BoutonDossierPdf personnelId={personnel.id} />}
         title={traduire('Fiche du personnel')}
         subtitle={traduire('Dossier, état de carrière, congés et contrat')}
       />

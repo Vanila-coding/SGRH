@@ -63,7 +63,7 @@ async function demandesEnAttente(req, res) {
 }
 
 async function demandesEnAttenteSecretariat(req, res) {
-  const demandes = await documentService.getDemandesEnAttenteSecretariat(req.user.role);
+  const demandes = await documentService.getDemandesEnAttenteSecretariat(req.user.role, req.user.id);
   return res.status(200).json({ demandes });
 }
 

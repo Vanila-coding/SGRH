@@ -39,7 +39,7 @@ const CATEGORY_ICONS = { 'Contrat': FileSignature, 'Congés': CalendarClock, 'Si
 function DashboardSkeleton() {
   return (
     <div className="space-y-6" role="status" aria-label={traduire('Chargement du tableau de bord')}>
-      <PageHeader crumbs={[{ label: traduire('Mon espace') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble de votre espace personnel")} />
+      <PageHeader crumbs={[{ label: traduire('Mon espace') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d'ensemble de votre espace personnel")} />
       <Skeleton className="h-24 rounded-xl" />
       <Skeleton className="h-28 rounded-lg" />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -102,7 +102,7 @@ export default function Dashboard() {
   if (error) {
     return (
       <div>
-        <PageHeader crumbs={[{ label: traduire('Mon espace') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble de votre espace personnel")} />
+        <PageHeader crumbs={[{ label: traduire('Mon espace') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d'ensemble de votre espace personnel")} />
         <p className="text-status-rejected text-sm">{error}</p>
       </div>
     );
@@ -115,7 +115,7 @@ export default function Dashboard() {
   if (!personnel) {
     return (
       <div>
-        <PageHeader crumbs={[{ label: traduire('Mon espace') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble de votre espace personnel")} />
+        <PageHeader crumbs={[{ label: traduire('Mon espace') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d'ensemble de votre espace personnel")} />
         <EmptyState title={traduire('Aucune fiche personnel associée à votre compte.')} description={traduire('Contactez le service RH si cela vous semble anormal.')} />
       </div>
     );
@@ -155,7 +155,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader crumbs={[{ label: traduire('Mon espace') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble de votre espace personnel")} />
+      <PageHeader crumbs={[{ label: traduire('Mon espace') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d'ensemble de votre espace personnel")} />
 
       {/* En-tête personnel */}
       <div className="bg-navy rounded-xl p-6 text-white">
@@ -247,7 +247,7 @@ export default function Dashboard() {
           {!contrat ? (
             <p className="text-sm text-gray-400">{traduire('Aucun contrat enregistré')}</p>
           ) : !contrat.date_fin ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">{traduire("Sans date d\'échéance")}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{traduire("Sans date d'échéance")}</p>
           ) : jours < 0 ? (
             <>
               <p className="text-lg font-bold text-status-rejected">{new Date(contrat.date_fin).toLocaleDateString('fr-FR')}</p>

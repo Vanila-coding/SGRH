@@ -22,19 +22,15 @@ export default function CongesAdmin() {
   const [sansDecision, setSansDecision] = useState([]);
   const [generatingId, setGeneratingId] = useState(null);
 
-  async function load() {
-    setLoading(true);
-    try {
-      setDemandes(await getPendingDemandes());
-      setSansDecision(await getCongesSansDecision());
-    } catch (err) {
-      setActionError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    Promise.all([getPendingDemandes(), getCongesSansDecision()])
+      .then(([demandesEnAttente, sansDecisionData]) => {
+        setDemandes(demandesEnAttente);
+        setSansDecision(sansDecisionData);
+      })
+      .catch((err) => setActionError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   // Décision d'octroi : établie pour un congé annuel approuvé, puis ouverte pour impression.
   async function handleGenererDecision(conge) {
@@ -154,8 +150,8 @@ export default function CongesAdmin() {
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-5 mt-8">
-        <h3 className="font-semibold text-navy dark:text-gold">{traduire("Décisions d\'octroi à établir")}</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-3">{traduire("Congés annuels approuvés pour lesquels la décision (fraction de congé) n\'a pas encore été générée.")}</p>
+        <h3 className="font-semibold text-navy dark:text-gold">{traduire("Décisions d'octroi à établir")}</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-3">{traduire("Congés annuels approuvés pour lesquels la décision (fraction de congé) n'a pas encore été générée.")}</p>
         {sansDecision.length === 0 && !loading && <p className="text-sm text-gray-400 dark:text-gray-500">{traduire('Aucune décision en attente.')}</p>}
         <ul className="divide-y divide-gray-100 dark:divide-gray-700">
           {sansDecision.map((c) => (

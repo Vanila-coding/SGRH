@@ -1,22 +1,19 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { loginRequest, fetchCurrentUser } from '../services/authApi';
 import { registerUnauthorizedHandler } from '../utils/apiError';
 import { toast } from '../utils/toast';
-import { traduire } from '../i18n';
+import { AuthContext } from './AuthContext';
 
-const AuthContext = createContext(null);
 const TOKEN_KEY = 'rh_token';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Chargement initial seulement s'il existe un jeton à vérifier.
+  const [loading, setLoading] = useState(() => !!localStorage.getItem(TOKEN_KEY));
 
   useEffect(() => {
     const token = localStorage.getItem(TOKEN_KEY);
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    if (!token) return;
     fetchCurrentUser(token)
       .then(setUser)
       .catch(() => localStorage.removeItem(TOKEN_KEY))
@@ -56,10 +53,4 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth doit être utilisé dans AuthProvider');
-  return ctx;
 }

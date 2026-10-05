@@ -15,18 +15,12 @@ export default function ValidationEquipe() {
   const [avisMap, setAvisMap] = useState({});
   const [reviewingId, setReviewingId] = useState(null);
 
-  async function load() {
-    setLoading(true);
-    try {
-      setDemandes(await getPendingEquipe());
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    getPendingEquipe()
+      .then(setDemandes)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleReview(id, decision) {
     if (reviewingId) return;
@@ -47,7 +41,7 @@ export default function ValidationEquipe() {
       <PageHeader
         crumbs={[{ label: traduire('Mon espace'), path: '/dashboard' }, { label: traduire('Validation équipe') }]}
         title={traduire('Validation équipe')}
-        subtitle={traduire("Demandes de votre équipe en attente de votre avis, avant transmission à l\'Admin RH")}
+        subtitle={traduire("Demandes de votre équipe en attente de votre avis, avant transmission à l'Admin RH")}
       />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />

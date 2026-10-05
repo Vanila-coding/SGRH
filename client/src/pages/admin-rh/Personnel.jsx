@@ -69,7 +69,11 @@ export default function Personnel() {
     [personnelBrut]
   );
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    listPersonnel()
+      .then(setPersonnelBrut)
+      .finally(() => setLoading(false));
+  }, []);
 
   async function toggleExpand(person) {
     if (expandedId === person.id) { setExpandedId(null); return; }
@@ -117,7 +121,13 @@ export default function Personnel() {
 
   // Revenir à la première page dès que la recherche, un filtre ou le tri change,
   // pour ne jamais se retrouver sur une page vide (ex. filtré à 3 résultats depuis la page 5).
-  useEffect(() => { setPage(1); }, [search, filterFonction, filterCorps, filterService, filterDirection, filterContrat, filterStatut, sortKey, sortAsc]);
+  // Remise à la page 1 pendant le rendu (pas d'effet) quand un critère change.
+  const signatureFiltres = [search, filterFonction, filterCorps, filterService, filterDirection, filterContrat, filterStatut, sortKey, sortAsc].join('|');
+  const [signatureVue, setSignatureVue] = useState(signatureFiltres);
+  if (signatureVue !== signatureFiltres) {
+    setSignatureVue(signatureFiltres);
+    setPage(1);
+  }
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = useMemo(

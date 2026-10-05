@@ -43,7 +43,9 @@ export default function Etablissements() {
     setEtablissements(list);
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    fetchEtablissements().then(setEtablissements);
+  }, []);
 
   async function handleCreate(e) {
     e.preventDefault();
@@ -119,7 +121,7 @@ export default function Etablissements() {
           autoFocus value={edition.valeur} maxLength={200}
           onChange={(e) => setEdition({ ...edition, valeur: e.target.value })}
           onKeyDown={(e) => { if (e.key === 'Enter') enregistrerNom(); if (e.key === 'Escape') setEdition(null); }}
-          aria-label={traduire("Nouveau nom de l\'établissement")}
+          aria-label={traduire("Nouveau nom de l'établissement")}
           className="flex-1 min-w-0 border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
         />
         <button type="button" onClick={enregistrerNom} disabled={enregistrementNom} aria-label={traduire('Enregistrer')} className="text-status-approved"><Check size={16} /></button>
@@ -159,7 +161,7 @@ export default function Etablissements() {
       <PageHeader
         crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Personnel'), path: '/admin/personnel/pe' }, { label: traduire('Établissements') }]}
         title={traduire('Établissements')}
-        subtitle={traduire("Établissements de l\'université auxquels rattacher un PE")}
+        subtitle={traduire("Établissements de l'université auxquels rattacher un PE")}
       />
 
       <form onSubmit={handleCreate} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-4 flex flex-wrap gap-2">
@@ -193,7 +195,7 @@ export default function Etablissements() {
         >
           {CATEGORIES.map((c) => <option key={c} value={c}>{CATEGORIE_LABELS[c]}</option>)}
         </SelectMenu>
-        <div className="flex items-center rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden shrink-0" role="group" aria-label={traduire("Mode d\'affichage")}>
+        <div className="flex items-center rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden shrink-0" role="group" aria-label={traduire("Mode d'affichage")}>
           <button
             type="button"
             onClick={() => setVue('liste')}

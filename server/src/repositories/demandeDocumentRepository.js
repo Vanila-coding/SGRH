@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { rolesDeCategorie } = require('../utils/categorieSecretariat');
 
 async function create({ personnelId, typeDocument, motif }) {
   const result = await pool.query(
@@ -26,10 +27,12 @@ async function findPending() {
 
 // File du secrétariat : `roleCible` = 'PE' | 'PAT' pour un compte SECRETAIRE_*
 // (ne voit que sa catégorie), ou null pour ADMIN_RH/SUPERADMIN (repli anti-blocage).
-async function findPendingForSecretariat(roleCible) {
+// categorie : 'PE' | 'PAT' | null (toutes). exclureUserId : le secrétaire ne voit pas ses propres demandes.
+async function findPendingForSecretariat(categorie, exclureUserId = null) {
   const conditions = [`d.decision_secretariat = 'en_attente'`];
   const values = [];
-  if (roleCible) { values.push(roleCible); conditions.push(`u.role = $${values.length}`); }
+  if (categorie) { values.push(rolesDeCategorie(categorie)); conditions.push(`u.role = ANY($${values.length})`); }
+  if (exclureUserId) { values.push(exclureUserId); conditions.push(`u.id <> $${values.length}`); }
   const result = await pool.query(
     `SELECT d.*, p.matricule, p.nom, p.prenom, p.email, u.role AS requester_role
      FROM demandes_documents d

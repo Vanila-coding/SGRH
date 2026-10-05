@@ -11,7 +11,7 @@ export function Apparence() {
   const { prefs, update } = useSettingsPreferences();
 
   return (
-    <SettingsCard icon={Palette} title={traduire('Apparence')} description={traduire("Personnalisez l\'affichage de votre espace SGRH.")}>
+    <SettingsCard icon={Palette} title={traduire('Apparence')} description={traduire("Personnalisez l'affichage de votre espace SGRH.")}>
       <SettingsSelect label={traduire('Thème')} description={traduire('Clair, sombre ou basé sur les préférences système.')}
         value={theme} onChange={setTheme}
         options={[{ value: 'light', label: traduire('Clair') }, { value: 'dark', label: traduire('Sombre') }, { value: 'system', label: traduire('Système') }]} />
@@ -23,7 +23,7 @@ export function Apparence() {
       <SettingsSelect label={traduire('Sidebar')} description={traduire('Affichage de la navigation principale.')}
         value={prefs.sidebarMode} onChange={(v) => update('sidebarMode', v)}
         options={[{ value: 'expanded', label: traduire('Toujours ouverte') }, { value: 'collapsed', label: traduire('Réduite') }]} />
-      <SettingsToggle label={traduire('Animations')} description={traduire("Active les transitions et animations de l\'interface.")}
+      <SettingsToggle label={traduire('Animations')} description={traduire("Active les transitions et animations de l'interface.")}
         checked={prefs.animations} onChange={(v) => update('animations', v)} />
     </SettingsCard>
   );
@@ -44,7 +44,7 @@ export function Notifications() {
   const { prefs, updateNested } = useSettingsPreferences();
   return (
     <div className="space-y-6">
-      <SettingsCard icon={Bell} title={traduire("Notifications dans l\'application")} description={traduire('Choisissez les alertes affichées dans le SGRH.')}>
+      <SettingsCard icon={Bell} title={traduire("Notifications dans l'application")} description={traduire('Choisissez les alertes affichées dans le SGRH.')}>
         {APP_ITEMS.map(([key, label]) => (
           <SettingsToggle key={key} label={label} checked={prefs.notifications.app[key]}
             onChange={(v) => updateNested('notifications', 'app', { ...prefs.notifications.app, [key]: v })} />
@@ -77,10 +77,10 @@ export function LangueRegion() {
 export function Accessibilite() {
   const { prefs, update } = useSettingsPreferences();
   return (
-    <SettingsCard icon={Accessibility} title={traduire('Accessibilité')} description={traduire("Ajustez l\'interface selon vos besoins.")}>
+    <SettingsCard icon={Accessibility} title={traduire('Accessibilité')} description={traduire("Ajustez l'interface selon vos besoins.")}>
       <SettingsToggle label={traduire('Contraste élevé')} description={traduire('Renforce les contrastes de couleurs et le focus visible.')}
         checked={prefs.highContrast} onChange={(v) => update('highContrast', v)} />
-      <SettingsToggle label={traduire('Réduction des animations')} description={traduire("Diminue les transitions et mouvements à l\'écran.")}
+      <SettingsToggle label={traduire('Réduction des animations')} description={traduire("Diminue les transitions et mouvements à l'écran.")}
         checked={prefs.reduceMotion} onChange={(v) => update('reduceMotion', v)} />
       <SettingsToggle label={traduire('Mise en évidence des éléments interactifs')} description={traduire('Contour visible sur les boutons et liens au focus clavier.')}
         checked={prefs.keyboardHighlight} onChange={(v) => update('keyboardHighlight', v)} />

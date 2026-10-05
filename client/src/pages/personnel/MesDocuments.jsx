@@ -38,7 +38,11 @@ export default function MesDocuments() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    getMesDemandesDocuments()
+      .then(setDemandes)
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -106,13 +110,13 @@ export default function MesDocuments() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 className="font-semibold text-navy dark:text-gold mb-4">{traduire('Mes demandes')}</h3>
         {loading && <SkeletonText lines={3} />}
-        {!loading && demandes.length === 0 && <p className="text-sm text-gray-400">{traduire("Aucune demande pour l\'instant.")}</p>}
+        {!loading && demandes.length === 0 && <p className="text-sm text-gray-400">{traduire("Aucune demande pour l'instant.")}</p>}
         <div className={vue === 'liste' ? 'space-y-3' : 'grid grid-cols-1 lg:grid-cols-2 gap-3'}>
           {demandes.map((d) => (
             <div key={d.id} className="border-b last:border-0 dark:border-gray-700 pb-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium text-navy dark:text-gray-100">
-                  {TYPES_DOCUMENT.find((t) => t.value === d.type_document)?.label || (d.type_document === 'decision_conge' ? traduire("Décision d\'octroi de congé") : d.type_document)}
+                  {TYPES_DOCUMENT.find((t) => t.value === d.type_document)?.label || (d.type_document === 'decision_conge' ? traduire("Décision d'octroi de congé") : d.type_document)}
                 </p>
                 <span className={`text-xs font-medium ${STATUT_LABELS[d.statut].color}`}>
                   {STATUT_LABELS[d.statut].label}

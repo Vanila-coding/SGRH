@@ -23,7 +23,26 @@ async function createPersonnel(data, createdBy) {
     throw new Error('Catégorie de secrétariat invalide');
   }
 
-  const personnel = await personnelRepository.create({ ...data, role: roles[0], secretariatRole: data.secretariatRole || null });
+  // Situation réglementaire choisie dans le formulaire : comme à la modification, l'indice
+  // vient de la grille et devient la référence. Une erreur de résolution bloque la création.
+  let situation = { indiceNum: null, indiceSource: data.indice ? 'SAISIE_RH' : 'A_CONFIRMER', ligneGrilleActuelleId: null };
+  if (data.resolveFromGrille) {
+    const { cadre, echelle, categorie, classe, echelon } = data.resolveFromGrille;
+    const regime = data.resolveFromGrille.regime || grilleIndiciaireService.regimeDepuisCorps(data.corps);
+    const resolution = await grilleIndiciaireService.resolveIndice({
+      regime, cadre, echelle, categorie, classe, echelon, dateEffet: new Date().toISOString().slice(0, 10),
+    });
+    situation = {
+      classe: resolution.classe, echelon: String(resolution.echelon), indice: resolution.display,
+      indiceNum: resolution.indice, indiceSource: 'REGLEMENTAIRE', ligneGrilleActuelleId: resolution.ligneGrilleId,
+    };
+  } else if (data.indice) {
+    situation.indiceNum = grilleIndiciaireService.parseIndiceAffiche(data.indice).indiceNum;
+  }
+
+  const personnel = await personnelRepository.create({
+    ...data, ...situation, role: roles[0], secretariatRole: data.secretariatRole || null,
+  });
   await personnelRepository.setRoles(personnel.id, roles);
   if (roles.includes('PE') && data.peInfos) {
     await personnelRepository.upsertPeInfos(personnel.id, data.peInfos);

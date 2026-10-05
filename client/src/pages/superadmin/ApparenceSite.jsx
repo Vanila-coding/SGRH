@@ -27,14 +27,14 @@ const COLOR_LABELS = {
 const CHAMPS_CONNEXION = [
   { key: 'login.titre_bienvenue', label: traduire('Titre'), defaut: "Bienvenue sur l'espace RH" },
   { key: 'login.slogan', label: traduire('Sous-titre'), defaut: 'Excellence • Intégrité • Innovation' },
-  { key: 'login.description_bienvenue', label: traduire("Message d\'accueil"), defaut: "Université de Mahajanga — Plateforme de gestion des ressources humaines. Consultez votre dossier, vos congés et vos notifications en un seul endroit.", multiligne: true },
+  { key: 'login.description_bienvenue', label: traduire("Message d'accueil"), defaut: "Université de Mahajanga — Plateforme de gestion des ressources humaines. Consultez votre dossier, vos congés et vos notifications en un seul endroit.", multiligne: true },
 ];
 const CHAMPS_BARRE_LATERALE = [
-  { key: 'sidebar.titre_ligne_2', label: traduire("Nom de l\'université — 1re partie"), defaut: 'UNIVERSITÉ' },
-  { key: 'sidebar.titre_ligne_3', label: traduire("Nom de l\'université — 2e partie"), defaut: 'DE MAHAJANGA' },
+  { key: 'sidebar.titre_ligne_2', label: traduire("Nom de l'université — 1re partie"), defaut: 'UNIVERSITÉ' },
+  { key: 'sidebar.titre_ligne_3', label: traduire("Nom de l'université — 2e partie"), defaut: 'DE MAHAJANGA' },
 ];
 const CHAMPS_FOOTER = [
-  { key: 'footer.nom_application', label: traduire("Nom de l\'application"), defaut: 'Université de Mahajanga' },
+  { key: 'footer.nom_application', label: traduire("Nom de l'application"), defaut: 'Université de Mahajanga' },
   { key: 'footer.description', label: traduire('Description (optionnelle)'), defaut: '' },
   { key: 'footer.copyright', label: traduire('Mention de copyright'), defaut: 'Tous droits réservés' },
   { key: 'footer.developpeur', label: traduire('Développé par (laisser vide pour masquer)'), defaut: 'JAOSOA Tanaël Faustin' },
@@ -52,7 +52,7 @@ const CHAMPS_MENU = [
   { key: 'menu.libelle_parametres', label: traduire('Paramètres'), defaut: 'Paramètres' },
 ];
 const CHAMPS_INSTITUTION = [
-  { key: 'institution.nom', label: traduire("Nom de l\'université"), defaut: 'Université de Mahajanga' },
+  { key: 'institution.nom', label: traduire("Nom de l'université"), defaut: 'Université de Mahajanga' },
   { key: 'institution.nom_court', label: traduire('Nom court / sigle'), defaut: '' },
   { key: 'institution.adresse', label: traduire('Adresse'), defaut: '' },
   { key: 'institution.telephone', label: traduire('Téléphone'), defaut: '' },
@@ -321,7 +321,7 @@ export default function ApparenceSite() {
         <>
           <Section title={traduire('Logo et favicon')}>
             <ChampImage label={traduire('Logo principal')} hint={traduire('Utilisé dans la sidebar et par défaut sur la page de connexion.')} valeurActuelle={settings.logo_principal_url} onUpload={async (f) => { await uploadLogo(f); await reloadSettings(); }} />
-            <ChampImage label={traduire('Favicon')} hint={traduire("Icône affichée dans l\'onglet du navigateur.")} valeurActuelle={settings.favicon_url} onUpload={async (f) => { await uploadFavicon(f); await reloadSettings(); }} />
+            <ChampImage label={traduire('Favicon')} hint={traduire("Icône affichée dans l'onglet du navigateur.")} valeurActuelle={settings.favicon_url} onUpload={async (f) => { await uploadFavicon(f); await reloadSettings(); }} />
             <ChampImage label={traduire('Logo — page de connexion (optionnel)')} hint={traduire('Si vide, le logo principal est utilisé.')} valeurActuelle={settings.logo_connexion_url} onUpload={async (f) => { await uploadLogoConnexion(f); await reloadSettings(); }} />
           </Section>
 
@@ -369,7 +369,7 @@ export default function ApparenceSite() {
             <div className="flex items-start gap-3 text-sm text-gray-500 dark:text-gray-400">
               <Moon size={18} className="shrink-0 mt-0.5" />
               <p>
-                {traduire("Le mode sombre est déjà disponible pour chaque utilisateur individuellement, via l\'icône")}
+                {traduire("Le mode sombre est déjà disponible pour chaque utilisateur individuellement, via l'icône")}
                 {traduire('lune/soleil dans la barre supérieure. C\'est une préférence personnelle (mémorisée sur')}
                 {traduire('l\'appareil de chacun), il n\'y a pas de bascule globale à configurer ici.')}
               </p>
@@ -392,7 +392,7 @@ export default function ApparenceSite() {
           <Section title={traduire('Messages système')} description={traduire('Affichés à la connexion selon l\'état du compte. Le mode maintenance n\'existe pas dans l\'application actuelle — rien à personnaliser pour cet élément.')}>
             {CHAMPS_SYSTEME.map((c) => <ChampTexte key={c.key} champ={c} />)}
           </Section>
-          <Section title={traduire('Libellés de navigation')} description={traduire("Ces libellés remplacent le texte affiché pour ces éléments dans le menu ; la structure du menu elle-même n\'est pas modifiable ici.")}>
+          <Section title={traduire('Libellés de navigation')} description={traduire("Ces libellés remplacent le texte affiché pour ces éléments dans le menu ; la structure du menu elle-même n'est pas modifiable ici.")}>
             {CHAMPS_MENU.map((c) => <ChampTexte key={c.key} champ={c} />)}
           </Section>
           <Section title={traduire('Aide (personnel)')} description={traduire('Contenu des 3 pages d\'aide affichées au personnel (PE/PAT) dans le menu Aide.')}>

@@ -40,10 +40,8 @@ export default function EnvoyerNotification() {
   const [feedback, setFeedback] = useState('');
 
   useEffect(() => {
-    if (ciblage === 'individual') {
-      setIndividualsLoading(true);
-      listUsers().then(setIndividuals).catch(() => {}).finally(() => setIndividualsLoading(false));
-    }
+    if (ciblage !== 'individual') return;
+    listUsers().then(setIndividuals).catch(() => {}).finally(() => setIndividualsLoading(false));
   }, [ciblage]);
 
   function buildTarget() {
@@ -78,7 +76,7 @@ export default function EnvoyerNotification() {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Destinataires')}</label>
             <SelectMenu
               value={ciblage}
-              onChange={(e) => setCiblage(e.target.value)}
+              onChange={(e) => { setCiblage(e.target.value); if (e.target.value === 'individual') setIndividualsLoading(true); }}
               className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
             >
               <option value="role">{traduire('Tout un groupe (PE ou PAT)')}</option>

@@ -160,7 +160,7 @@ export function Sessions() {
           <Laptop size={20} className="text-slate-400" />
           <div>
             <p className="text-sm font-medium text-slate-800 dark:text-gray-100">{device} · {browser}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{traduire("Dernière activité : à l\'instant")}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{traduire("Dernière activité : à l'instant")}</p>
           </div>
         </div>
         <span className="rounded-full bg-status-approved/10 px-2.5 py-1 text-xs font-medium text-status-approved">{traduire('Session actuelle')}</span>

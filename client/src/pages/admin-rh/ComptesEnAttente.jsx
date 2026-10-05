@@ -14,18 +14,12 @@ export default function ComptesEnAttente() {
   const [actionError, setActionError] = useState('');
   const [action, setAction] = useState(null);
 
-  async function load() {
-    setLoading(true);
-    try {
-      setAccounts(await getPendingAccounts());
-    } catch (err) {
-      setActionError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    getPendingAccounts()
+      .then(setAccounts)
+      .catch((err) => setActionError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleAction(id, type, request) {
     setActionError('');
@@ -48,7 +42,7 @@ export default function ComptesEnAttente() {
       <PageHeader
         crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Utilisateurs & comptes') }, { label: traduire('Comptes en attente') }]}
         title={traduire('Comptes en attente')}
-        subtitle={traduire("Comptes créés via matricule + code de vérification, en attente d\'activation")}
+        subtitle={traduire("Comptes créés via matricule + code de vérification, en attente d'activation")}
       />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />

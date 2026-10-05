@@ -53,7 +53,7 @@ export default function Historique() {
           onChange={(e) => setFilterType(e.target.value)}
           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy shrink-0"
         >
-          <option value="">{traduire("Tous les types d\'action")}</option>
+          <option value="">{traduire("Tous les types d'action")}</option>
           {Object.entries(ACTION_LABELS).map(([type, { label }]) => (
             <option key={type} value={type}>{label}</option>
           ))}
@@ -67,7 +67,7 @@ export default function Historique() {
       )}
 
       {loading && (
-        <div className={vue === 'liste' ? 'space-y-2' : 'grid grid-cols-1 lg:grid-cols-2 gap-2'} role="status" aria-label={traduire("Chargement du journal d\'activité")}>
+        <div className={vue === 'liste' ? 'space-y-2' : 'grid grid-cols-1 lg:grid-cols-2 gap-2'} role="status" aria-label={traduire("Chargement du journal d'activité")}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-start gap-3">
               <Skeleton className="h-5 w-28 rounded shrink-0" />

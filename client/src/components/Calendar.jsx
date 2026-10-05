@@ -1,4 +1,3 @@
-import { traduire } from '../i18n';
 export default function MiniCalendar({ demandes }) {
   const now = new Date();
   const year = now.getFullYear();

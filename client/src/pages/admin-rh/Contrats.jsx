@@ -13,31 +13,13 @@ import PersonnelSearchSelect from '../../components/PersonnelSearchSelect';
 import { toast } from '../../utils/toast';
 import SelectMenu from '../../components/ui/SelectMenu';
 import { traduire } from '../../i18n';
+import DateInput from '../../components/ui/DateInput';
 
 const STATUT_CONTRAT_LABELS = {
   actif: 'Actif', expire: 'Expiré', renouvele: 'Renouvelé', non_renouvele: 'Non renouvelé', resilie: 'Résilié',
 };
 
 const emptyContratForm = { typeContrat: TYPES_CONTRAT[0], dateDebut: '', dateFin: '', referenceDecision: '', observations: '' };
-
-// Le sélecteur natif affiche « jj/mm/aaaa » quand il est vide et ce texte n'est pas
-// modifiable ; on pose donc le libellé « Début » ou « Fin » par-dessus, sans bloquer le
-// clic ni l'icône du calendrier.
-function ChampDate({ libelle, value, className, ...props }) {
-  return (
-    <div className="relative min-w-0">
-      <input type="date" value={value} className={`w-full ${className}`} {...props} />
-      {!value && (
-        <span
-          aria-hidden="true"
-          className={`pointer-events-none absolute inset-px right-9 flex items-center rounded-l-md bg-white px-3 text-gray-400 dark:bg-gray-700 dark:text-gray-500 ${className.includes('text-xs') ? 'text-xs' : 'text-sm'}`}
-        >
-          {libelle}
-        </span>
-      )}
-    </div>
-  );
-}
 
 export default function Contrats() {
   const [searchParams] = useSearchParams();
@@ -75,13 +57,22 @@ export default function Contrats() {
   }
 
   useEffect(() => {
-    loadContrats(selectedId);
+    if (!selectedId) return;
+    getHistoriquePersonnel(selectedId)
+      .then(setContrats)
+      .catch((err) => setContratFeedback(err.message))
+      .finally(() => setLoading(false));
+  }, [selectedId]);
+
+  function choisirPersonne(id) {
+    setSelectedId(id);
+    if (!id) setContrats(null);
     setContratForm(emptyContratForm);
     setContratFile(null);
     setRenouvelForm(emptyContratForm);
     setRenouvelFile(null);
     setNonRenouvelModal(null);
-  }, [selectedId]);
+  }
 
   async function handleImportContrat(e) {
     e.preventDefault();
@@ -179,7 +170,7 @@ export default function Contrats() {
           id="contrats-personnel"
           items={personnelList}
           value={selectedId}
-          onChange={setSelectedId}
+          onChange={choisirPersonne}
           formatOption={(p) => `${p.matricule} — ${[p.prenom, p.nom].filter(Boolean).join(' ')} (${p.role})`}
           className="max-w-xl"
         />
@@ -206,13 +197,13 @@ export default function Contrats() {
             >
               {TYPES_CONTRAT.map((t) => <option key={t} value={t}>{t}</option>)}
             </SelectMenu>
-            <ChampDate libelle={traduire('Début')}
-              type="date" required value={contratForm.dateDebut}
+            <DateInput placeholder={traduire('Début')}
+              required value={contratForm.dateDebut}
               onChange={(e) => setContratForm((p) => ({ ...p, dateDebut: e.target.value }))}
               className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
               />
-            <ChampDate libelle={traduire('Fin')}
-              type="date" value={contratForm.dateFin}
+            <DateInput placeholder={traduire('Fin')}
+              value={contratForm.dateFin}
               onChange={(e) => setContratForm((p) => ({ ...p, dateFin: e.target.value }))}
               className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
               />
@@ -245,7 +236,7 @@ export default function Contrats() {
             </p>
           )}
 
-          {!contrats.contrats?.length && <p className="text-sm text-gray-400">{traduire("Aucun contrat enregistré pour l\'instant.")}</p>}
+          {!contrats.contrats?.length && <p className="text-sm text-gray-400">{traduire("Aucun contrat enregistré pour l'instant.")}</p>}
 
           <div className="space-y-3">
             {contrats.contrats?.map((c) => (
@@ -315,13 +306,13 @@ export default function Contrats() {
                         >
                           {TYPES_CONTRAT.map((t) => <option key={t} value={t}>{t}</option>)}
                         </SelectMenu>
-                        <ChampDate libelle={traduire('Début')}
-                            type="date" required value={renouvelForm.dateDebut}
+                        <DateInput placeholder={traduire('Début')}
+                            required value={renouvelForm.dateDebut}
                             onChange={(e) => setRenouvelForm((p) => ({ ...p, dateDebut: e.target.value }))}
                             className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                           />
-                        <ChampDate libelle={traduire('Fin')}
-                            type="date" value={renouvelForm.dateFin}
+                        <DateInput placeholder={traduire('Fin')}
+                            value={renouvelForm.dateFin}
                             onChange={(e) => setRenouvelForm((p) => ({ ...p, dateFin: e.target.value }))}
                             className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                           />

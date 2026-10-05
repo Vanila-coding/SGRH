@@ -27,7 +27,12 @@ export default function Permissions() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    listAllPermissions()
+      .then(setRaw)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   // Regroupe la liste plate (une ligne par permission x rôle) en une matrice
   // { category: [ { id, key, label, byRole: { ADMIN_RH: {enabled, permissionId}, ... } } ] }

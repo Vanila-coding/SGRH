@@ -23,8 +23,6 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const titreUniversite1 = useText('login.titre_universite_1', 'UNIVERSITÉ', 'Login');
-  const titreUniversite2 = useText('login.titre_universite_2', 'DE MAHAJANGA', 'Login');
   const slogan = useText('login.slogan', 'Excellence • Intégrité • Innovation', 'Login');
   const titreBienvenue = useText('login.titre_bienvenue', "Bienvenue sur l'espace RH", 'Login');
   const descriptionBienvenue = useText(

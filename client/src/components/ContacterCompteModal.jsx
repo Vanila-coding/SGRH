@@ -52,7 +52,7 @@ export default function ContacterCompteModal({ compte, libelleBouton, sujetDefau
         {compte.email ? (
           <>
             <p className="text-xs text-gray-400 -mt-2">
-              {traduire("L\'envoi de cet e-mail est obligatoire avant de poursuivre : relisez le message puis validez.")}
+              {traduire("L'envoi de cet e-mail est obligatoire avant de poursuivre : relisez le message puis validez.")}
             </p>
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{traduire('Sujet')}</label>

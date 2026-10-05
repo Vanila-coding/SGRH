@@ -551,6 +551,7 @@ export const DICTIONNAIRE_EN = {
   "Historique des fonctions": "Position history",
   "Historique des situations": "Situation history",
   "Historique, renouvellement et documents contractuels": "History, renewal and contract documents",
+  "IB (indice brut)": "Raw index (IB)",
   "IM :": "Staff ID:",
   "Icône affichée dans l'onglet du navigateur.": "Icon shown in the browser tab.",
   "Identifiant d'établissement invalide.": "Invalid institution ID.",

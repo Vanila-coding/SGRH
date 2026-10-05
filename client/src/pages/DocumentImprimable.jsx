@@ -13,9 +13,9 @@ function fmt(date) {
 function EnTeteUniversite() {
   return (
     <div className="text-center mb-6 text-sm">
-      <p className="text-xs">{traduire("REPOBLIKAN\'I MADAGASIKARA")}</p>
+      <p className="text-xs">{traduire("REPOBLIKAN'I MADAGASIKARA")}</p>
       <p className="text-xs italic">{traduire('Fitiavana - Tanindrazana - Fandrosoana')}</p>
-      <p className="font-semibold mt-2">{traduire("MINISTÈRE DE L\'ENSEIGNEMENT SUPÉRIEUR ET DE LA RECHERCHE SCIENTIFIQUE")}</p>
+      <p className="font-semibold mt-2">{traduire("MINISTÈRE DE L'ENSEIGNEMENT SUPÉRIEUR ET DE LA RECHERCHE SCIENTIFIQUE")}</p>
       <p className="font-semibold">{traduire('UNIVERSITÉ DE MAHAJANGA')}</p>
       <p className="text-xs mt-1">{traduire('DIRECTION DES AFFAIRES ADMINISTRATIVES ET FINANCIÈRES')}</p>
       <p className="text-xs">{traduire('SERVICE PERSONNEL')}</p>
@@ -104,7 +104,7 @@ export default function DocumentImprimable() {
   if (!doc) {
     return (
       <div className="min-h-screen bg-gray-100 py-8">
-        <div className="max-w-2xl mx-auto bg-white p-10 shadow" role="status" aria-label={traduire('Chargement du document')}>
+        <div className="max-w-2xl mx-auto bg-white text-slate-800 p-10 shadow" role="status" aria-label={traduire('Chargement du document')}>
           <Skeleton className="h-3 w-2/3 rounded mx-auto mb-2" />
           <Skeleton className="h-3 w-1/2 rounded mx-auto mb-6" />
           <Skeleton className="h-5 w-1/3 rounded mx-auto mb-8" />
@@ -115,8 +115,15 @@ export default function DocumentImprimable() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 print:bg-white print:py-0">
-      <div className={`${['decision_conge', 'etat_conge'].includes(doc.type_document) ? 'max-w-3xl' : 'max-w-2xl'} mx-auto bg-white p-10 shadow print:shadow-none`}>
+    <div className="min-h-screen bg-gray-100 py-8 print:bg-white print:py-0 print:pt-24 print:pb-16">
+      <div className="hidden print:block fixed top-4 left-6">
+        <img src="/logo-univ-mahajanga.png" alt="Université de Mahajanga" className="h-14 w-14 object-contain" />
+      </div>
+      <div className="hidden print:flex fixed bottom-3 left-6 right-6 items-center justify-between text-[9px] text-gray-500">
+        <span className="flex items-center gap-1.5"><img src="/logo-um-hr.png" alt="UM-HR" className="h-4 w-auto" />Conçu et développé par JAOSOA Tanaël Faustin</span>
+        <span>UM-HR</span>
+      </div>
+      <div className={`${['decision_conge', 'etat_conge'].includes(doc.type_document) ? 'max-w-3xl' : 'max-w-2xl'} mx-auto bg-white text-slate-800 p-10 shadow print:shadow-none`}>
         <div className="flex justify-end mb-6 print:hidden">
           <button
             onClick={() => window.print()}

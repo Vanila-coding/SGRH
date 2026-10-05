@@ -49,7 +49,7 @@ export default function MesContrats() {
       </div>
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         {error && <p className="text-sm text-status-rejected mb-2">{error}</p>}
-        {!contrats.contrats?.length && <p className="text-sm text-gray-400">{traduire("Aucun contrat enregistré pour l\'instant.")}</p>}
+        {!contrats.contrats?.length && <p className="text-sm text-gray-400">{traduire("Aucun contrat enregistré pour l'instant.")}</p>}
         <div className={vue === 'liste' ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-3 lg:grid-cols-2'}>
           {contrats.contrats?.map((c) => (
             <div key={c.id} className="border border-gray-100 dark:border-gray-700 rounded-md p-3">

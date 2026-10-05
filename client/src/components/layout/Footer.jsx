@@ -56,7 +56,7 @@ export default function Footer() {
         </div>
 
         {liensVisibles.length > 0 && (
-          <nav aria-label={traduire("Liens d\'aide")} className="flex flex-wrap gap-x-4 gap-y-1 sm:justify-end">
+          <nav aria-label={traduire("Liens d'aide")} className="flex flex-wrap gap-x-4 gap-y-1 sm:justify-end">
             {liensVisibles.map((l) => (
               <Link key={l.path} to={l.path} className="hover:text-navy dark:hover:text-gold hover:underline">
                 {l.label}

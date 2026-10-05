@@ -57,7 +57,12 @@ export default function Comptes() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    listAccounts()
+      .then(setAccounts)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleReactivate(account) {
     setError('');

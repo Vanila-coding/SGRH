@@ -6,6 +6,7 @@ import { toast } from '../../utils/toast';
 import { SkeletonCard, SkeletonTable } from '../../components/ui/Skeleton';
 import SelectMenu from '../../components/ui/SelectMenu';
 import { traduire } from '../../i18n';
+import DateInput from '../../components/ui/DateInput';
 
 const inputClass = 'border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-1.5 text-sm';
 
@@ -63,7 +64,14 @@ function OngletGrilles() {
     setLoading(false);
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    Promise.all([fetchGrilles(), rechercherLignes({})])
+      .then(([g, l]) => {
+        setGrilles(g);
+        setLignes(l);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   function updateLigneForm(field, value) {
     setLigneForm((prev) => ({ ...prev, [field]: value, ...(field === 'classe' ? { echelon: '' } : {}) }));
@@ -146,7 +154,7 @@ function OngletGrilles() {
             <input type="text" placeholder={traduire('Catégorie (I-X, si applicable)')} value={ligneForm.categorie} onChange={(e) => updateLigneForm('categorie', e.target.value)} className={inputClass} />
             <input type="text" placeholder={traduire('Cadre (A-D, si applicable)')} value={ligneForm.cadre} onChange={(e) => updateLigneForm('cadre', e.target.value)} className={inputClass} />
             <input type="text" placeholder={traduire('Échelle (si applicable)')} value={ligneForm.echelle} onChange={(e) => updateLigneForm('echelle', e.target.value)} className={inputClass} />
-            <input required type="date" value={ligneForm.dateDebutValidite} onChange={(e) => updateLigneForm('dateDebutValidite', e.target.value)} className={inputClass} />
+            <DateInput required  value={ligneForm.dateDebutValidite} onChange={(e) => updateLigneForm('dateDebutValidite', e.target.value)} className={inputClass} />
             <input required type="text" placeholder={traduire('Texte source (obligatoire)')} value={ligneForm.sourceTexte} onChange={(e) => updateLigneForm('sourceTexte', e.target.value)} className={`${inputClass} sm:col-span-2`} />
             <input type="text" placeholder={traduire('Article / référence')} value={ligneForm.sourceArticle} onChange={(e) => updateLigneForm('sourceArticle', e.target.value)} className={`${inputClass} sm:col-span-2`} />
             <div className="col-span-2 sm:col-span-4">
@@ -199,7 +207,9 @@ export default function ParametresCarriere() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    fetchParametresCarriere().then(setParams).finally(() => setLoading(false));
+  }, []);
 
   async function handleSave(cle) {
     setStatus((s) => ({ ...s, [cle]: 'loading' }));

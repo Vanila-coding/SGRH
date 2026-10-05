@@ -8,6 +8,7 @@ import GrilleIndiciaireSelector from './GrilleIndiciaireSelector';
 import Modal from './ui/Modal';
 import SelectMenu from './ui/SelectMenu';
 import { traduire } from '../i18n';
+import DateInput from './ui/DateInput';
 
 const CORPS_OPTIONS = ['EFA', 'ELD', 'Fonctionnaire'];
 const TYPES_CONTRAT = ['CDI', 'CDD', 'Vacataire', 'Stagiaire'];
@@ -48,12 +49,15 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
     fetchEtablissements()
       .then((list) => setEtablissements(list.filter((e) => e.statut === 'ACTIF' || e.id === personnel.etablissement_id)))
       .catch(() => setEtablissements([]));
-  }, []);
+  }, [personnel.direction, personnel.etablissement_id]);
 
   useEffect(() => {
-    if (!selectedDirectionId) { setServices([]); return; }
+    if (!selectedDirectionId) return;
     fetchServices(selectedDirectionId).then(setServices).catch(() => setServices([]));
   }, [selectedDirectionId]);
+
+  // Services de la direction choisie : vide tant qu'aucune direction n'est sélectionnée.
+  const servicesAffiches = selectedDirectionId ? services : [];
 
   function update(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -77,7 +81,7 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
 
   function handleServiceChange(e) {
     const id = e.target.value;
-    const svc = services.find((s) => String(s.id) === id);
+    const svc = servicesAffiches.find((s) => String(s.id) === id);
     update('service', svc ? svc.nom : '');
   }
 
@@ -207,23 +211,19 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
                   setGrilleResolved(!!resolution);
                 }}
               />
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                {traduire('Enregistré :')} {traduire('indice')} {personnel.indice || '—'} · {traduire('IB')} {personnel.indice_num ?? '—'}
+                {personnel.indice_source === 'A_CONFIRMER' && personnel.indice ? ` (${traduire('à confirmer')})` : ''}
+              </p>
             </div>
           ) : (
             <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Classe')}</label>
-                <input
-                  type="text" value={form.classe}
-                  onChange={(e) => update('classe', e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Échelon')}</label>
-                <input
-                  type="text" value={form.echelon}
-                  onChange={(e) => update('echelon', e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Classe et échelon')}</label>
+                <GrilleIndiciaireSelector
+                  regime={null}
+                  value={{ classe: form.classe, echelon: form.echelon, categorie: form.categorie, cadre: form.cadre, echelle: form.echelle, indice: form.indice }}
+                  onChange={(next) => setForm((prev) => ({ ...prev, ...next }))}
                 />
               </div>
               <div>
@@ -291,13 +291,13 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Service')}</label>
             <SelectMenu
-              value={services.find((s) => s.nom === form.service)?.id || ''}
+              value={servicesAffiches.find((s) => s.nom === form.service)?.id || ''}
               onChange={handleServiceChange}
               disabled={!selectedDirectionId}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"
             >
               <option value="">--</option>
-              {services.map((s) => <option key={s.id} value={s.id}>{s.nom}</option>)}
+              {servicesAffiches.map((s) => <option key={s.id} value={s.id}>{s.nom}</option>)}
             </SelectMenu>
           </div>
           <div>
@@ -321,8 +321,8 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Date de recrutement')}</label>
-            <input
-              type="date" value={form.dateRecrutement}
+            <DateInput
+               value={form.dateRecrutement}
               onChange={(e) => update('dateRecrutement', e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
             />
@@ -341,8 +341,8 @@ export default function ModifierEmployeModal({ personnel, onClose, onSuccess }) 
           {!form.contratPermanent && (
             <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Date de fin de contrat')}</label>
-              <input
-                type="date" value={form.dateEcheanceContrat}
+              <DateInput
+                 value={form.dateEcheanceContrat}
                 onChange={(e) => update('dateEcheanceContrat', e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
               />

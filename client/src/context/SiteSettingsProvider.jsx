@@ -1,8 +1,7 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getSiteSettings } from '../services/siteSettingsAdminApi';
 import { urlFichierSite } from '../utils/siteAssets';
-
-const SiteSettingsContext = createContext(null);
+import { SiteSettingsContext } from './SiteSettingsContext';
 
 // Correspondance clé site_settings -> variable CSS définie dans index.css (@theme).
 // Couleur principale et couleur des boutons pointent toutes deux vers --color-navy,
@@ -37,13 +36,12 @@ export function SiteSettingsProvider({ children }) {
   const [settings, setSettings] = useState({});
   const [loaded, setLoaded] = useState(false);
 
-  const reload = useCallback(async () => {
-    const data = await getSiteSettings();
+  const reload = useCallback(() => getSiteSettings().then((data) => {
     setSettings(data || {});
     applyColors(data || {});
     applyFavicon(data || {});
     setLoaded(true);
-  }, []);
+  }), []);
 
   useEffect(() => { reload(); }, [reload]);
 
@@ -52,10 +50,4 @@ export function SiteSettingsProvider({ children }) {
       {children}
     </SiteSettingsContext.Provider>
   );
-}
-
-export function useSiteSettings() {
-  const ctx = useContext(SiteSettingsContext);
-  if (!ctx) throw new Error('useSiteSettings doit être utilisé dans SiteSettingsProvider');
-  return ctx;
 }

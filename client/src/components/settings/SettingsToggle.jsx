@@ -1,4 +1,3 @@
-import { traduire } from '../../i18n';
 export default function SettingsToggle({ checked, onChange, label, description, disabled }) {
   return (
     <div className="flex items-center justify-between gap-4 py-4">

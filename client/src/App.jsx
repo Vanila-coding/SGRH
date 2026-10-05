@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { ToastProvider } from './context/ToastContext';
-import { ThemeProvider } from './context/ThemeContext';
-import { PermissionProvider } from './context/PermissionContext';
-import { TextProvider } from './context/TextContext';
-import { SiteSettingsProvider } from './context/SiteSettingsContext';
-import { SettingsPreferencesProvider } from './context/SettingsPreferencesContext';
+import { AuthProvider } from './context/AuthProvider';
+import { ToastProvider } from './context/ToastProvider';
+import { ThemeProvider } from './context/ThemeProvider';
+import { PermissionProvider } from './context/PermissionProvider';
+import { TextProvider } from './context/TextProvider';
+import { SiteSettingsProvider } from './context/SiteSettingsProvider';
+import { SettingsPreferencesProvider } from './context/SettingsPreferencesProvider';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/layout/AppShell';
 import Login from './pages/Login';

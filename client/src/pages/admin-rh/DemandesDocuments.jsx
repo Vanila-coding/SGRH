@@ -24,18 +24,12 @@ export default function DemandesDocuments() {
     return demandes.filter((d) => `${d.matricule || ''} ${d.prenom || ''} ${d.nom || ''}`.toLowerCase().includes(q));
   }, [demandes, search]);
 
-  async function load() {
-    setLoading(true);
-    try {
-      setDemandes(await getDemandesEnAttente());
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    getDemandesEnAttente()
+      .then(setDemandes)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleTraiter(id) {
     setError('');

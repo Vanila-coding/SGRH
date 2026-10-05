@@ -9,7 +9,7 @@ export function PreferencesTableaux() {
   const { prefs, updateNested } = useSettingsPreferences();
   const t = prefs.table;
   return (
-    <SettingsCard icon={Table2} title={traduire('Préférences des tableaux')} description={traduire("S\'applique aux listes de personnel, congés, documents, etc.")}>
+    <SettingsCard icon={Table2} title={traduire('Préférences des tableaux')} description={traduire("S'applique aux listes de personnel, congés, documents, etc.")}>
       <SettingsSelect label={traduire('Lignes par page')} value={String(t.pageSize)}
         onChange={(v) => updateNested('table', 'pageSize', Number(v))}
         options={[10, 25, 50, 100].map((n) => ({ value: String(n), label: String(n) }))} />
@@ -26,7 +26,7 @@ export function Documents() {
   const { prefs, updateNested } = useSettingsPreferences();
   const d = prefs.documents;
   return (
-    <SettingsCard icon={FileText} title={traduire('Documents')} description={traduire("Préférences d\'affichage pour vos documents RH.")}>
+    <SettingsCard icon={FileText} title={traduire('Documents')} description={traduire("Préférences d'affichage pour vos documents RH.")}>
       <SettingsToggle label={traduire('Prévisualisation automatique')} checked={d.autoPreview} onChange={(v) => updateNested('documents', 'autoPreview', v)} />
       <SettingsToggle label={traduire('Téléchargement automatique')} checked={d.autoDownload} onChange={(v) => updateNested('documents', 'autoDownload', v)} />
       <SettingsSelect label={traduire('Format préféré')} value={d.preferredFormat} onChange={(v) => updateNested('documents', 'preferredFormat', v)}

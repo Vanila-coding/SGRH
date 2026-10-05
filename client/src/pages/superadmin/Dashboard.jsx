@@ -30,7 +30,7 @@ const QUICK_ACTIONS = [
   { label: traduire('Gérer les comptes'), to: '/superadmin/comptes', icon: ShieldCheck },
   { label: traduire('Comptes en attente'), to: '/admin/comptes-attente', icon: UserCheck },
   { label: traduire('Gérer les permissions'), to: '/superadmin/permissions', icon: KeyRound },
-  { label: traduire("Consulter l\'activité"), to: '/admin/historique', icon: History },
+  { label: traduire("Consulter l'activité"), to: '/admin/historique', icon: History },
   { label: traduire('Ouvrir la corbeille'), to: '/superadmin/corbeille', icon: Trash2 },
   { label: traduire('Réclamations'), to: '/superadmin/reclamations', icon: MessageSquareWarning },
   { label: traduire('Paramètres'), to: '/parametres', icon: Settings },
@@ -112,7 +112,7 @@ export default function SuperadminDashboard() {
   if (error) {
     return (
       <div>
-        <PageHeader crumbs={[{ label: traduire('Administration') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble administrative et technique du SGRH")} />
+        <PageHeader crumbs={[{ label: traduire('Administration') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d'ensemble administrative et technique du SGRH")} />
         <p className="text-status-rejected text-sm">{error}</p>
       </div>
     );
@@ -123,7 +123,7 @@ export default function SuperadminDashboard() {
   if (loading) {
     return (
       <div className="space-y-6" role="status" aria-label={traduire('Chargement du tableau de bord')}>
-        <PageHeader crumbs={[{ label: traduire('Administration') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble administrative et technique du SGRH")} />
+        <PageHeader crumbs={[{ label: traduire('Administration') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d'ensemble administrative et technique du SGRH")} />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} padding="p-5">
@@ -184,7 +184,7 @@ export default function SuperadminDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader crumbs={[{ label: traduire('Administration') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble administrative et technique du SGRH")} />
+      <PageHeader crumbs={[{ label: traduire('Administration') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d'ensemble administrative et technique du SGRH")} />
 
       {/* Ligne 1 — Comptes utilisateurs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -325,7 +325,7 @@ export default function SuperadminDashboard() {
               <Badge variant={reclamationsOuvertes > 0 ? 'pending' : 'approved'}>{reclamationsOuvertes}</Badge>
             </li>
           </ul>
-          <ShortcutLink to="/admin/historique">{traduire("Consulter l\'audit complet")}</ShortcutLink>
+          <ShortcutLink to="/admin/historique">{traduire("Consulter l'audit complet")}</ShortcutLink>
         </Card>
 
         <Card>

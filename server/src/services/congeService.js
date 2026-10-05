@@ -8,6 +8,7 @@ const congeSuiviRepository = require('../repositories/congeSuiviRepository');
 const verificationService = require('./verificationService');
 const congeUtilisationService = require('./congeUtilisationService');
 const pool = require('../config/db');
+const { categorieMetier, categorieVerifiee, estSecretaire } = require('../utils/categorieSecretariat');
 
 const JUSTIFICATIF_REQUIS_VALIDATION = ['Congé de maladie', 'Congé de maternité'];
 
@@ -92,7 +93,8 @@ async function createDemande(userId, { typeConge, dateDebut, dateFin, motif, lie
   // La notification du validateur (ou du RH s'il n'y en a pas) n'a lieu qu'une fois
   // le secrétariat satisfait — voir reviewSecretariat. À la création, seul le
   // secrétariat de la catégorie du demandeur (et le RH en repli anti-blocage) est prévenu.
-  const secretaires = await userRepository.listActive({ role: user.role === 'PE' ? 'SECRETAIRE_PE' : 'SECRETAIRE_PAT' });
+  const categorie = categorieMetier(user.role);
+  const secretaires = categorie ? await userRepository.listActive({ role: `SECRETAIRE_${categorie}` }) : [];
   const admins = await userRepository.listActive({ role: 'ADMIN_RH' });
   for (const destinataire of [...secretaires, ...admins]) {
     await notificationRepository.create({
@@ -187,9 +189,10 @@ async function reviewIntermediaire(id, decision, validateurUserId, avis) {
 // `secretaireRole` : 'SECRETAIRE_PE' | 'SECRETAIRE_PAT' | 'ADMIN_RH' | 'SUPERADMIN'
 // (ADMIN_RH/SUPERADMIN servent de repli anti-blocage si aucun secrétaire n'est
 // désigné pour une catégorie — ils passent sans restriction de catégorie).
-async function getPendingForSecretariat(secretaireRole) {
-  const roleCible = secretaireRole === 'SECRETAIRE_PE' ? 'PE' : secretaireRole === 'SECRETAIRE_PAT' ? 'PAT' : null;
-  return congeRepository.findPendingForSecretariat(roleCible);
+// Un secrétaire ne voit pas ses propres demandes (séparation des tâches).
+async function getPendingForSecretariat(secretaireRole, secretaireUserId) {
+  const exclure = estSecretaire(secretaireRole) ? secretaireUserId : null;
+  return congeRepository.findPendingForSecretariat(categorieVerifiee(secretaireRole), exclure);
 }
 
 async function reviewSecretariat(id, decision, secretaireUserId, secretaireRole, avis) {
@@ -201,9 +204,13 @@ async function reviewSecretariat(id, decision, secretaireUserId, secretaireRole,
   if (demande.decision_secretariat !== 'en_attente') {
     throw new Error('Cette demande a déjà été vérifiée par le secrétariat');
   }
-  const roleCible = secretaireRole === 'SECRETAIRE_PE' ? 'PE' : secretaireRole === 'SECRETAIRE_PAT' ? 'PAT' : null;
-  if (roleCible && demande.role !== roleCible) {
-    throw new Error("Cette demande ne relève pas de votre secrétariat");
+  if (estSecretaire(secretaireRole)) {
+    if (demande.user_id === secretaireUserId) {
+      throw new Error('Vous ne pouvez pas vérifier votre propre demande');
+    }
+    if (categorieMetier(demande.role) !== categorieVerifiee(secretaireRole)) {
+      throw new Error("Cette demande ne relève pas de votre secrétariat");
+    }
   }
 
   // Décision, changement de statut et restitution des jours : atomiques, comme

@@ -20,6 +20,7 @@ import SelectMenu from '../../components/ui/SelectMenu';
 import ViewToggle from '../../components/ui/ViewToggle';
 import useVueListe from '../../hooks/useVueListe';
 import { traduire } from '../../i18n';
+import DateInput from '../../components/ui/DateInput';
 
 const TYPES_EVENEMENT = [
   'Recrutement', 'Stage', 'Titularisation', 'Prolongation de stage', "Avancement d'échelon",
@@ -108,9 +109,10 @@ export default function Carriere() {
   }
 
   useEffect(() => {
-    loadCarriere(selectedId);
-    loadSituations(selectedId);
-    loadAlertes(selectedId);
+    if (!selectedId) return;
+    getCarriere(selectedId).then(setData).catch((err) => setFeedback(err.message)).finally(() => setLoading(false));
+    getSituationsForPersonnel(selectedId).then(setSituations).catch((err) => setFeedback(err.message));
+    fetchAlertesAvancement(selectedId).then(setAlertes).catch(() => setAlertes([]));
   }, [selectedId]);
 
   function ouvrirTraitementAlerte(alerte) {
@@ -297,7 +299,7 @@ export default function Carriere() {
           id="carriere-personnel"
           items={personnelList}
           value={selectedId}
-          onChange={(id) => { setSelectedId(id); resetForm(); }}
+          onChange={(id) => { setSelectedId(id); resetForm(); if (!id) { setData(null); setSituations(null); setAlertes([]); } }}
           formatOption={(p) => `${p.matricule} — ${[p.prenom, p.nom].filter(Boolean).join(' ')} (${p.role})`}
           className="max-w-xl"
         />
@@ -323,7 +325,7 @@ export default function Carriere() {
               </div>
             )}
             {!situations?.actuelle && situations && (
-              <p className="text-sm text-gray-400 mb-4">{traduire("Aucune situation administrative enregistrée pour l\'instant.")}</p>
+              <p className="text-sm text-gray-400 mb-4">{traduire("Aucune situation administrative enregistrée pour l'instant.")}</p>
             )}
 
             <form onSubmit={handleAddSituation} className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
@@ -337,8 +339,8 @@ export default function Carriere() {
                   <option key={t.id} value={t.id}>{t.libelle}{t.categories_concernees ? ` (${t.categories_concernees})` : ''}</option>
                 ))}
               </SelectMenu>
-              <input
-                type="date" required value={situationForm.dateDebut}
+              <DateInput
+                 required value={situationForm.dateDebut}
                 onChange={(e) => setSituationForm((p) => ({ ...p, dateDebut: e.target.value }))}
                 className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm"
               />
@@ -454,8 +456,8 @@ export default function Carriere() {
                           <option value="">{traduire('-- Catégorie --')}</option>
                           {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'].map((c) => <option key={c} value={c}>{c}</option>)}
                         </SelectMenu>
-                        <input
-                          type="date" required value={traiterForm.dateEffet}
+                        <DateInput
+                           required value={traiterForm.dateEffet}
                           onChange={(e) => setTraiterForm((p) => ({ ...p, dateEffet: e.target.value }))}
                           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                         />
@@ -470,7 +472,7 @@ export default function Carriere() {
                           className="border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-2 py-1.5 text-xs"
                         />
                         <div className="col-span-2 sm:col-span-4 flex gap-2">
-                          <button type="submit" disabled={traiterStatus === 'loading'} className="text-xs px-3 py-1 rounded-md bg-navy text-white font-medium disabled:opacity-50">{traduire("Valider l\'avancement")}</button>
+                          <button type="submit" disabled={traiterStatus === 'loading'} className="text-xs px-3 py-1 rounded-md bg-navy text-white font-medium disabled:opacity-50">{traduire("Valider l'avancement")}</button>
                           <button type="button" onClick={() => setTraiterAlerteId(null)} className="text-xs px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300">{traduire('Annuler')}</button>
                         </div>
                       </form>
@@ -500,17 +502,17 @@ export default function Carriere() {
               </SelectMenu>
 
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire("Date de l\'événement *")}</label>
-                <input
-                  type="date" required value={form.dateEvenement}
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire("Date de l'événement *")}</label>
+                <DateInput
+                   required value={form.dateEvenement}
                   onChange={(e) => updateForm('dateEvenement', e.target.value)}
                   className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire("Date d\'effet")}</label>
-                <input
-                  type="date" value={form.dateEffet}
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{traduire("Date d'effet")}</label>
+                <DateInput
+                   value={form.dateEffet}
                   onChange={(e) => updateForm('dateEffet', e.target.value)}
                   className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
                 />

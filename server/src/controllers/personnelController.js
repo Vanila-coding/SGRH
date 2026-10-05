@@ -4,7 +4,9 @@ const path = require('path');
 const crypto = require('crypto');
 const pool = require('../config/db');
 const personnelRepository = require('../repositories/personnelRepository');
+const activityLogRepository = require('../repositories/activityLogRepository');
 const personnelService = require('../services/personnelService');
+const { genererDossierPdf } = require('../services/dossierPdfService');
 const { imageExtension } = require('../utils/imageType');
 const { FONCTIONS_PAR_ROLE } = require('../services/userService');
 
@@ -79,7 +81,7 @@ async function updatePhoto(req, res) {
 }
 
 async function create(req, res) {
-  const { matricule, nom, prenom, email, role, roles, fonction, corps, grade, poste, service, direction, telephone, typeContrat, dateRecrutement, dateEcheanceContrat, contratPermanent, categorieId, peInfos, secretariatRole } = req.body;
+  const { matricule, nom, prenom, email, role, roles, fonction, corps, grade, poste, service, direction, telephone, typeContrat, dateRecrutement, dateEcheanceContrat, contratPermanent, categorieId, peInfos, secretariatRole, classe, echelon, indice, resolveFromGrille } = req.body;
 
   const rolesFinal = Array.isArray(roles) && roles.length > 0 ? roles : (role ? [role] : []);
   if (!matricule || !nom || !email || rolesFinal.length === 0) {
@@ -91,13 +93,35 @@ async function create(req, res) {
 
   try {
     const personnel = await personnelService.createPersonnel(
-      { matricule, nom, prenom, email, roles: rolesFinal, fonction, corps, grade, poste, service, direction, telephone, typeContrat, dateRecrutement, dateEcheanceContrat, contratPermanent, categorieId, peInfos, secretariatRole },
+      { matricule, nom, prenom, email, roles: rolesFinal, fonction, corps, grade, poste, service, direction, telephone, typeContrat, dateRecrutement, dateEcheanceContrat, contratPermanent, categorieId, peInfos, secretariatRole, classe, echelon, indice, resolveFromGrille },
       req.user.id
     );
     return res.status(201).json({ message: 'Fiche personnel créée', personnel });
   } catch (err) {
     return res.status(400).json({ message: err.message });
   }
+}
+
+// Le téléchargement est journalisé avant l'envoi : la trace existe même si l'envoi échoue.
+async function envoyerDossierPdf(req, res, fiche) {
+  await activityLogRepository.create(req.user.id, 'dossier_pdf_telecharge', `Dossier PDF téléchargé : ${fiche.prenom} ${fiche.nom} (matricule ${fiche.matricule})`);
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="dossier-${fiche.matricule}.pdf"`);
+  genererDossierPdf(fiche, res);
+}
+
+async function monDossierPdf(req, res) {
+  const fiche = await personnelRepository.findByUserId(req.user.id);
+  if (!fiche) return res.status(404).json({ message: 'Aucune fiche personnel associée à votre compte' });
+  const detail = await personnelRepository.findDetailleById(fiche.id);
+  return envoyerDossierPdf(req, res, detail);
+}
+
+async function dossierPdf(req, res) {
+  if (!/^\d+$/.test(req.params.id)) return res.status(400).json({ message: 'Identifiant du personnel invalide' });
+  const fiche = await personnelRepository.findDetailleById(Number(req.params.id));
+  if (!fiche) return res.status(404).json({ message: 'Fiche personnel introuvable' });
+  return envoyerDossierPdf(req, res, fiche);
 }
 
 async function update(req, res) {
@@ -291,4 +315,4 @@ async function updateMesInfos(req, res) {
   }
 }
 
-module.exports = { me, getOne, updatePhoto, create, update, list, listWithoutAccount, sendRegistrationLink, exportExcel, modeleImportExcel, importExcel, monEquipe, updateMesInfos };
+module.exports = { me, getOne, monDossierPdf, dossierPdf, updatePhoto, create, update, list, listWithoutAccount, sendRegistrationLink, exportExcel, modeleImportExcel, importExcel, monEquipe, updateMesInfos };

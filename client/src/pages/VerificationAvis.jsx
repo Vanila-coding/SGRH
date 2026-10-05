@@ -30,7 +30,7 @@ export default function VerificationAvis() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-start justify-center p-4 sm:p-8">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <p className="text-xs text-gray-400 text-center">{traduire("Université de Mahajanga — Vérification d\'un avis")}</p>
+        <p className="text-xs text-gray-400 text-center">{traduire("Université de Mahajanga — Vérification d'un avis")}</p>
 
         {!result && !error && <p className="mt-6 text-center text-sm text-gray-500" role="status">{traduire('Vérification en cours…')}</p>}
 

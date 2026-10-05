@@ -31,7 +31,12 @@ export default function Reclamation() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    getMesReclamations()
+      .then(setMesReclamations)
+      .catch((err) => setFeedback(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -55,7 +60,7 @@ export default function Reclamation() {
       <PageHeader
         crumbs={[{ label: traduire('Aide') }, { label: traduire('Signaler un problème') }]}
         title={traduire('Signaler un problème')}
-        subtitle={traduire("Décrivez le problème rencontré : le Superadmin est notifié dès l\'envoi")}
+        subtitle={traduire("Décrivez le problème rencontré : le Superadmin est notifié dès l'envoi")}
       />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
@@ -104,7 +109,7 @@ export default function Reclamation() {
           <h3 className="font-semibold text-navy dark:text-gold mb-4">{traduire('Mes réclamations')}</h3>
           {loading && <SkeletonText lines={4} />}
           {!loading && mesReclamations.length === 0 && (
-            <p className="text-gray-400 dark:text-gray-500 text-sm">{traduire("Aucune réclamation pour l\'instant.")}</p>
+            <p className="text-gray-400 dark:text-gray-500 text-sm">{traduire("Aucune réclamation pour l'instant.")}</p>
           )}
           <div className={vue === 'liste' ? 'space-y-3' : 'grid grid-cols-1 lg:grid-cols-2 gap-3'}>
             {mesReclamations.map((r) => (

@@ -24,7 +24,7 @@ export default function MonEquipe() {
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />
       </div>
-        <div className={vue === 'liste' ? 'flex flex-col gap-4' : 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'} role="status" aria-label={traduire("Chargement de l\'équipe")}>
+        <div className={vue === 'liste' ? 'flex flex-col gap-4' : 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'} role="status" aria-label={traduire("Chargement de l'équipe")}>
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-center gap-3">
               <SkeletonAvatar size={40} />
@@ -49,7 +49,7 @@ export default function MonEquipe() {
 
       {data.equipe.length === 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <p className="text-sm text-gray-400">{traduire("Aucun membre dans cette équipe pour l\'instant.")}</p>
+          <p className="text-sm text-gray-400">{traduire("Aucun membre dans cette équipe pour l'instant.")}</p>
         </div>
       )}
       <div className={vue === 'liste' ? 'flex flex-col gap-4' : 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'}>

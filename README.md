@@ -261,6 +261,8 @@ Une situation déjà close ne peut pas être supprimée (`DELETE /api/situations
 
 L'indice de traitement d'un fonctionnaire n'est jamais une valeur saisie librement : il est **déterminé** par `grilleIndiciaireService.resolveIndice()` (logique centralisée, jamais dupliquée) à partir d'une grille réglementaire et de la situation de l'agent (classe, échelon, catégorie/cadre/échelle, date d'effet). Cette règle ne s'applique qu'au régime `FONCTIONNAIRE` (déduit de `personnel.corps = 'Fonctionnaire'` — voir note terminologique ci-dessous) ; pour les agents non encadrés (`EFA`/`ELD`), aucune grille chiffrée n'a pu être vérifiée par une source officielle, donc aucune n'est codée en dur : leur indice reste en saisie libre (`indice_source = 'A_CONFIRMER'`).
 
+La grille générale des fonctionnaires est chargée depuis le fichier de référence RH (migration 022) : catégories I à IX (deuxième classe, première classe, principalat, classe exceptionnelle, échelons 1 à 3, classe exceptionnelle 1 et 2) et deux échelons de la classe exceptionnelle pour la catégorie X. Les stagiaires (échelon 0) et les échelons 1 à 6 de la structure particulière de X ne sont pas chargés. Les EFA et ELD n'ont pas de grille : leur indice reste à saisir ou à confirmer.
+
 ### Sources réglementaires vérifiées
 
 | Texte | Ce qu'il fixe |
@@ -539,6 +541,7 @@ Toutes les clés étrangères vers `users.id` ont un comportement `ON DELETE` ex
 | `019_add_secretariat_roles.sql` | Élargit `users_role_check` à `SECRETAIRE_PE`/`SECRETAIRE_PAT` ; ajoute `decision_secretariat`/`decision_secretariat_le`/`avis_secretariat` sur `conges` et `demandes_documents` ; rétro-approuve les lignes déjà existantes (jamais bloquées rétroactivement par la nouvelle étape). | Non |
 | `020_add_personnel_secretariat_role.sql` | Ajoute la colonne nullable `personnel.secretariat_role` (`SECRETAIRE_PE`/`SECRETAIRE_PAT`, `CHECK`) désignée par l'Admin RH à la création de la fiche. | Non |
 | `021_directions_services_actif_et_etablissements.sql` | Ajoute `directions.actif` et `services.actif` (`BOOLEAN NOT NULL DEFAULT TRUE`) pour désactiver sans supprimer. | Non |
+| `022_grille_fonction_publique.sql` | Crée la grille `FONCTIONNAIRE_GRILLE_GENERALE` (101 lignes : catégories I à IX en 2e classe, 1re classe, principalat et classe exceptionnelle ; deux échelons de la classe exceptionnelle pour X), puis **désactive** (sans supprimer) la grille transitoire. Modifie des données : il n'existe aucune fiche ni événement lié aux anciennes lignes. | Non (désactive, ne supprime pas) |
 
 Elles sont réexécutables sans risque (`IF NOT EXISTS` / `DROP CONSTRAINT IF EXISTS` avant chaque `ADD`) et n'altèrent jamais de données existantes. Les migrations `012` (type de colonne et `DEFAULT`) et `011` (contrainte) modifient la définition d'une colonne ou d'une contrainte, sans toucher aux lignes.
 

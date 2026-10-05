@@ -10,16 +10,8 @@ export default function NotificationBell() {
   const ref = useRef(null);
   const navigate = useNavigate();
 
-  async function load() {
-    try {
-      setNotifications(await getMyNotifications());
-    } catch {
-      // silencieux : pas grave si ça échoue ponctuellement
-    }
-  }
-
   useEffect(() => {
-    load();
+    getMyNotifications().then(setNotifications).catch(() => {});
   }, []);
 
   useEffect(() => {

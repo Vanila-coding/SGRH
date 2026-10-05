@@ -21,18 +21,12 @@ export default function CongesSecretariat() {
   const [avisMap, setAvisMap] = useState({});
   const [reviewingId, setReviewingId] = useState(null);
 
-  async function load() {
-    setLoading(true);
-    try {
-      setDemandes(await getPendingSecretariat());
-    } catch (err) {
-      setActionError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    getPendingSecretariat()
+      .then(setDemandes)
+      .catch((err) => setActionError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleReview(id, decision) {
     if (reviewingId) return;

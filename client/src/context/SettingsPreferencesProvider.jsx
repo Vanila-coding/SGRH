@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { SettingsPreferencesContext } from './SettingsPreferencesContext';
 
 const KEY = 'rh_settings_prefs';
 
@@ -47,8 +48,6 @@ function loadPrefs() {
   }
 }
 
-const SettingsPreferencesContext = createContext(null);
-
 export function SettingsPreferencesProvider({ children }) {
   const [prefs, setPrefs] = useState(loadPrefs);
 
@@ -85,10 +84,4 @@ export function SettingsPreferencesProvider({ children }) {
       <div key={prefs.langue} className="contents">{children}</div>
     </SettingsPreferencesContext.Provider>
   );
-}
-
-export function useSettingsPreferences() {
-  const ctx = useContext(SettingsPreferencesContext);
-  if (!ctx) throw new Error('useSettingsPreferences doit être utilisé dans SettingsPreferencesProvider');
-  return ctx;
 }

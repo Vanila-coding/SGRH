@@ -79,7 +79,7 @@ export default function MaCarriere() {
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 className="font-semibold text-navy dark:text-gold mb-4">{traduire('Ma carrière')}</h3>
-        {data.timeline.length === 0 && <p className="text-sm text-gray-400">{traduire("Aucun événement enregistré pour l\'instant.")}</p>}
+        {data.timeline.length === 0 && <p className="text-sm text-gray-400">{traduire("Aucun événement enregistré pour l'instant.")}</p>}
         <div className="relative border-l-2 border-gray-200 dark:border-gray-700 pl-4 space-y-4">
           {data.timeline.map((item, i) => (
             <div key={i} className="relative">

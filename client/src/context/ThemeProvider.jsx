@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ThemeContext } from './ThemeContext';
 
-const ThemeContext = createContext(null);
 const THEME_KEY = 'rh_theme';
 
 function resolveIsDark(theme) {
@@ -44,10 +44,4 @@ export function ThemeProvider({ children }) {
       {children}
     </ThemeContext.Provider>
   );
-}
-
-export function useTheme() {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error('useTheme doit être utilisé dans ThemeProvider');
-  return ctx;
 }

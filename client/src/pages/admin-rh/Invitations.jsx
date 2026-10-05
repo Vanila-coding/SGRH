@@ -22,7 +22,11 @@ export default function Invitations() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    listPersonnelWithoutAccount()
+      .then(setPersonnel)
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtered = personnel.filter((p) => {
     if (!search) return true;
@@ -41,7 +45,7 @@ export default function Invitations() {
     try {
       await sendRegistrationLink(selectedId);
       setStatus('success');
-      setMessage(traduire("Lien d\'inscription envoyé."));
+      setMessage(traduire("Lien d'inscription envoyé."));
       setSelectedId(null);
       setSearch('');
       load();
@@ -118,7 +122,7 @@ export default function Invitations() {
         className="w-full inline-flex items-center justify-center gap-2 bg-navy text-white rounded-lg py-3 text-sm font-medium shadow-sm hover:bg-navy/90 focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <Send size={17} />
-        {status === 'loading' ? 'Envoi...' : traduire("Envoyer le lien d\'inscription")}
+        {status === 'loading' ? 'Envoi...' : traduire("Envoyer le lien d'inscription")}
       </button>
 
       {message && (

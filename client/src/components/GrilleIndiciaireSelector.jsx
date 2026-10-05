@@ -19,39 +19,33 @@ const inputClass = 'w-full border border-gray-300 dark:bg-gray-700 dark:border-g
  *  - onChange(nextValue, resolution|null)
  */
 export default function GrilleIndiciaireSelector({ regime, value, onChange, dateEffet }) {
-  const [resolution, setResolution] = useState(null);
-  const [resolutionError, setResolutionError] = useState('');
-  const [loading, setLoading] = useState(false);
-
   const classeInfo = CLASSES_GRILLE.find((c) => c.value === value.classe);
   const echelons = classeInfo ? Array.from({ length: classeInfo.echelons }, (_, i) => i + 1) : [];
 
+  // Résolution seulement pour un fonctionnaire avec classe, échelon et catégorie. Le résultat
+  // est rattaché à la combinaison qui l'a produit : pas de réinitialisation dans l'effet.
+  const applicable = regime === 'FONCTIONNAIRE' && !!value.classe && !!value.echelon && !!value.categorie;
+  const cle = applicable ? [value.classe, value.echelon, value.categorie, value.cadre, value.echelle, dateEffet].join('|') : null;
+  const [resultat, setResultat] = useState(null); // { cle, resolution, error }
+
   useEffect(() => {
-    if (regime !== 'FONCTIONNAIRE' || !value.classe || !value.echelon || !value.categorie) {
-      setResolution(null);
-      setResolutionError('');
-      return;
-    }
+    if (!cle) return;
     let cancelled = false;
-    setLoading(true);
     resolveIndice({
       regime, classe: value.classe, echelon: value.echelon, categorie: value.categorie,
       cadre: value.cadre, echelle: value.echelle, dateEffet,
     }).then(({ resolution: r, error }) => {
       if (cancelled) return;
-      setLoading(false);
-      if (r) {
-        setResolution(r);
-        setResolutionError('');
-        onChange({ ...value, indice: String(r.indice) }, r);
-      } else {
-        setResolution(null);
-        setResolutionError(error);
-      }
+      setResultat({ cle, resolution: r, error });
+      if (r) onChange({ ...value, indice: String(r.indice) }, r);
     });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [regime, value.classe, value.echelon, value.categorie, value.cadre, value.echelle, dateEffet]);
+  }, [cle]);
+
+  const loading = applicable && resultat?.cle !== cle;
+  const resolution = applicable && resultat?.cle === cle ? resultat.resolution : null;
+  const resolutionError = applicable && resultat?.cle === cle && !resultat.resolution ? resultat.error : '';
 
   function update(field, val) {
     const next = { ...value, [field]: val };
@@ -88,6 +82,10 @@ export default function GrilleIndiciaireSelector({ regime, value, onChange, date
             {CATEGORIES.map((c) => <option key={c} value={c}>{traduire('Catégorie')} {c}</option>)}
           </SelectMenu>
         </div>
+      )}
+
+      {regime === 'FONCTIONNAIRE' && value.classe && value.echelon && !value.categorie && (
+        <p className="text-xs text-amber-600 dark:text-amber-400">{traduire("Choisis la catégorie (I à X) pour calculer l'indice et l'IB.")}</p>
       )}
 
       {loading && <p className="text-xs text-gray-400">{traduire('Recherche dans la grille…')}</p>}

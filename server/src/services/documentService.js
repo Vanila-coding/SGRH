@@ -4,6 +4,7 @@ const personnelRepository = require('../repositories/personnelRepository');
 const notificationRepository = require('../repositories/notificationRepository');
 const userRepository = require('../repositories/userRepository');
 const activityLogRepository = require('../repositories/activityLogRepository');
+const { categorieMetier, categorieVerifiee, estSecretaire } = require('../utils/categorieSecretariat');
 const congeDocumentsService = require('./congeDocumentsService');
 const pool = require('../config/db');
 
@@ -70,7 +71,8 @@ async function demanderDocument(userId, typeDocument, motif) {
   // La notification du RH n'a lieu qu'une fois le secrétariat satisfait — voir
   // reviewDemandeSecretariat. À la création, seul le secrétariat de la catégorie du
   // demandeur (et le RH en repli anti-blocage) est prévenu.
-  const secretaires = await userRepository.listActive({ role: user.role === 'PE' ? 'SECRETAIRE_PE' : 'SECRETAIRE_PAT' });
+  const categorie = categorieMetier(user.role);
+  const secretaires = categorie ? await userRepository.listActive({ role: `SECRETAIRE_${categorie}` }) : [];
   const admins = await userRepository.listActive({ role: 'ADMIN_RH' });
   for (const destinataire of [...secretaires, ...admins]) {
     await notificationRepository.create({
@@ -86,9 +88,10 @@ async function demanderDocument(userId, typeDocument, motif) {
   return demande;
 }
 
-async function getDemandesEnAttenteSecretariat(secretaireRole) {
-  const roleCible = secretaireRole === 'SECRETAIRE_PE' ? 'PE' : secretaireRole === 'SECRETAIRE_PAT' ? 'PAT' : null;
-  return demandeDocumentRepository.findPendingForSecretariat(roleCible);
+// Un secrétaire ne voit pas ses propres demandes (séparation des tâches).
+async function getDemandesEnAttenteSecretariat(secretaireRole, secretaireUserId) {
+  const exclure = estSecretaire(secretaireRole) ? secretaireUserId : null;
+  return demandeDocumentRepository.findPendingForSecretariat(categorieVerifiee(secretaireRole), exclure);
 }
 
 async function reviewDemandeSecretariat(demandeId, decision, secretaireUserId, secretaireRole, avis) {
@@ -103,9 +106,13 @@ async function reviewDemandeSecretariat(demandeId, decision, secretaireUserId, s
 
   const requesterUserId = await personnelRepository.findLinkedUserId(demande.personnel_id);
   const requester = requesterUserId ? await userRepository.findById(requesterUserId) : null;
-  const roleCible = secretaireRole === 'SECRETAIRE_PE' ? 'PE' : secretaireRole === 'SECRETAIRE_PAT' ? 'PAT' : null;
-  if (roleCible && requester?.role !== roleCible) {
-    throw new Error("Cette demande ne relève pas de votre secrétariat");
+  if (estSecretaire(secretaireRole)) {
+    if (requesterUserId === secretaireUserId) {
+      throw new Error('Vous ne pouvez pas vérifier votre propre demande');
+    }
+    if (categorieMetier(requester?.role) !== categorieVerifiee(secretaireRole)) {
+      throw new Error("Cette demande ne relève pas de votre secrétariat");
+    }
   }
 
   const updated = await demandeDocumentRepository.setDecisionSecretariat(demandeId, decision, avis);

@@ -30,7 +30,12 @@ export default function Corbeille() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    listCorbeille()
+      .then(setItems)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleRestore(id) {
     setError('');
@@ -82,7 +87,7 @@ export default function Corbeille() {
       <PageHeader
         crumbs={[{ label: traduire('Administration') }, { label: traduire('Corbeille') }]}
         title={traduire('Corbeille')}
-        subtitle={traduire("Les éléments supprimés restent ici jusqu\'à restauration ou suppression définitive")}
+        subtitle={traduire("Les éléments supprimés restent ici jusqu'à restauration ou suppression définitive")}
       />
       <div className="flex justify-end mb-3">
         <ViewToggle value={vue} onChange={setVue} />

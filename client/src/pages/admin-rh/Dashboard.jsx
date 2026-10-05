@@ -66,7 +66,7 @@ export default function Dashboard() {
   if (!stats) {
     return (
       <div className="space-y-6" role="status" aria-label={traduire('Chargement du tableau de bord')}>
-        <PageHeader crumbs={[{ label: traduire('Admin RH') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble des ressources humaines")} />
+        <PageHeader crumbs={[{ label: traduire('Admin RH') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d'ensemble des ressources humaines")} />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-5 flex items-center gap-4">
@@ -102,7 +102,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader crumbs={[{ label: traduire('Admin RH') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d\'ensemble des ressources humaines")} />
+      <PageHeader crumbs={[{ label: traduire('Admin RH') }]} title={traduire('Tableau de bord')} subtitle={traduire("Vue d'ensemble des ressources humaines")} />
 
       <div className="space-y-3">
         <SectionTitle>{traduire('Effectifs')}</SectionTitle>

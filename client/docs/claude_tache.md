@@ -735,6 +735,17 @@ Incident maîtrisé : un script de test a cliqué le bouton « Générer la déc
 
 ---
 
+## Bilan 2026-10-06 — secrétariat, grille générale, qualité
+
+- **Circuit de vérification du secrétariat (congés et documents)** : la catégorie d'une demande se déduit du métier de son auteur (un secrétaire est PAT). Un secrétaire ne voit ni ne vérifie sa propre demande ; le contrôle de catégorie est appliqué dans les services. Logique centralisée dans `server/src/utils/categorieSecretariat.js`. Tests : `server/test/secretariat.integration.test.js`.
+- **Grille générale des fonctionnaires** : migration `022_grille_fonction_publique.sql` (101 lignes, générées depuis le fichier de référence RH). La grille transitoire est désactivée, pas supprimée. Tests de `grilleIndiciaireService` adaptés à la nouvelle référence.
+- **Création de fiche par l'API** : le contrôleur transmettait une liste fixe de champs et perdait classe, échelon, indice et résolution de grille. Corrigé ; test de régression dans `server/test/creationPersonnelGrille.integration.test.js`.
+- **Formulaires personnel** : sélecteur classe/échelon dans l'ajout et la modification (EFA/ELD inclus) ; l'indice et l'IB enregistrés sont affichés dans la modification ; un message signale quand la catégorie manque pour calculer l'indice.
+- **Dossier PDF** : chaque téléchargement est journalisé (`dossier_pdf_telecharge`).
+- **Qualité** : lint client sans erreur (contextes séparés en hooks `.js` et Providers `.jsx` ; chargements déplacés hors des effets) ; build client OK ; tests serveur 79/79.
+- **Permissions** : `manage_accounts` reste réservé au superadministrateur (décision RH).
+- **Reste à faire** : enregistrer la catégorie grille sur la fiche (migration, en attente de validation) et confirmer la correspondance CAT → I–X ; fournir les grilles EFA et ELD ; jouer le parcours complet du circuit secrétariat dans le navigateur.
+
 ## 🎯 Les 10 prochaines tâches prioritaires
 
 Si tu veux simplement savoir **quoi attaquer maintenant**, je mettrais :

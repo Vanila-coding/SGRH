@@ -6,6 +6,8 @@ import { fetchEtablissements } from '../services/etablissementApi';
 import Modal from './ui/Modal';
 import SelectMenu from './ui/SelectMenu';
 import { traduire } from '../i18n';
+import DateInput from './ui/DateInput';
+import GrilleIndiciaireSelector from './GrilleIndiciaireSelector';
 
 const FONCTIONS_PAR_ROLE = {
   PE: ['Enseignant', 'Enseignant Chercheur', 'Maître de Conférences', 'Professeur'],
@@ -19,10 +21,12 @@ const empty = {
   corps: '', grade: '', poste: '', categorieId: '', service: '', direction: '', telephone: '', typeContrat: '',
   dateRecrutement: '', dateEcheanceContrat: '', contratPermanent: false,
   etablissementId: '', corpsPe: '', diplome: '', specialite: '', secretariatRole: '',
+  classe: '', echelon: '', categorie: '', cadre: '', echelle: '', indice: '',
 };
 
 export default function AjouterEmployeModal({ onClose, onSuccess }) {
   const [form, setForm] = useState(empty);
+  const [grilleResolved, setGrilleResolved] = useState(false);
   const [status, setStatus] = useState(null);
   const [message, setMessage] = useState('');
 
@@ -44,9 +48,12 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
   }, []);
 
   useEffect(() => {
-    if (!selectedDirectionId) { setServices([]); return; }
+    if (!selectedDirectionId) return;
     fetchServices(selectedDirectionId).then(setServices).catch(() => setServices([]));
   }, [selectedDirectionId]);
+
+  // Services de la direction choisie : vide tant qu'aucune direction n'est sélectionnée.
+  const servicesAffiches = selectedDirectionId ? services : [];
 
   function update(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -72,7 +79,7 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
 
   function handleServiceChange(e) {
     const id = e.target.value;
-    const svc = services.find((s) => String(s.id) === id);
+    const svc = servicesAffiches.find((s) => String(s.id) === id);
     update('service', svc ? svc.nom : '');
   }
 
@@ -95,12 +102,19 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
     }
     setStatus('loading');
     setMessage('');
-    const { etablissementId, corpsPe, diplome, specialite, ...rest } = form;
+    const { etablissementId, corpsPe, diplome, specialite, classe, echelon, indice, categorie, cadre, echelle, ...rest } = form;
     const peInfos = form.roles.includes('PE')
       ? { etablissementId: etablissementId || null, corpsPe: corpsPe || null, diplome: diplome || null, specialite: specialite || null }
       : undefined;
+    // Fonctionnaire avec une combinaison résolue dans la grille : le serveur fixe l'indice.
+    const resolveFromGrille = form.corps === 'Fonctionnaire' && grilleResolved && classe && echelon
+      ? { classe, echelon: Number(echelon), categorie: categorie || undefined, cadre: cadre || undefined, echelle: echelle || undefined }
+      : undefined;
     try {
-      await createPersonnel({ ...rest, categorieId: form.categorieId || null, peInfos });
+      await createPersonnel({
+        ...rest, categorieId: form.categorieId || null, peInfos,
+        classe: classe || null, echelon: echelon || null, indice: indice || null, resolveFromGrille,
+      });
       setStatus('success');
       setMessage(traduire('Fiche personnel créée.'));
       setTimeout(() => onSuccess?.(), 800);
@@ -196,6 +210,17 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
               {CORPS_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
             </SelectMenu>
           </div>
+          <div className="col-span-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Classe et échelon (grille indiciaire)')}</label>
+            <GrilleIndiciaireSelector
+              regime={form.corps === 'Fonctionnaire' ? 'FONCTIONNAIRE' : null}
+              value={{ classe: form.classe, echelon: form.echelon, categorie: form.categorie, cadre: form.cadre, echelle: form.echelle, indice: form.indice }}
+              onChange={(next, resolution) => {
+                setForm((prev) => ({ ...prev, ...next }));
+                setGrilleResolved(!!resolution);
+              }}
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Grade')}</label>
             <input
@@ -278,13 +303,13 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Service')}</label>
             <SelectMenu
-              value={services.find((s) => s.nom === form.service)?.id || ''}
+              value={servicesAffiches.find((s) => s.nom === form.service)?.id || ''}
               onChange={handleServiceChange}
               disabled={!selectedDirectionId}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"
             >
               <option value="">--</option>
-              {services.map((s) => <option key={s.id} value={s.id}>{s.nom}</option>)}
+              {servicesAffiches.map((s) => <option key={s.id} value={s.id}>{s.nom}</option>)}
             </SelectMenu>
           </div>
           <div>
@@ -309,8 +334,8 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Date de recrutement')}</label>
-            <input
-              type="date" value={form.dateRecrutement}
+            <DateInput
+               value={form.dateRecrutement}
               onChange={(e) => update('dateRecrutement', e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
             />
@@ -331,8 +356,8 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
           {!form.contratPermanent && (
             <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Date de fin de contrat')}</label>
-              <input
-                type="date" value={form.dateEcheanceContrat}
+              <DateInput
+                 value={form.dateEcheanceContrat}
                 onChange={(e) => update('dateEcheanceContrat', e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
               />
@@ -345,7 +370,7 @@ export default function AjouterEmployeModal({ onClose, onSuccess }) {
               disabled={status === 'loading'}
               className="w-full bg-navy text-white rounded-md py-2 font-medium hover:opacity-90 disabled:opacity-50"
             >
-              {status === 'loading' ? 'Enregistrement...' : traduire("Enregistrer l\'employé")}
+              {status === 'loading' ? 'Enregistrement...' : traduire("Enregistrer l'employé")}
             </button>
             {message && (
               <p className={`text-sm mt-2 ${status === 'success' ? 'text-status-approved' : 'text-status-rejected'}`}>

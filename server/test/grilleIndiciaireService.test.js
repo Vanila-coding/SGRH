@@ -47,7 +47,7 @@ test('TEST 1 — combinaison valide retourne le bon indice, avec sa source', asy
 test('TEST 2 — combinaison inexistante (grille sans ligne correspondante) est rejetée', async () => {
   await assert.rejects(
     grilleIndiciaireService.resolveIndice({
-      regime: 'FONCTIONNAIRE', categorie: 'I', classe: 'DEUXIEME_CLASSE', echelon: 1, dateEffet: '2026-01-01',
+      regime: 'FONCTIONNAIRE', categorie: 'X', classe: 'DEUXIEME_CLASSE', echelon: 1, dateEffet: '2026-01-01', // X n'a que la classe exceptionnelle
     }),
     /Aucune ligne indiciaire ne correspond/
   );
@@ -67,11 +67,11 @@ test('TEST 3 — une classe ne peut pas utiliser un échelon inexistant', async 
 });
 
 test('TEST 4 — la grille active à la date d\'effet est choisie (validité temporelle)', async () => {
-  // La grille seedée est valide à partir du 2005-06-01 : une résolution avant cette
+  // La grille générale est valide à partir du 1997-01-16 : une résolution avant cette
   // date ne doit trouver aucune grille active (pas de choix arbitraire).
   await assert.rejects(
     grilleIndiciaireService.resolveIndice({
-      regime: 'FONCTIONNAIRE', categorie: 'I', classe: 'CLASSE_EXCEPTIONNELLE', echelon: 1, dateEffet: '2000-01-01',
+      regime: 'FONCTIONNAIRE', categorie: 'I', classe: 'CLASSE_EXCEPTIONNELLE', echelon: 1, dateEffet: '1990-01-01',
     }),
     /grille inconnue/
   );
@@ -98,7 +98,7 @@ test('TEST 5/6 — un avancement d\'échelon crée un nouvel événement et cons
   const evenementsCarriere = timeline.filter((t) => t.source === 'evenement');
   assert.equal(evenementsCarriere.length, 2);
   const ancien = evenementsCarriere.find((e) => e.id === premier.id);
-  assert.equal(ancien.indice, '515'); // l'ancien événement garde SON indice, jamais réécrit
+  assert.equal(ancien.indice, '515-CE/E1'); // indice + code de grille du fichier // l'ancien événement garde SON indice, jamais réécrit
 
   const personnelMisAJour = await personnelRepository.findByIdRaw(personnel.id);
   assert.equal(personnelMisAJour.indice_num, 675); // situation courante = l'événement le plus récent
@@ -159,12 +159,12 @@ test('TEST 11 — deux situations différentes mais même indice numérique rest
 });
 
 test('TEST 12 — une grille avec une date de validité future ne modifie pas rétroactivement une résolution passée', async () => {
-  const grille = await grilleIndiciaireRepository.findGrilleById(1);
+  const grille = (await grilleIndiciaireRepository.listGrilles({ regime: 'FONCTIONNAIRE' })).find((g) => g.code === 'FONCTIONNAIRE_GRILLE_GENERALE');
   const resolutionPassee = await grilleIndiciaireService.resolveIndice({
     regime: 'FONCTIONNAIRE', categorie: 'I', classe: 'CLASSE_EXCEPTIONNELLE', echelon: 1, dateEffet: '2006-01-01',
   });
   assert.equal(resolutionPassee.grilleId, grille.id);
-  assert.equal(resolutionPassee.indice, 515); // toujours la grille transitoire, pas une grille hypothétique future
+  assert.equal(resolutionPassee.indice, 515); // même valeur qu'avant la grille générale : pas de grille hypothétique future
 });
 
 test('TEST 13 — le scan d\'alertes crée une alerte pour un échelon échu sans modifier personnel/carriere_evenements', async () => {

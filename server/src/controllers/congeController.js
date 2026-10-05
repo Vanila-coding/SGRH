@@ -110,7 +110,7 @@ async function reviewIntermediaire(req, res) {
 }
 
 async function pendingSecretariat(req, res) {
-  const demandes = await congeService.getPendingForSecretariat(req.user.role);
+  const demandes = await congeService.getPendingForSecretariat(req.user.role, req.user.id);
   return res.status(200).json({ demandes });
 }
 

@@ -104,7 +104,6 @@ const LIENS_PERSONNEL = { carriere: '/carriere', conges: '/conges', contrats: '/
 export function SyntheseDossier({ personnel, situations, contrats, timeline, solde, liens = LIENS_PERSONNEL }) {
   const situationActuelle = situations?.actuelle || null;
   const derniereEvolution = timeline[0] || null;
-  const indice = personnel.indice || (personnel.indice_num ? String(personnel.indice_num) : null);
   const classeEchelon = [CLASSE_LABELS[personnel.classe] || personnel.classe, personnel.echelon ? `échelon ${personnel.echelon}` : null]
     .filter(Boolean).join(', ');
   const categorie = personnel.categorie_appellation
@@ -133,7 +132,8 @@ export function SyntheseDossier({ personnel, situations, contrats, timeline, sol
             <Field icon={GraduationCap} label={traduire('Catégorie professionnelle')} value={categorie} />
             <Field icon={Award} label={traduire('Grade')} value={personnel.grade} />
             {classeEchelon && <Field icon={Award} label={traduire('Classe et échelon')} value={classeEchelon} />}
-            <Field icon={Hash} label={traduire('Indice')} value={indice} />
+            <Field icon={Hash} label={traduire('Indice')} value={personnel.indice} />
+            <Field icon={Hash} label={traduire('IB (indice brut)')} value={personnel.indice_num} />
             <Field icon={UserCog} label={traduire('Situation administrative actuelle')}
               value={situationActuelle ? `${situationActuelle.libelle} (depuis le ${formatDate(situationActuelle.date_debut)})` : (situations ? null : traduire('Non disponible'))} />
             <Field icon={FileText} label={traduire('Dernière évolution de carrière')}
@@ -188,7 +188,7 @@ export function SyntheseDossier({ personnel, situations, contrats, timeline, sol
               ) : (
                 <div data-testid="duree-contrat-restante">
                   <p className="text-xs text-slate-500 dark:text-gray-400">{traduire('Durée restante avant le')} {formatDate(contratInfo.dateFin)}</p>
-                  <p className="mt-0.5 text-lg font-bold text-navy dark:text-gold">{dureeRestante(contratInfo.dateFin) || traduire("Dernier jour aujourd\'hui")}</p>
+                  <p className="mt-0.5 text-lg font-bold text-navy dark:text-gold">{dureeRestante(contratInfo.dateFin) || traduire("Dernier jour aujourd'hui")}</p>
                   <p className="text-xs text-slate-500 dark:text-gray-400">soit {joursContrat} jour{joursContrat > 1 ? 's' : ''}</p>
                   {joursContrat <= SEUIL_ECHEANCE_PROCHE_JOURS && (
                     <Badge variant="pending" className="mt-2">{traduire('Échéance dans moins de 6 mois')}</Badge>
@@ -218,7 +218,7 @@ export function ParcoursCard({ timeline, dateRecrutement }) {
         </h2>
         <div className="p-5 sm:p-6">
           {timeline.length === 0 ? (
-            <p className="text-sm text-slate-500 dark:text-gray-400">{traduire("Aucune information de carrière n\'est actuellement enregistrée.")}</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400">{traduire("Aucune information de carrière n'est actuellement enregistrée.")}</p>
           ) : (
             <ol className="space-y-4 border-l-2 border-slate-200 pl-5 dark:border-gray-700">
               {timeline.map((item, index) => (

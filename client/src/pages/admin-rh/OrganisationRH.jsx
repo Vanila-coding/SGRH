@@ -42,7 +42,9 @@ export default function OrganisationRH() {
     setDirections(await fetchDirections({ tous: true }));
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    fetchDirections({ tous: true }).then(setDirections);
+  }, []);
 
   async function rechargerServices(directionId) {
     const services = await fetchServices(directionId, { tous: true });
@@ -184,7 +186,7 @@ export default function OrganisationRH() {
       <PageHeader
         crumbs={[{ label: traduire('Admin RH') }, { label: traduire('Personnel'), path: '/admin/personnel' }, { label: traduire('Directions & services') }]}
         title={traduire('Directions & services')}
-        subtitle={traduire("Structure de l\'université : ajoutez, renommez ou désactivez une direction et ses services")}
+        subtitle={traduire("Structure de l'université : ajoutez, renommez ou désactivez une direction et ses services")}
       />
 
       <div className="flex flex-wrap items-center gap-2 mb-4">

@@ -7,6 +7,7 @@ import { TYPES_CONGE, JUSTIFICATIF_OBLIGATOIRE, STATUS_LABELS } from '../../cons
 import { SkeletonText } from '../../components/ui';
 import SelectMenu from '../../components/ui/SelectMenu';
 import { traduire } from '../../i18n';
+import DateInput from '../../components/ui/DateInput';
 
 function formatJours(n) {
   if (n === null || n === undefined) return '—';
@@ -59,7 +60,16 @@ export default function Conges() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    Promise.all([getMyPersonnel(), getMyDemandes(), getSoldeConges()])
+      .then(([p, d, s]) => {
+        setPersonnel(p);
+        setDemandes(d);
+        setSolde(s);
+      })
+      .catch((err) => setFeedback(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   function resetForm() {
     setDateDebut(''); setDateFin(''); setMotif('');
@@ -175,7 +185,7 @@ export default function Conges() {
               )}
               {JUSTIFICATIF_OBLIGATOIRE.includes(typeConge) && (
                 <p className="text-xs text-status-pending mt-1">
-                  {traduire("Un justificatif sera demandé à l\'étape suivante pour ce type de congé.")}
+                  {traduire("Un justificatif sera demandé à l'étape suivante pour ce type de congé.")}
                 </p>
               )}
             </div>
@@ -183,16 +193,16 @@ export default function Conges() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Date de début')}</label>
-                <input
-                  type="date" required value={dateDebut}
+                <DateInput
+                   required value={dateDebut}
                   onChange={(e) => setDateDebut(e.target.value)}
                   className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Date de fin')}</label>
-                <input
-                  type="date" required value={dateFin}
+                <DateInput
+                   required value={dateFin}
                   onChange={(e) => setDateFin(e.target.value)}
                   className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
                 />
@@ -211,8 +221,8 @@ export default function Conges() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{traduire('Date de reprise de service')}</label>
-              <input
-                type="date" value={dateRepriseService}
+              <DateInput
+                 value={dateRepriseService}
                 onChange={(e) => setDateRepriseService(e.target.value)}
                 className="w-full border border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-navy"
               />
@@ -294,7 +304,7 @@ export default function Conges() {
         <h3 className="font-semibold text-navy dark:text-gold mb-4">{traduire('Mes demandes')}</h3>
         {loading && <SkeletonText lines={4} />}
         {!loading && demandes.length === 0 && (
-          <p className="text-gray-400 dark:text-gray-500 text-sm">{traduire("Aucune demande pour l\'instant.")}</p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm">{traduire("Aucune demande pour l'instant.")}</p>
         )}
         <div className="space-y-3">
           {demandes.map((d) => (
@@ -309,7 +319,7 @@ export default function Conges() {
                 Du {new Date(d.date_debut).toLocaleDateString('fr-FR')} au {new Date(d.date_fin).toLocaleDateString('fr-FR')}
               </p>
               {d.decision_intermediaire === 'en_attente' && (
-                <p className="text-xs text-status-pending mt-1">{traduire("En attente de l\'avis du responsable direct")}</p>
+                <p className="text-xs text-status-pending mt-1">{traduire("En attente de l'avis du responsable direct")}</p>
               )}
               {d.lieu_jouissance && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{traduire('Lieu :')} {d.lieu_jouissance}</p>}
               {d.avis_chef_service && (

@@ -23,11 +23,8 @@ export default function GestionFonctions() {
   const selectedUser = users.find((u) => u.id === Number(selectedUserId));
 
   useEffect(() => {
-    if (selectedUserId) {
-      getFonctionHistory(selectedUserId).then(setHistory).catch(() => setHistory([]));
-    } else {
-      setHistory([]);
-    }
+    if (!selectedUserId) return;
+    getFonctionHistory(selectedUserId).then(setHistory).catch(() => setHistory([]));
   }, [selectedUserId]);
 
   async function handleSubmit(e) {
@@ -67,7 +64,7 @@ export default function GestionFonctions() {
               required
               items={users}
               value={selectedUserId}
-              onChange={(id) => { setSelectedUserId(id); setNewFonction(''); }}
+              onChange={(id) => { setSelectedUserId(id); setNewFonction(''); if (!id) setHistory([]); }}
               formatOption={(u) => `${u.matricule ? `${u.matricule} — ` : ''}${[u.prenom, u.nom].filter(Boolean).join(' ') || u.email} (${u.fonction || 'aucune fonction'})`}
               formatLabel={(u) => `${u.matricule ? `${u.matricule} — ` : ''}${[u.prenom, u.nom].filter(Boolean).join(' ') || u.email}`}
             />

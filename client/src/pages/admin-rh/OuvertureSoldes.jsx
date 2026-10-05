@@ -4,6 +4,7 @@ import { getSuiviConges, saisirOuvertureConges } from '../../services/congeApi';
 import { generateDocument } from '../../services/documentApi';
 import PersonnelSearchSelect from '../../components/PersonnelSearchSelect';
 import { traduire } from '../../i18n';
+import DateInput from '../../components/ui/DateInput';
 
 const nouvelleLigne = () => ({ annee: '', libellePeriode: '', droit: '', reference: '', conges: [] });
 const nouveauConge = () => ({ dateDebut: '', dateFin: '', jours: '', lieuJouissance: '' });
@@ -68,7 +69,7 @@ export default function OuvertureSoldes() {
     setFeedback(null);
     try {
       await saisirOuvertureConges(selectedId, { lignes, remplacerSoldeOuverture: remplacer });
-      setFeedback({ type: 'success', text: traduire("Soldes d\'ouverture enregistrés.") });
+      setFeedback({ type: 'success', text: traduire("Soldes d'ouverture enregistrés.") });
       setLignes([nouvelleLigne()]);
       setRemplacer(false);
       await charger(selectedId);
@@ -99,7 +100,7 @@ export default function OuvertureSoldes() {
         <div className="mt-4 text-sm">
           <p className="text-navy dark:text-gray-100">{traduire('Solde enregistré :')}<strong>{nombre(suivi.soldeEnregistre)} {'jour(s)'}</strong></p>
           {suivi.soldeOuvertureNonVentile !== 0 && (
-            <p className="text-xs text-status-pending mt-1">{traduire('Dont')} {nombre(suivi.soldeOuvertureNonVentile)} {traduire("jour(s) de solde d\'ouverture non ventilé par année.")}</p>
+            <p className="text-xs text-status-pending mt-1">{traduire('Dont')} {nombre(suivi.soldeOuvertureNonVentile)} {traduire("jour(s) de solde d'ouverture non ventilé par année.")}</p>
           )}
           {suivi.historiques?.length > 0 && (
             <div className="mt-3">
@@ -147,8 +148,8 @@ export default function OuvertureSoldes() {
               </div>
               {l.conges.map((c, j) => (
                 <div key={j} className="grid grid-cols-2 sm:grid-cols-5 gap-2 items-center">
-                  <input className={champ} type="date" aria-label={traduire('Début du congé pris')} required value={c.dateDebut} onChange={(e) => majConge(i, j, { dateDebut: e.target.value })} />
-                  <input className={champ} type="date" aria-label={traduire('Fin du congé pris')} required value={c.dateFin} onChange={(e) => majConge(i, j, { dateFin: e.target.value })} />
+                  <DateInput className={champ}  aria-label={traduire('Début du congé pris')} required value={c.dateDebut} onChange={(e) => majConge(i, j, { dateDebut: e.target.value })} />
+                  <DateInput className={champ}  aria-label={traduire('Fin du congé pris')} required value={c.dateFin} onChange={(e) => majConge(i, j, { dateFin: e.target.value })} />
                   <input className={champ} type="number" step="0.5" min="0.5" placeholder={traduire('Jours (auto)')} aria-label={traduire('Jours pris')} value={c.jours} onChange={(e) => majConge(i, j, { jours: e.target.value })} />
                   <input className={champ} type="text" maxLength={150} placeholder={traduire('Lieu de jouissance')} aria-label={traduire('Lieu de jouissance')} value={c.lieuJouissance} onChange={(e) => majConge(i, j, { lieuJouissance: e.target.value })} />
                   <button type="button" className="text-xs text-gray-400 dark:text-gray-500 hover:text-status-rejected text-left" onClick={() => majLigne(i, { conges: l.conges.filter((_, k) => k !== j) })}>{traduire('Retirer ce congé')}</button>
@@ -156,7 +157,7 @@ export default function OuvertureSoldes() {
               ))}
               <div className="flex gap-4 text-xs">
                 <button type="button" className="text-navy dark:text-gold underline" onClick={() => majLigne(i, { conges: [...l.conges, nouveauConge()] })}>{traduire('+ Congé pris')}</button>
-                {lignes.length > 1 && <button type="button" className="text-gray-400 dark:text-gray-500 hover:text-status-rejected" onClick={() => setLignes((prev) => prev.filter((_, k) => k !== i))}>{traduire("Supprimer l\'année")}</button>}
+                {lignes.length > 1 && <button type="button" className="text-gray-400 dark:text-gray-500 hover:text-status-rejected" onClick={() => setLignes((prev) => prev.filter((_, k) => k !== i))}>{traduire("Supprimer l'année")}</button>}
               </div>
             </div>
           ))}
@@ -170,7 +171,7 @@ export default function OuvertureSoldes() {
           )}
 
           <button type="submit" disabled={saving} className="bg-navy text-white rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50">
-            {saving ? 'Enregistrement…' : traduire("Enregistrer les soldes d\'ouverture")}
+            {saving ? 'Enregistrement…' : traduire("Enregistrer les soldes d'ouverture")}
           </button>
         </form>
       )}

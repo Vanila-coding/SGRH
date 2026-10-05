@@ -19,6 +19,7 @@ function uploadProfilePhoto(req, res, next) {
 const router = express.Router();
 
 router.get('/me', requireAuth, requirePermission('view_profil'), personnelController.me);
+router.get('/me/dossier.pdf', requireAuth, requirePermission('view_profil'), personnelController.monDossierPdf);
 router.patch('/me/photo', requireAuth, requirePermission('view_profil'), uploadProfilePhoto, personnelController.updatePhoto);
 router.get('/mon-equipe', requireAuth, personnelController.monEquipe);
 router.post('/', requireAuth, requirePermission('create_personnel'), personnelController.create);
@@ -28,6 +29,7 @@ router.post('/import', requireAuth, requirePermission('create_personnel'), uploa
 router.get('/', requireAuth, requirePermission('view_personnel'), personnelController.list);
 router.get('/sans-compte', requireAuth, requirePermission('send_registration_link'), personnelController.listWithoutAccount);
 // Déclarée après les routes GET fixes (/me, /mon-equipe, /export, /sans-compte) : sinon ":id" les capterait.
+router.get('/:id/dossier.pdf', requireAuth, requirePermission('view_personnel'), personnelController.dossierPdf);
 router.get('/:id', requireAuth, requirePermission('view_personnel'), personnelController.getOne);
 router.post('/:id/envoyer-lien', requireAuth, requirePermission('send_registration_link'), personnelController.sendRegistrationLink);
 router.patch('/me', requireAuth, requirePermission('modifier_mes_infos'), personnelController.updateMesInfos);

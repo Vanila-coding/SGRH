@@ -181,7 +181,7 @@ export default function Register() {
             <div className="text-center">
               <p className="text-status-approved font-medium mb-2">{traduire('Compte créé avec succès')}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {traduire("Votre compte est en attente de validation par l\'administration RH.")}
+                {traduire("Votre compte est en attente de validation par l'administration RH.")}
               </p>
             </div>
           )}

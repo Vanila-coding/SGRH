@@ -111,6 +111,11 @@ export function exportPersonnelExcel(role) {
   return telechargerFichier(`/personnel/export${query}`, role ? `personnel-${role}.xlsx` : 'personnel.xlsx', "Échec de l'export");
 }
 
+export function telechargerDossierPdf(personnelId) {
+  const chemin = personnelId ? `/personnel/${personnelId}/dossier.pdf` : '/personnel/me/dossier.pdf';
+  return telechargerFichier(chemin, 'dossier.pdf', 'Échec du téléchargement du dossier');
+}
+
 export function telechargerModeleImport(role) {
   return telechargerFichier(`/personnel/import/modele?role=${role}`, `modele-import-personnel-${role}.xlsx`, 'Échec du téléchargement du modèle');
 }

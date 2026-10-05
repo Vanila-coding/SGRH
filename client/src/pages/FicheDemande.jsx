@@ -55,7 +55,7 @@ function AvisChefService({ demande }) {
   if (demande.decision_intermediaire === 'approuvee' && demande.avis_qr) {
     return (
       <div>
-        <img src={demande.avis_qr.dataUrl} alt={traduire("QR code de vérification de l\'avis du chef de service")} className="w-28 h-28" />
+        <img src={demande.avis_qr.dataUrl} alt={traduire("QR code de vérification de l'avis du chef de service")} className="w-28 h-28" />
         <p className="mt-1 font-semibold">{traduire('Avis favorable')}</p>
         <p className="text-xs">
           {[demande.validateur_prenom, demande.validateur_nom].filter(Boolean).join(' ')}
@@ -63,7 +63,7 @@ function AvisChefService({ demande }) {
           {demande.decision_intermediaire_le ? ` — le ${fmt(demande.decision_intermediaire_le)}` : ''}
         </p>
         {demande.avis_chef_service && <p className="text-xs mt-1">{demande.avis_chef_service}</p>}
-        <p className="text-[10px] text-gray-500 mt-1 print:text-gray-600">{traduire("Scanner le QR code pour vérifier l\'authenticité de cet avis.")}</p>
+        <p className="text-[10px] text-gray-500 mt-1 print:text-gray-600">{traduire("Scanner le QR code pour vérifier l'authenticité de cet avis.")}</p>
       </div>
     );
   }
@@ -75,7 +75,7 @@ function AvisChefService({ demande }) {
       </div>
     );
   }
-  if (demande.decision_intermediaire === 'en_attente') return <p>{traduire("En attente de l\'avis du chef de service.")}</p>;
+  if (demande.decision_intermediaire === 'en_attente') return <p>{traduire("En attente de l'avis du chef de service.")}</p>;
   return <p>{traduire('Aucun chef de service désigné : demande transmise directement au Service du Personnel.')}</p>;
 }
 
@@ -93,7 +93,7 @@ export default function FicheDemande() {
   if (!demande) {
     return (
       <div className="min-h-screen bg-gray-100 py-8">
-        <div className="max-w-2xl mx-auto bg-white p-10 shadow" role="status" aria-label={traduire('Chargement de la demande')}>
+        <div className="max-w-2xl mx-auto bg-white text-slate-800 p-10 shadow" role="status" aria-label={traduire('Chargement de la demande')}>
           <Skeleton className="h-3 w-2/3 rounded mx-auto mb-2" />
           <Skeleton className="h-3 w-1/2 rounded mx-auto mb-6" />
           <Skeleton className="h-5 w-1/3 rounded mx-auto mb-8" />
@@ -104,8 +104,15 @@ export default function FicheDemande() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 print:bg-white print:py-0">
-      <div className="max-w-2xl mx-auto bg-white p-10 shadow print:shadow-none">
+    <div className="min-h-screen bg-gray-100 py-8 print:bg-white print:py-0 print:pt-24 print:pb-16">
+      <div className="hidden print:block fixed top-4 left-6">
+        <img src="/logo-univ-mahajanga.png" alt="Université de Mahajanga" className="h-14 w-14 object-contain" />
+      </div>
+      <div className="hidden print:flex fixed bottom-3 left-6 right-6 items-center justify-between text-[9px] text-gray-500">
+        <span className="flex items-center gap-1.5"><img src="/logo-um-hr.png" alt="UM-HR" className="h-4 w-auto" />Conçu et développé par JAOSOA Tanaël Faustin</span>
+        <span>UM-HR</span>
+      </div>
+      <div className="max-w-2xl mx-auto bg-white text-slate-800 p-10 shadow print:shadow-none">
         <div className="flex justify-end mb-6 print:hidden">
           <button
             onClick={() => window.print()}
@@ -116,9 +123,9 @@ export default function FicheDemande() {
         </div>
 
         <div className="text-center mb-6">
-          <p className="text-xs">{traduire("REPOBLIKAN\'I MADAGASIKARA")}</p>
+          <p className="text-xs">{traduire("REPOBLIKAN'I MADAGASIKARA")}</p>
           <p className="text-xs italic">{traduire('Fitiavana - Tanindrazana - Fandrosoana')}</p>
-          <p className="text-sm font-semibold mt-2">{traduire("MINISTÈRE DE L\'ENSEIGNEMENT SUPÉRIEUR ET DE LA RECHERCHE SCIENTIFIQUE")}</p>
+          <p className="text-sm font-semibold mt-2">{traduire("MINISTÈRE DE L'ENSEIGNEMENT SUPÉRIEUR ET DE LA RECHERCHE SCIENTIFIQUE")}</p>
           <p className="text-sm font-semibold">{traduire('UNIVERSITÉ DE MAHAJANGA')}</p>
           {(demande.service || demande.direction) && <p className="text-xs mt-1">{demande.service || demande.direction}</p>}
         </div>
@@ -153,7 +160,7 @@ export default function FicheDemande() {
           </div>
           <div className="text-right">
             <p>Mahajanga, le {fmt(demande.created_at)}</p>
-            <p className="mt-8">{traduire("L\'intéressé")}</p>
+            <p className="mt-8">{traduire("L'intéressé")}</p>
             <p className="mt-6">{demande.prenom} {demande.nom}</p>
           </div>
         </div>

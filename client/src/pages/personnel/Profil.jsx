@@ -14,6 +14,8 @@ import { present, toInputDate } from '../../utils/dossier';
 import { Skeleton, SkeletonAvatar, SkeletonText } from '../../components/ui';
 import SelectMenu from '../../components/ui/SelectMenu';
 import { traduire } from '../../i18n';
+import BoutonDossierPdf from '../../components/personnel/BoutonDossierPdf';
+import DateInput from '../../components/ui/DateInput';
 
 const SITUATIONS_FAMILIALES = ['Célibataire', 'Marié(e)', 'Divorcé(e)', 'Veuf/Veuve'];
 const SEXES = ['Masculin', 'Féminin'];
@@ -85,7 +87,7 @@ export default function Profil() {
       return;
     }
     if (file.size > 3 * 1024 * 1024) {
-      setError(traduire("L\'image ne doit pas dépasser 3 Mo."));
+      setError(traduire("L'image ne doit pas dépasser 3 Mo."));
       event.target.value = '';
       return;
     }
@@ -197,6 +199,7 @@ export default function Profil() {
         crumbs={[{ label: traduire('Mon espace'), path: '/dashboard' }, { label: traduire('Mon dossier') }]}
         title={traduire('Mon dossier')}
         subtitle={traduire('Informations personnelles et administratives')}
+        actions={<BoutonDossierPdf />}
       />
 
       <div className="overflow-hidden rounded-2xl bg-navy shadow-sm">
@@ -286,8 +289,8 @@ export default function Profil() {
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">{traduire('Date de naissance')}</label>
-                <input
-                  type="date" value={formDateNaissance} onChange={(e) => setFormDateNaissance(e.target.value)}
+                <DateInput
+                   value={formDateNaissance} onChange={(e) => setFormDateNaissance(e.target.value)}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                 />
               </div>
@@ -307,8 +310,8 @@ export default function Profil() {
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-gray-400">{traduire('Date de prise de fonction')}</label>
-                <input
-                  type="date" value={formDatePriseFonction} onChange={(e) => setFormDatePriseFonction(e.target.value)}
+                <DateInput
+                   value={formDatePriseFonction} onChange={(e) => setFormDatePriseFonction(e.target.value)}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                 />
               </div>

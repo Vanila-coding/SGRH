@@ -19,16 +19,11 @@ export default function NotificationsPage() {
   const [filter, setFilter] = useState('toutes'); // 'toutes' | 'non_lues' | 'lues'
   const navigate = useNavigate();
 
-  async function load() {
-    setLoading(true);
-    try {
-      setNotifications(await getMyNotifications());
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    getMyNotifications()
+      .then(setNotifications)
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleRead(id) {
     await markNotificationAsRead(id);

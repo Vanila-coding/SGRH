@@ -26,18 +26,12 @@ export default function DemandesDocumentsSecretariat() {
     return demandes.filter((d) => `${d.matricule || ''} ${d.prenom || ''} ${d.nom || ''}`.toLowerCase().includes(q));
   }, [demandes, search]);
 
-  async function load() {
-    setLoading(true);
-    try {
-      setDemandes(await getDemandesEnAttenteSecretariat());
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    getDemandesEnAttenteSecretariat()
+      .then(setDemandes)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleReview(id, decision) {
     if (decision === 'refusee' && !(avisMap[id] || '').trim()) {

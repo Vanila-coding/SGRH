@@ -39,7 +39,15 @@ export default function DocumentsAdmin() {
     }
   }
 
-  useEffect(() => { loadHistorique(selectedId); }, [selectedId]);
+  useEffect(() => {
+    if (!selectedId) return;
+    getHistoriquePersonnel(selectedId).then(setHistorique).catch(() => setHistorique([]));
+  }, [selectedId]);
+
+  function choisirPersonne(id) {
+    setSelectedId(id);
+    if (!id) setHistorique([]);
+  }
 
   async function handleGenerate(e) {
     e.preventDefault();
@@ -71,7 +79,7 @@ export default function DocumentsAdmin() {
             required
             items={personnelList}
             value={selectedId}
-            onChange={setSelectedId}
+            onChange={choisirPersonne}
             className="col-span-2"
           />
           )}

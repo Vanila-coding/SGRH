@@ -147,7 +147,7 @@ async function calculerReclassementIndiciaire(personnelId, dateEffet) {
   // "indice immédiatement supérieur du cadre/échelle immédiatement supérieur", ce
   // qui suppose le classement cadre/échelle complet non disponible ici (voir README).
   if (personnel.cadre === 'A' && personnel.echelle === 'A1') {
-    const majoration = Math.min(500, 100); // une seule majoration par déclenchement ; répétable tous les 2 ans (cf. Art.3)
+    const majoration = 100; // une seule majoration par déclenchement ; répétable tous les 2 ans (cf. Art.3), plafond 500
     return {
       type: 'MAJORATION_INDICE_CADRE_A1',
       majoration,

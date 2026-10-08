@@ -87,7 +87,7 @@ Chaque page affiche un en-tête cohérent via le composant réutilisable `PageHe
 
 | Zone | Pages principales |
 | --- | --- |
-| Publique | Connexion, inscription, OTP, mot de passe oublié et réinitialisation. |
+| Publique | Accueil, à propos, contact, FAQ/aide, connexion, inscription, OTP, mot de passe oublié et réinitialisation. |
 | Admin RH | Tableau de bord, personnel, carrière (fonctions, paramètres carrière **+ grilles indiciaires**), **contrats**, congés & absences, documents (administratifs, demandes), utilisateurs & comptes (invitations, comptes en attente), envoyer une notification, audit & journal. |
 | Superadmin | Gestion des comptes, corbeille, rôles & permissions, apparence. |
 | Personnel | Tableau de bord, mon dossier, ma carrière, **mes contrats**, mes congés & absences, mes documents, mon équipe / validation équipe (chefs de service), aide. |
@@ -117,6 +117,10 @@ La personne peut remplacer sa photo depuis ce dossier. L'image est prévisualis�
 ### Contrats
 
 Deux pages distinctes, séparées de la carrière : `/mes-contrats` (personnel, lecture seule) et `/admin/contrats` (RH, gestion complète — import, décision, renouvellement, avenants). La page RH accepte un paramètre `?personnel=<id>` pour présélectionner un employé, utilisé par les liens de notification d'échéance. Les PDF de contrat sont stockés hors de `express.static`, dans `server/private-uploads/contrats/` (ignoré par Git, à ajouter explicitement si absent), sous un nom UUID non prédictible ; leur téléchargement passe par une route authentifiée qui vérifie que le demandeur est le propriétaire du contrat ou un `ADMIN_RH`.
+
+### Pages publiques avant connexion
+
+`App.jsx` route `/` vers `Accueil.jsx` (au lieu de rediriger directement vers `/login`), ainsi que `/a-propos`, `/contact` et `/faq` ; le chemin générique (`*`) redirige désormais vers `/` plutôt que `/login`. Ces quatre pages partagent un en-tête commun (`components/layout/PublicHeader.jsx` : logo, nav, sélecteur FR/EN, bouton « Se connecter ») et le `Footer` existant — `Login.jsx` et `Register.jsx` ne sont pas modifiés. Les textes passent par `useText` (catégories `Accueil`, `À propos`, `Contact`), donc éditables depuis Personnalisation comme le reste du site. La FAQ (`Faq.jsx`) décrit le parcours réel d'inscription et de réinitialisation du mot de passe (pas un contenu générique), en accordéon filtrable par catégorie (Inscription / Mot de passe). Trois illustrations décoratives (`client/public/illustrations/*.svg`, licence libre unDraw, non attribuée) accompagnent l'accueil, l'à propos et le contact, masquées sous `lg` pour ne pas alourdir le mobile.
 
 ### Identité visuelle
 

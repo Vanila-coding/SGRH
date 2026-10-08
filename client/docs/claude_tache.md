@@ -746,6 +746,18 @@ Incident maîtrisé : un script de test a cliqué le bouton « Générer la déc
 - **Permissions** : `manage_accounts` reste réservé au superadministrateur (décision RH).
 - **Reste à faire** : enregistrer la catégorie grille sur la fiche (migration, en attente de validation) et confirmer la correspondance CAT → I–X ; fournir les grilles EFA et ELD ; jouer le parcours complet du circuit secrétariat dans le navigateur.
 
+## Bilan 2026-10-09 — pages publiques avant connexion
+
+- **Accueil, À propos, Contact, FAQ** (`Accueil.jsx`, `APropos.jsx`, `Contact.jsx`, `Faq.jsx`) : la route `/` affiche désormais une vraie page d'accueil publique (au lieu de rediriger directement vers `/login`) ; `*` redirige vers `/` au lieu de `/login`. **`Login.jsx` et `Register.jsx` n'ont pas été modifiés**, conformément à la demande explicite. Les quatre pages partagent `components/layout/PublicHeader.jsx` (logo, nav, FR/EN, bouton « Se connecter ») et le `Footer` existant.
+- **Contenu réel, pas inventé** : les fonctionnalités mises en avant (dossier, congés, documents avec QR, notifications) et les questions de la FAQ correspondent au parcours effectivement codé (vérifié dans `Register.jsx` — email + code à 4 chiffres + matricule — et `MotDePasseOublie.jsx`). Contact réutilise les mêmes clés `institution.*` que `Footer.jsx` (une seule saisie côté Personnalisation, affichée partout).
+- **Textes éditables** : tous les textes de ces pages passent par `useText` (catégories `Accueil`, `À propos`, `Contact`), donc modifiables depuis Superadmin → Personnalisation sans toucher au code, comme le reste du site.
+- **Illustrations** : trois SVG décoratifs d'unDraw.co (licence libre, usage commercial autorisé, aucune attribution requise — vérifié sur `undraw.co/license`), choisis pour représenter des fonctionnalités réelles (liste de personnel + droits par ligne pour l'accueil, page d'équipe pour à propos, contact/localisation pour contact), stockés dans `client/public/illustrations/`, masqués sous `lg` pour ne jamais risquer de régression mobile.
+- **Analyse de référence** : le portail `augure.mef.gov.mg` (AUGURE/Compte Agent, le SIRH national malgache) a été étudié (capture via Chrome headless, le site a un certificat SSL invalide) pour sa structure de page publique avant connexion ; seule l'architecture (accueil/à propos/contact/FAQ) a inspiré nos pages, aucun contenu n'a été copié.
+- **Documentation conception** (hors périmètre applicatif, pour le mémoire) : `docs/conception/06_modele_physique_donnees.md` (MPD, 13 tables cœur de métier, généré par introspection de la base réelle) et `07_cas_utilisation.md` (diagramme de cas d'utilisation des 6 rôles réels, généré depuis `03_matrice_roles_permissions.md`, image dans `docs/conception/assets/`).
+- **Piège technique rencontré** : un `ImageRun` docx-js dans un `Paragraph` portant une prop `spacing` s'affiche blanc dans un export PDF LibreOffice (image bien présente dans le fichier, juste invisible au rendu) — contournement : ne jamais mettre `spacing` sur le paragraphe contenant l'image, utiliser un paragraphe vide séparé si besoin d'espacement. Noté en mémoire (`feedback_docx_image_spacing_bug`).
+- **Tests** : lint client 0 erreur, build client OK à chaque étape. Pas de nouveau test automatisé (pages statiques, sans logique métier).
+- **Non commité à part** : `docs/memoire/*.docx` (livrables Word du mémoire) et `Grille_indiciaire_fonction_publique_Madagascar.xlsx` restent hors du suivi Git du projet, comme convenu précédemment.
+
 ## 🎯 Les 10 prochaines tâches prioritaires
 
 Si tu veux simplement savoir **quoi attaquer maintenant**, je mettrais :

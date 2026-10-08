@@ -8,6 +8,10 @@ import { SiteSettingsProvider } from './context/SiteSettingsProvider';
 import { SettingsPreferencesProvider } from './context/SettingsPreferencesProvider';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/layout/AppShell';
+import Accueil from './pages/Accueil';
+import APropos from './pages/APropos';
+import Contact from './pages/Contact';
+import Faq from './pages/Faq';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MotDePasseOublie from './pages/MotDePasseOublie';
@@ -75,6 +79,10 @@ function App() {
           <AuthProvider>
             <PermissionProvider>
               <Routes>
+                <Route path="/" element={<Accueil />} />
+                <Route path="/a-propos" element={<APropos />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/faq" element={<Faq />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
@@ -293,7 +301,7 @@ function App() {
                   </ProtectedRoute>
                 } />
 
-                <Route path="*" element={<Navigate to="/login" replace />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </PermissionProvider>
           </AuthProvider>

@@ -1,7 +1,7 @@
 import { ShieldCheck, QrCode, Clock, MapPinOff, ListChecks } from 'lucide-react';
 import { useText } from '../context/TextContext';
 import PublicHeader from '../components/layout/PublicHeader';
-import Footer from '../components/layout/Footer';
+import PublicFooter from '../components/layout/PublicFooter';
 import { traduire } from '../i18n';
 
 const POINTS_BREF = [
@@ -76,7 +76,7 @@ export default function APropos() {
       </section>
 
       <div className="mt-auto">
-        <Footer />
+        <PublicFooter />
       </div>
     </div>
   );

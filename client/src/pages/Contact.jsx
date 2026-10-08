@@ -1,7 +1,7 @@
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { useText } from '../context/TextContext';
 import PublicHeader from '../components/layout/PublicHeader';
-import Footer from '../components/layout/Footer';
+import PublicFooter from '../components/layout/PublicFooter';
 import { traduire } from '../i18n';
 
 // Reprend volontairement les mêmes clés que Footer.jsx (groupe « Institution ») : les
@@ -59,7 +59,7 @@ export default function Contact() {
         />
       </section>
 
-      <Footer />
+      <PublicFooter />
     </div>
   );
 }

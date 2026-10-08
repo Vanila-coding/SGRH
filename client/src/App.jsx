@@ -12,6 +12,7 @@ import Accueil from './pages/Accueil';
 import APropos from './pages/APropos';
 import Contact from './pages/Contact';
 import Faq from './pages/Faq';
+import MentionsLegales from './pages/MentionsLegales';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MotDePasseOublie from './pages/MotDePasseOublie';
@@ -83,6 +84,7 @@ function App() {
                 <Route path="/a-propos" element={<APropos />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/faq" element={<Faq />} />
+                <Route path="/mentions-legales" element={<MentionsLegales />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />

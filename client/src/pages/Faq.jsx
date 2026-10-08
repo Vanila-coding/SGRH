@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import PublicHeader from '../components/layout/PublicHeader';
-import Footer from '../components/layout/Footer';
+import PublicFooter from '../components/layout/PublicFooter';
 import { traduire } from '../i18n';
 
 // Contenu propre à notre parcours réel (inscription par email + code de vérification +
@@ -148,7 +148,7 @@ export default function Faq() {
         </div>
       </section>
 
-      <Footer />
+      <PublicFooter />
     </div>
   );
 }

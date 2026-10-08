@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { LogIn, UserPlus, IdCard, CalendarCheck, FileCheck2, BellRing, ShieldCheck, QrCode, ListChecks } from 'lucide-react';
 import { useText } from '../context/TextContext';
 import PublicHeader from '../components/layout/PublicHeader';
-import Footer from '../components/layout/Footer';
+import PublicFooter from '../components/layout/PublicFooter';
 import { traduire } from '../i18n';
 
 const ICONES_FONCTIONNALITES = [IdCard, CalendarCheck, FileCheck2, BellRing];
@@ -134,7 +134,7 @@ export default function Accueil() {
       </section>
 
       <div className="mt-auto">
-        <Footer />
+        <PublicFooter />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, ExternalLink } from 'lucide-react';
 import { useText } from '../../context/TextContext';
+import EditableText from '../EditableText';
 import { traduire } from '../../i18n';
 
 // Pied de page des pages publiques (Accueil, À propos, Contact, FAQ) uniquement : un
@@ -23,9 +24,9 @@ export default function PublicFooter() {
   const siteMesupres = useText('footer.lien_mesupres', 'https://mesupres.mg', 'Footer');
 
   const coordonnees = [
-    { icon: MapPin, valeur: adresse },
-    { icon: Phone, valeur: telephone },
-    { icon: Mail, valeur: email },
+    { icon: MapPin, valeur: adresse, textKey: 'institution.adresse' },
+    { icon: Phone, valeur: telephone, textKey: 'institution.telephone' },
+    { icon: Mail, valeur: email, textKey: 'institution.email' },
   ].filter((c) => c.valeur);
 
   const liensInstitutionnels = [
@@ -38,16 +39,22 @@ export default function PublicFooter() {
       <div className="mx-auto max-w-[1600px] px-4 sm:px-8 py-10">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8">
           <div>
-            <p className="font-semibold text-navy dark:text-gold mb-1">{traduire(nomInstitution)}</p>
-            {description && <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">{traduire(description)}</p>}
+            <p className="font-semibold text-navy dark:text-gold mb-1">
+              <EditableText value={traduire(nomInstitution)} textKey="institution.nom" />
+            </p>
+            {description && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
+                <EditableText value={traduire(description)} textKey="footer.description" multiline />
+              </p>
+            )}
           </div>
 
           {coordonnees.length > 0 && (
             <div className="space-y-1.5">
-              {coordonnees.map(({ icon: Icon, valeur }) => (
-                <div key={valeur} className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+              {coordonnees.map(({ icon: Icon, valeur, textKey }) => (
+                <div key={textKey} className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                   <Icon size={15} className="text-navy dark:text-gold shrink-0" />
-                  <span>{valeur}</span>
+                  <span><EditableText value={valeur} textKey={textKey} /></span>
                 </div>
               ))}
             </div>
@@ -56,8 +63,12 @@ export default function PublicFooter() {
 
         <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p className="text-xs text-gray-400 dark:text-gray-500">
-            © {new Date().getFullYear()} {traduire(nomApplication)} — {traduire(copyright)}
-            {developpeur && <span className="text-gray-300 dark:text-gray-600"> {traduire('· Développé par')} {traduire(developpeur)}</span>}
+            © {new Date().getFullYear()} <EditableText value={traduire(nomApplication)} textKey="footer.nom_application" /> — <EditableText value={traduire(copyright)} textKey="footer.copyright" />
+            {developpeur && (
+              <span className="text-gray-300 dark:text-gray-600">
+                {' '}{traduire('· Développé par')} <EditableText value={traduire(developpeur)} textKey="footer.developpeur" />
+              </span>
+            )}
           </p>
 
           <nav className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">

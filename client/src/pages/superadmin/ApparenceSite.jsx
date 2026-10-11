@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getAllTexts, updateText } from '../../services/siteTextsApi';
 import { updateSiteSetting, resetSiteColors, uploadLogo, uploadFavicon, uploadLogoConnexion } from '../../services/siteSettingsAdminApi';
 import { useTextContext } from '../../context/TextContext';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
+import { useEditMode } from '../../context/EditModeContext';
 import PageHeader from '../../components/PageHeader';
 import { toast } from '../../utils/toast';
 import { Skeleton } from '../../components/ui/Skeleton';
-import { ConfirmDialog } from '../../components/ui';
-import { Moon, RotateCcw } from 'lucide-react';
+import { ConfirmDialog, Button } from '../../components/ui';
+import { Moon, RotateCcw, PenLine } from 'lucide-react';
 import { urlFichierSite } from '../../utils/siteAssets';
 import { traduire } from '../../i18n';
 
@@ -220,6 +222,13 @@ export default function ApparenceSite() {
   const [resetting, setResetting] = useState(false);
   const { reload: reloadSettings, settings } = useSiteSettings();
   const { loaded: textsLoaded } = useTextContext();
+  const { setEditMode } = useEditMode();
+  const navigate = useNavigate();
+
+  function handleModifierAccueil() {
+    setEditMode(true);
+    navigate('/');
+  }
 
   useEffect(() => {
     Promise.all([
@@ -287,6 +296,20 @@ export default function ApparenceSite() {
   return (
     <div className="mx-auto max-w-[1600px]">
       <PageHeader crumbs={[{ label: traduire('Administration') }, { label: traduire('Personnalisation') }]} title={traduire('Personnalisation')} subtitle={traduire('Apparence, contenu et informations institutionnelles du site')} />
+
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6 flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{traduire("Page d'accueil du site")}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            {traduire('Modifiez directement les textes depuis la page elle-même (accueil, à propos, contact, FAQ, mentions légales).')}
+          </p>
+        </div>
+        <Button variant="primary" onClick={handleModifierAccueil}>
+          <PenLine size={15} />
+          {traduire("Modifier la page d'accueil")}
+        </Button>
+      </div>
+
       <div className="flex flex-wrap gap-2 mb-6">
         {[
           ['apparence', 'Apparence'],

@@ -6,6 +6,7 @@ import { PermissionProvider } from './context/PermissionProvider';
 import { TextProvider } from './context/TextProvider';
 import { SiteSettingsProvider } from './context/SiteSettingsProvider';
 import { SettingsPreferencesProvider } from './context/SettingsPreferencesProvider';
+import { EditModeProvider } from './context/EditModeProvider';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/layout/AppShell';
 import Accueil from './pages/Accueil';
@@ -79,6 +80,7 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <PermissionProvider>
+            <EditModeProvider>
               <Routes>
                 <Route path="/" element={<Accueil />} />
                 <Route path="/a-propos" element={<APropos />} />
@@ -305,6 +307,7 @@ function App() {
 
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
+            </EditModeProvider>
             </PermissionProvider>
           </AuthProvider>
         </BrowserRouter>

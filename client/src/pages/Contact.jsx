@@ -2,6 +2,7 @@ import { Phone, Mail, MapPin } from 'lucide-react';
 import { useText } from '../context/TextContext';
 import PublicHeader from '../components/layout/PublicHeader';
 import PublicFooter from '../components/layout/PublicFooter';
+import EditableText from '../components/EditableText';
 import { traduire } from '../i18n';
 
 // Reprend volontairement les mêmes clés que Footer.jsx (groupe « Institution ») : les
@@ -19,9 +20,9 @@ export default function Contact() {
   );
 
   const coordonnees = [
-    { icon: MapPin, valeur: adresse },
-    { icon: Phone, valeur: telephone },
-    { icon: Mail, valeur: email },
+    { icon: MapPin, valeur: adresse, textKey: 'institution.adresse' },
+    { icon: Phone, valeur: telephone, textKey: 'institution.telephone' },
+    { icon: Mail, valeur: email, textKey: 'institution.email' },
   ].filter((c) => c.valeur);
 
   return (
@@ -31,15 +32,19 @@ export default function Contact() {
       <section className="flex-1 mx-auto max-w-[1600px] w-full px-4 sm:px-8 py-14 sm:py-20 flex items-center gap-12">
         <div className="max-w-xl">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">{traduire('Contact')}</h1>
-          <p className="text-gray-500 dark:text-gray-400 mb-8">{traduire(intro)}</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-8">
+            <EditableText value={traduire(intro)} textKey="contact.intro" multiline />
+          </p>
 
           {coordonnees.length > 0 ? (
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
-              <p className="font-semibold text-navy dark:text-gold">{traduire(nomInstitution)}</p>
-              {coordonnees.map(({ icon: Icon, valeur }) => (
-                <div key={valeur} className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+              <p className="font-semibold text-navy dark:text-gold">
+                <EditableText value={traduire(nomInstitution)} textKey="institution.nom" />
+              </p>
+              {coordonnees.map(({ icon: Icon, valeur, textKey }) => (
+                <div key={textKey} className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
                   <Icon size={17} className="text-navy dark:text-gold shrink-0" />
-                  <span>{valeur}</span>
+                  <span><EditableText value={valeur} textKey={textKey} /></span>
                 </div>
               ))}
             </div>

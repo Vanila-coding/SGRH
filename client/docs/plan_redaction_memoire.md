@@ -134,6 +134,29 @@ Structure enrichie par rapport au plan AQUALMA (qui ne traitait qu'avantages/lim
 
 ---
 
+## Liste des figures et captures attendues
+
+Récapitulatif, dans l'ordre d'apparition, de toutes les images que le mémoire doit contenir — pour éviter d'en oublier et savoir lesquelles sont déjà prêtes.
+
+| # | Figure | Emplacement | Statut |
+| --- | --- | --- | --- |
+| 1 | Logo de l'Université de Mahajanga | Page de garde | ✅ fichier déjà dans le projet (`client/public/logo-univ-mahajanga.png`) |
+| 2 | Schéma du cursus (BACC → L1/L2 → L3 → M1 → M2) | Pages liminaires, « Présentation de l'établissement » | ⚠️ en attente du PDF du stage |
+| 3 | Organigramme général de l'Université de Mahajanga | Chapitre I.1 | ⚠️ en attente du PDF du stage (une version existe déjà sur `mahajanga-univ.mg`, à vérifier si réutilisable) |
+| 4 | Organigramme ou photo du service d'accueil du stage | Chapitre I.2 | ⚠️ en attente du PDF du stage |
+| 5 | Schéma d'architecture logicielle (client React / API Express / PostgreSQL) | Chapitre III.4, juste après le texte sur l'architecture | ✍️ à produire — un schéma à 3 blocs suffit, pas encore fait |
+| 6 | Diagramme de cas d'utilisation (6 acteurs, 12 cas) | Chapitre III.7, **avant** le MCD | ✅ prêt — `docs/conception/assets/cas_utilisation.png` + `docs/memoire/cas_utilisation.docx` |
+| 7 | Modèle conceptuel de données (MCD) | Chapitre III.7, après le diagramme de cas d'utilisation | ✅ prêt — diagramme Mermaid dans `docs/conception/02_modele_donnees_dictionnaire.md` (à exporter en image pour Word) |
+| 8 | Modèle physique de données (MPD) | Chapitre III.7, juste après le MCD | ✅ prêt — `docs/memoire/modele_physique_donnees.docx` (13 tables en boîtes) |
+| 9 | Captures d'écran des interfaces, une par sous-section | Chapitre IV.1 à IV.9 (connexion, tableaux de bord par rôle, personnel, congés, documents, contrats, comptes/permissions, mode sombre) | ✍️ à prendre toi-même dans l'application — liste précise au § VI de `preparation_memoire.md` |
+| 10 | Schéma de déploiement *(optionnel)* | Chapitre V | ✍️ à produire seulement si tu veux l'illustrer |
+| 11 | MCD et MPD en pleine page | Annexes | ✍️ optionnel — mêmes sources que les figures 6 et 7, juste réimprimées plus grandes |
+| 12 | Capture de la matrice de permissions complète | Annexes | ✍️ optionnel — depuis `docs/conception/03_matrice_roles_permissions.md` ou la page Rôles & permissions de l'appli |
+
+**Règle pratique** : les figures ✅ sont prêtes à coller telles quelles dans le `.docx` ; les figures ⚠️ dépendent d'informations que tu dois encore fournir (PDF du stage) ; les figures ✍️ demandent une action simple de ta part (une capture d'écran) ou de la mienne (un schéma à dessiner) le moment venu.
+
+---
+
 ## Pages finales
 
 | Section | Contenu attendu | Statut |
